@@ -41,6 +41,7 @@ interface NavigationItem {
 export default function Navbar({ children }: NavbarProps) {
   const { data: sessionData } = useSession();
   const userId = sessionData?.user.id;
+  const router = useRouter();
 
   const signedInNavigation: NavigationItem[] = [
     {
@@ -124,8 +125,6 @@ export default function Navbar({ children }: NavbarProps) {
 
   const [searchInput, setSearchInput] = useState("");
 
-  const router = useRouter();
-
   const handleSearch = async () => {
     router.push(`/search?q=${searchInput}`);
   };
@@ -135,7 +134,6 @@ export default function Navbar({ children }: NavbarProps) {
       void handleSearch();
     }
   };
-
 
   return (
     <>
@@ -159,7 +157,7 @@ export default function Navbar({ children }: NavbarProps) {
                   <input
                     id="search"
                     name="search"
-                    className="focus:ring-primary block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 "
+                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 "
                     placeholder="Search"
                     type="search"
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -255,7 +253,7 @@ export default function Navbar({ children }: NavbarProps) {
               <div className="flex flex-row space-x-3">
                 <Button
                   className="ml-4"
-                  size='sm'
+                  size="sm"
                   onClick={!sessionData ? () => void signIn() : () => ""}
                 >
                   Log in
