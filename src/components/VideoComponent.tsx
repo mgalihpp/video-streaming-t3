@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Thumbnail } from ".";
 import { cn } from "@/lib/utils";
 import moment from "moment";
+import React, { useState } from "react";
+import { ChevronDown, ChevronUp } from "./Icons/Icons";
+
 interface VideoComponentProps {
   videos: {
     id: string;
@@ -16,6 +19,26 @@ interface VideoComponentProps {
     image: string | null;
   }[];
   refetch?: () => Promise<unknown>;
+}
+
+interface CommentProps {
+  comment: {
+    id: string;
+    message: string | null;
+    createdAt: Date;
+  };
+  user: {
+    id: string | null;
+    name: string | null;
+    image: string | null;
+    handle: string | null;
+  };
+}
+
+interface VideoCommentSectionProps {
+  videoId: string;
+  comments: CommentProps[];
+  refetch: () => Promise<unknown>;
 }
 
 export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
@@ -34,7 +57,7 @@ export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
           <Link
             key={video.id}
             // nanti ganti ini jadi search params /video?watch=videoid
-            href={`/video?watch=${video.id}`}
+            href={`/watch?video=${video.id}`}
             className="flex flex-col items-start justify-between hover:bg-gray-100"
           >
             <div className="relative w-full">
@@ -71,7 +94,7 @@ export const SingleColumnVideo: React.FC<VideoComponentProps> = ({
         return null;
       }
       return (
-        <Link href={`/video?watch=${video.id}`} key={video.id}>
+        <Link href={`/watch?video=${video.id}`} key={video.id}>
           <div className="my-5 flex flex-col gap-4 hover:bg-gray-100 lg:flex-row">
             <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:w-64 lg:shrink-0">
               <Thumbnail thumbnailUrl={video.thumbnailUrl} />
@@ -91,6 +114,41 @@ export const SingleColumnVideo: React.FC<VideoComponentProps> = ({
     })}
   </div>
 );
+
+export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
+  videos,
+  users,
+  refetch,
+}) => {
+  return (
+    <>
+      {videos.map((video, index) => {
+        const user = users[index];
+        if (!user) {
+          return null;
+        }
+        return (
+          <Link
+            href={`/watch?video=${video.id}`}
+            onClick={refetch}
+            key={video.id}
+          >
+            <div className="relative isolate my-4 flex flex-col gap-4 rounded-2xl border hover:bg-gray-100 lg:flex-row">
+              <div className="aspect-[16/9] sm:aspect-[2/1] lg:w-52 lg:shrink-0">
+                <Thumbnail thumbnailUrl={video.thumbnailUrl} />
+              </div>
+              <div className="mt-2 flex w-full flex-col items-start overflow-hidden text-xs max-lg:mx-2">
+                <VideoTitle title={video.title} limitHeight limitSize />
+                <VideoInfo views={video.views} createdAt={video.createdAt} />
+                <VideoUserName name={user.name!} />
+              </div>
+            </div>
+          </Link>
+        );
+      })}
+    </>
+  );
+};
 
 export function VideoTitle({
   title,
@@ -126,8 +184,7 @@ export function VideoInfo({
   return (
     <div className="mt-1 flex max-h-6 items-start overflow-hidden text-sm">
       <p className="text-gray-600">
-        {views}
-        <span>Views</span>
+        {views} <span>Views</span>
       </p>
       <li className="pl-2 text-sm text-gray-500">
         {moment(createdAt).fromNow()}
@@ -160,5 +217,90 @@ export function UserImage({
         fill
       />
     </div>
+  );
+}
+
+export function VideoDescription({
+  text,
+  length,
+  border = false,
+}: {
+  text: string;
+  length: number;
+  border?: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  if (text.length === 0 || text === null) {
+    return null;
+  } else if (text.length < length) {
+    return (
+      <>
+        {border ? <div className="border-b border-gray-200"></div> : null}
+        <p className="my-3 text-left text-sm font-semibold text-gray-600">
+          {text}
+        </p>
+      </>
+    );
+  } else {
+    return (
+      <>
+        {border ? <div className="border-b border-gray-200"></div> : null}
+        <div className="relative w-full">
+          <button
+            onClick={toggleExpand}
+            className="flex flex-row place-content-evenly"
+          >
+            <p
+              className={`text-left text-sm font-semibold text-gray-600 ${
+                !isExpanded ? "line-clamp-2" : ""
+              }`}
+            >
+              {text}
+            </p>
+            <span className="items-end">
+              {isExpanded ? <ChevronUp /> : <ChevronDown />}
+            </span>
+          </button>
+        </div>
+      </>
+    );
+  }
+}
+
+export function VideoCommentSection({
+  videoId,
+  comments,
+  refetch,
+}: VideoCommentSectionProps) {
+  return (
+    <>
+      <div className="py-5">
+        <div className="flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <div className="min-w-0 flex-1 space-y-3">
+            {comments
+              .sort(
+                (a, b) =>
+                  new Date(b.comment.createdAt).getTime() -
+                  new Date(a.comment.createdAt).getTime(),
+              )
+              .map(({ user, comment }) => (
+                <div className="my-6" key={comment.id}>
+                  <div className="my-4 border-t border-gray-200">
+                    <div className="flex gap-2">
+                      <UserImage image={user.image!}/>
+                      
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
