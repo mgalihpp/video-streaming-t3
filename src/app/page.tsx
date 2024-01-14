@@ -13,7 +13,7 @@ export default function Home() {
 
   const Error = () => {
     if (isLoading) {
-      return <LoadingMessage />;
+      return <LoadingMessage count={6} medium/>;
     } else if (error ?? !data) {
       return (
         <ErrorMessage
