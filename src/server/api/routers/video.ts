@@ -149,6 +149,43 @@ export const videoRouter = createTRPCRouter({
         },
       });
 
+      let viewerHasFollowed = false;
+      let viewerHasLikes = false;
+      let viewerHasDislikes = false;
+
+      if (input.viewerId && input.viewerId !== "") {
+        viewerHasLikes = !!(await ctx.db.videoEngagement.findFirst({
+          where: {
+            videoId: rawVideo.id,
+            userId: input.viewerId,
+            engagementType: EngagementType.LIKE,
+          },
+        }));
+        viewerHasDislikes = !!(await ctx.db.videoEngagement.findFirst({
+          where: {
+            videoId: rawVideo.id,
+            userId: input.viewerId,
+            engagementType: EngagementType.DISLIKE,
+          },
+        }));
+        viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+          where: {
+            followingId: rawVideo.userId,
+            followerId: input.viewerId,
+          },
+        }));
+      } else {
+        viewerHasDislikes = false;
+        viewerHasLikes = false;
+        viewerHasFollowed = false;
+      }
+
+      const viewer = {
+        hasFollowed: viewerHasFollowed,
+        hasLiked: viewerHasLikes,
+        hasDisliked: viewerHasDislikes,
+      };
+
       const userWithFollowers = { ...user, followers };
       const videoWithLikeDislikesViews = { ...video, likes, dislikes, views };
       const commentWithUsers = Comment.map(({ user, ...comment }) => ({
@@ -160,6 +197,7 @@ export const videoRouter = createTRPCRouter({
         video: videoWithLikeDislikesViews,
         user: userWithFollowers,
         comments: commentWithUsers,
+        viewer,
       };
     }),
 });
