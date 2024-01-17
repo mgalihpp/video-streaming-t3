@@ -171,7 +171,7 @@ model FollowEngagement {
 model Playlist {
     id          String   @id @default(cuid())
     title       String   @db.Text
-    description String   @db.Text
+    description String?   @db.Text
     userId      String
     createdAt   DateTime @default(now())
     updateAt    DateTime @updatedAt
