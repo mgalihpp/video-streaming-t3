@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Wrapper,
   LoadingMessage,
   ErrorMessage,
   MultiColumnVideo,
@@ -9,11 +8,11 @@ import {
 import { api } from "@/trpc/react";
 
 export default function Home() {
-  const { data, isLoading, error } = api.video.getRandomVideo.useQuery(20);
+  const { data, isLoading, error } = api.video.getRandomVideo.useQuery(40);
 
   const Error = () => {
     if (isLoading) {
-      return <LoadingMessage count={6} medium/>;
+      return <LoadingMessage count={6} medium />;
     } else if (error ?? !data) {
       return (
         <ErrorMessage
@@ -28,7 +27,7 @@ export default function Home() {
   };
 
   return (
-    <Wrapper closeSidebar={false}>
+    <>
       {!data ?? error ? (
         <Error />
       ) : (
@@ -52,6 +51,6 @@ export default function Home() {
           />
         </>
       )}
-    </Wrapper>
+    </>
   );
 }

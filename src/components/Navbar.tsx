@@ -47,7 +47,7 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <User className={className} />,
       name: "View Profile",
-      path: `/${String(userId)}/ProfileVideos`,
+      path: `/channel/${String(userId)}`,
       lineAbove: true,
     },
     {
@@ -254,7 +254,7 @@ export default function Navbar({ children }: NavbarProps) {
                 <Button
                   className="ml-4"
                   size="sm"
-                  onClick={!sessionData ? () => void signIn() : () => ""}
+                  onClick={!sessionData ? () => void signIn() : void {}}
                 >
                   Log in
                 </Button>

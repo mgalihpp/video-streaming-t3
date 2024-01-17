@@ -2,6 +2,7 @@ import React from "react";
 import { GreenHorn, GreenPeople, GreenPlay } from "./Icons/Icons";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 type IconSelectionProps = {
   icon: "Horn" | "People" | "Play";
@@ -51,10 +52,12 @@ export function LoadingMessage({
   count = 1,
   small = false,
   medium = false,
+  profile = false,
 }: {
   count?: number;
   small?: boolean;
   medium?: boolean;
+  profile?: boolean;
 }) {
   return (
     <div
@@ -77,17 +80,24 @@ export function LoadingMessage({
             </div>
           </div>
         ) : medium ? (
-          <div className="max-w-xl h-[300px] flex flex-col" key={index}>
-            <Skeleton className="max-w-xl h-3/5 md:h-3/5 lg:h-2/5 max-lg:h-2/5 xl:h-3/5 rounded-2xl" />
+          <div className="max-w-xl h-fit flex flex-col" key={index}>
+            <Skeleton className="max-w-xl h-[calc(8vw+80px)] max-h-[200px] rounded-2xl" />
             <div className="max-w-xl h-[92px] max-h-[92px] mt-4 flex flex-row space-x-2">
               <Skeleton className="min-w-9 min-h-9 max-w-9 max-h-9 rounded-full" />
               <div className="flex flex-col w-full h-full space-y-2">
-                <Skeleton className="w-full h-2/5"/>
-                <Skeleton className="w-full h-1/5"/>
-                <Skeleton className="w-full h-1/5"/>
+                <Skeleton className="w-full h-2/5" />
+                <Skeleton className="w-full h-1/5" />
+                <Skeleton className="w-full h-1/5" />
               </div>
             </div>
           </div>
+        ) : profile ? (
+          <>
+          <div className="mx-auto flex items-center justify-center h-screen">
+            <Loader2 className="w-12 h-12 animate-spin"/>
+          </div>
+
+          </>
         ) : (
           <div key={index}>
             <Skeleton className="w-full h-[200px] sm:h-[300px] lg:h-[499px] " />
@@ -102,6 +112,35 @@ export function LoadingMessage({
                 <div className="flex flex-col gap-2 h-10 w-16">
                   <Skeleton className="w-full h-5" />
                   <Skeleton className="w-full h-5" />
+                </div>
+              </div>
+            </div>
+            <div className="my-5 flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm">
+              <div className="min-w-0 flex-1 space-y-3">
+                <Skeleton className="w-1/6 h-5" />
+                <div className="mt-2 flex flex-row gap-2 w-full">
+                  <Skeleton className="w-11/12 h-10" />
+                  <Skeleton className="w-1/12 h-10" />
+                </div>
+
+                <div className="my-6">
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <div key={index}>
+                      <div className="my-4 border-t border-gray-200" />
+                      <div className="flex gap-2">
+                        <Skeleton className="w-9 h-9 rounded-full" />
+                        <div className="flex w-full flex-col gap-2">
+                          <div className="flex flex-col gap-2">
+                            <div className="flex flex-row">
+                              <Skeleton className="w-full h-6" />
+                            </div>
+                            <Skeleton className="w-full h-6" />
+                          </div>
+                          <Skeleton className="w-full h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

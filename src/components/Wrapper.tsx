@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Footer, Navbar, SideBar } from ".";
 import Menu from "./Icons/Menu";
 import { cn } from "@/lib/utils";
 
 interface WrapperProps {
-  children: JSX.Element;
+  children: JSX.Element | ReactNode;
   closeSidebar?: boolean;
 }
 
-export default function Wrapper({ children, closeSidebar }: WrapperProps) {
+export default function Wrapper({ children }: WrapperProps) {
   const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [closeSidebar, setCloseSidebar] = useState(true);
 
   return (
     <>
@@ -30,8 +31,9 @@ export default function Wrapper({ children, closeSidebar }: WrapperProps) {
         isOpen={sideBarOpen}
         setSidebarOpen={setSideBarOpen}
         closeSidebar={closeSidebar}
+        setCloseSideBar={setCloseSidebar}
       />
-      <div className='lg:hidden'>
+      <div className="lg:hidden">
         <Footer />
       </div>
       <div className={cn("lg:pl-56", { "lg:pl-20": closeSidebar })}>

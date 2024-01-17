@@ -13,7 +13,9 @@ import { useSearchParams } from "next/navigation";
 export default function SearchPage() {
   const query = useSearchParams().get("q");
 
-  const { data, isLoading, error } = api.video.getVideoBySearch.useQuery(query!);
+  const { data, isLoading, error } = api.video.getVideoBySearch.useQuery(
+    query!,
+  );
 
   const Error = () => {
     if (isLoading) {
@@ -32,32 +34,30 @@ export default function SearchPage() {
   };
 
   return (
-    <SessionProvider>
-      <Wrapper closeSidebar={false}>
-        {data?.videos.length === 0 ?? error ? (
-          <Error />
-        ) : (
-          <>
-            <SingleColumnVideo
-              videos={
-                data?.videos.map((video) => ({
-                  id: video?.id ?? "",
-                  title: video?.title ?? "",
-                  thumbnailUrl: video?.thumbnailUrl ?? "",
-                  createdAt: video?.createdAt ?? new Date(),
-                  views: video?.views ?? 0,
-                })) ?? []
-              }
-              users={
-                data?.users.map((user) => ({
-                  name: user?.name ?? "",
-                  image: user?.image ?? "",
-                })) ?? []
-              }
-            />
-          </>
-        )}
-      </Wrapper>
-    </SessionProvider>
+    <>
+      {data?.videos.length === 0 ?? error ? (
+        <Error />
+      ) : (
+        <>
+          <SingleColumnVideo
+            videos={
+              data?.videos.map((video) => ({
+                id: video?.id ?? "",
+                title: video?.title ?? "",
+                thumbnailUrl: video?.thumbnailUrl ?? "",
+                createdAt: video?.createdAt ?? new Date(),
+                views: video?.views ?? 0,
+              })) ?? []
+            }
+            users={
+              data?.users.map((user) => ({
+                name: user?.name ?? "",
+                image: user?.image ?? "",
+              })) ?? []
+            }
+          />
+        </>
+      )}
+    </>
   );
 }

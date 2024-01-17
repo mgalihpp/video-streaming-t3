@@ -13,8 +13,8 @@ import {
   LikeDislikeButton,
   VideoDescription,
   VideoCommentSection,
+  SaveButton,
 } from "@/components";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { api } from "@/trpc/react";
@@ -83,8 +83,7 @@ function VideoPage() {
   const video = videoData?.video;
   const user = videoData?.user;
   const viewer = videoData?.viewer;
-  const comment = videoData?.comments;
-  const errorTypes = videoError || !video || !user || !viewer;
+  const errorTypes = videoError ?? !video ?? !user ?? !viewer;
 
   // change metadata
   const title = `${video?.title ?? "Video App"}`;
@@ -98,7 +97,7 @@ function VideoPage() {
       return (
         <ErrorMessage
           icon="Play"
-          message="No Videos"
+          message="Video Error"
           className="items-center"
           description="Sorry there is an error to loading video"
         />
@@ -109,92 +108,92 @@ function VideoPage() {
   };
 
   return (
-    <Wrapper closeSidebar={true}>
-      <main className="mx-auto lg:flex">
-        {errorTypes ? (
-          <Error />
-        ) : (
-          <>
-            <div className="w-full sm:px-4 lg:w-4/5">
-              <div className="py-4">
-                <Suspense
-                  fallback={
-                    <Skeleton className="w-full h-[200px] sm:h-[300px] lg:h-[499px]" />
-                  }
-                >
-                  <ReactPlayer
-                    playing={isPlayerReady}
-                    controls
-                    style={{ borderRadius: "1rem", overflow: "hidden" }}
-                    width={"100%"}
-                    height={"100%"}
-                    url={video.videoUrl}
-                    onReady={handlePlayerReady}
-                    config={{
-                      file: { attributes: { controlsList: "nodownload" } },
-                    }}
-                  />
-                </Suspense>
-              </div>
-              <div className="flex space-x-3 rounded-2xl border border-gray-200 p-4 shadow-sm">
-                <div className="min-w-0 flex-1 space-y-3 ">
-                  <div className="xs:flex-wrap flex flex-row justify-between gap-4 max-md:flex-wrap">
-                    <div className="flex flex-col items-start justify-center gap-1 self-stretch ">
-                      <VideoTitle title={video.title} />
-                      <VideoInfo
-                        views={video.views}
-                        createdAt={video.createdAt}
-                      />
-                    </div>
-                    <div className="flex-inline flex items-end justify-start  gap-4 self-start  ">
-                      <LikeDislikeButton
-                        EngagementData={{
-                          id: video.id,
-                          likes: video.likes,
-                          dislikes: video.dislikes,
-                        }}
-                        viewer={{
-                          hasDisliked: viewer.hasDisliked,
-                          hasLiked: viewer.hasLiked,
-                        }}
-                      />
-                      {/* <SaveButton videoId={video.id} /> */}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row  place-content-between gap-x-4 ">
-                    <Link
-                      href={`/${video.userId}/ProfileVideos`}
-                      key={video.userId}
-                    >
-                      <div className="flex flex-row gap-2">
-                        <UserImage image={user.image || ""} />
-                        <button className="flex flex-col">
-                          <VideoUserName name={user.name || ""} />
-                          <p className=" text-sm text-gray-600">
-                            {user.followers}
-                            <span> Followers</span>
-                          </p>
-                        </button>
-                      </div>
-                    </Link>
-                    <FollowButton
-                      followingId={user.id}
-                      viewer={{
-                        hasFollowed: viewer.hasFollowed,
-                      }}
+    <main className="mx-auto lg:flex">
+      {errorTypes ? (
+        <Error />
+      ) : (
+        <>
+          <div className="w-full sm:px-4 lg:w-4/5">
+            <div className="py-4">
+              <Suspense
+                fallback={
+                  <Skeleton className="w-full h-[200px] sm:h-[300px] lg:h-[499px]" />
+                }
+              >
+                <ReactPlayer
+                  playing={isPlayerReady}
+                  controls
+                  style={{ borderRadius: "1rem", overflow: "hidden" }}
+                  width={"100%"}
+                  height={"100%"}
+                  url={video?.videoUrl}
+                  onReady={handlePlayerReady}
+                  config={{
+                    file: { attributes: { controlsList: "nodownload" } },
+                  }}
+                />
+              </Suspense>
+            </div>
+            <div className="flex space-x-3 rounded-2xl border border-gray-200 p-4 shadow-sm">
+              <div className="min-w-0 flex-1 space-y-3 ">
+                <div className="xs:flex-wrap flex flex-row justify-between gap-4 max-md:flex-wrap">
+                  <div className="flex flex-col items-start justify-center gap-1 self-stretch ">
+                    <VideoTitle title={video?.title ?? ""} />
+                    <VideoInfo
+                      views={video?.views ?? 0}
+                      createdAt={video?.createdAt ?? ""}
                     />
                   </div>
-                  <VideoDescription
-                    text={video.description || ""}
-                    length={200}
-                    border={true}
+                  <div className="flex-inline flex items-end justify-start  gap-4 self-start  ">
+                    <LikeDislikeButton
+                      EngagementData={{
+                        id: video?.id ?? "",
+                        likes: video?.likes ?? 0,
+                        dislikes: video?.dislikes ?? 0,
+                      }}
+                      viewer={{
+                        hasDisliked: viewer?.hasDisliked ?? false,
+                        hasLiked: viewer?.hasLiked ?? false,
+                      }}
+                    />
+                    <SaveButton videoId={video?.id ?? ""} />
+                  </div>
+                </div>
+
+                <div className="flex flex-row  place-content-between gap-x-4 ">
+                  <Link
+                    href={`/channel/${String(video?.userId)}`}
+                    key={video?.userId}
+                  >
+                    <div className="flex flex-row gap-2">
+                      <UserImage image={user?.image ?? ""} />
+                      <button className="flex flex-col">
+                        <VideoUserName name={user?.name ?? ""} />
+                        <p className=" text-sm text-gray-600">
+                          {user?.followers}
+                          <span> Followers</span>
+                        </p>
+                      </button>
+                    </div>
+                  </Link>
+                  <FollowButton
+                    followingId={user?.id ?? ""}
+                    viewer={{
+                      hasFollowed: viewer?.hasFollowed ?? false,
+                    }}
                   />
                 </div>
+                <VideoDescription
+                  text={video?.description ?? ""}
+                  length={200}
+                  border={true}
+                />
               </div>
-              <VideoCommentSection
-                videoId={video.id}
-                comments={videoData.comments.map(({ user, comment }) => ({
+            </div>
+            <VideoCommentSection
+              videoId={video?.id ?? ""}
+              comments={
+                videoData?.comments?.map(({ user, comment }) => ({
                   comment: {
                     id: comment.id,
                     message: comment.message,
@@ -206,40 +205,40 @@ function VideoPage() {
                     image: user.image,
                     handle: user.handle,
                   },
-                }))}
-                refetch={refectVideoData}
-              />
-            </div>
+                })) ?? []
+              }
+              refetch={refectVideoData}
+            />
+          </div>
+        </>
+      )}
+      <div className="px-4 lg:w-2/5 lg:px-0">
+        {!sideBarVideo ? (
+          <LoadingMessage count={6} small />
+        ) : (
+          <>
+            <SmallSingleColumnVideo
+              refetch={refetchSideBarVideo}
+              videos={
+                sideBarVideo?.videos.map((video) => ({
+                  id: video?.id ?? "",
+                  title: video?.title ?? "",
+                  thumbnailUrl: video?.thumbnailUrl ?? "",
+                  createdAt: video?.createdAt ?? new Date(),
+                  views: video?.views ?? 0,
+                })) ?? []
+              }
+              users={
+                sideBarVideo?.users.map((user) => ({
+                  name: user?.name ?? "",
+                  image: user?.image ?? "",
+                })) ?? []
+              }
+            />
           </>
         )}
-        <div className="px-4 lg:w-2/5 lg:px-0">
-          {!sideBarVideo ? (
-            <LoadingMessage count={6} small />
-          ) : (
-            <>
-              <SmallSingleColumnVideo
-                refetch={refetchSideBarVideo}
-                videos={
-                  sideBarVideo?.videos.map((video) => ({
-                    id: video?.id ?? "",
-                    title: video?.title ?? "",
-                    thumbnailUrl: video?.thumbnailUrl ?? "",
-                    createdAt: video?.createdAt ?? new Date(),
-                    views: video?.views ?? 0,
-                  })) ?? []
-                }
-                users={
-                  sideBarVideo?.users.map((user) => ({
-                    name: user?.name ?? "",
-                    image: user?.image ?? "",
-                  })) ?? []
-                }
-              />
-            </>
-          )}
-        </div>
-      </main>
-    </Wrapper>
+      </div>
+    </main>
   );
 }
 

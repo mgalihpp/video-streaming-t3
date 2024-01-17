@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import {
   Brush,
@@ -20,7 +22,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Fragment, useEffect } from "react";
+import { Fragment, MouseEventHandler, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Button } from "./ui/button";
 import { UserImage } from ".";
@@ -29,6 +31,7 @@ interface SidebarProps {
   isOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   closeSidebar?: boolean;
+  setCloseSideBar: (open: boolean) => void;
 }
 
 interface NavigationItem {
@@ -42,6 +45,7 @@ export default function SideBar({
   isOpen,
   setSidebarOpen,
   closeSidebar,
+  setCloseSideBar,
 }: SidebarProps) {
   const pathname = usePathname();
   const { data: sessionData } = useSession();
@@ -70,9 +74,9 @@ export default function SideBar({
     },
     {
       name: "Your Videos",
-      path: userId ? `/${String(userId)}/ProfileVideos` : "sign-in",
+      path: userId ? `/channel/${String(userId)}` : "sign-in",
       icon: (className) => <VideoRecorder className={className} />,
-      current: pathname === `/${String(userId)}/ProfileVideos`,
+      current: pathname === `/channel/${String(userId)}`,
     },
     {
       name: "Library",
@@ -91,9 +95,9 @@ export default function SideBar({
   const signedInMobileNavigation: NavigationItem[] = [
     {
       name: "Profile",
-      path: `/${String(userId)}/ProfileVideos`,
+      path: `/channel/${String(userId)}`,
       icon: (className) => <User className={className} />,
-      current: pathname === `/${String(userId)}/ProfileVideos`,
+      current: pathname === `/channel/${String(userId)}`,
     },
     {
       icon: (className) => <Brush className={className} />,
@@ -147,17 +151,19 @@ export default function SideBar({
     mobileNavigation.forEach((nav) => {
       nav.current = nav.path === pathname;
     });
-  });
+  }, [pathname]);
 
   return (
     <>
       <div
+        onMouseEnter={() => setCloseSideBar(false)}
+        onMouseLeave={() => setCloseSideBar(true)}
         className={cn(
           closeSidebar ? "lg:w-20 " : "lg:w-56",
-          "bottom-0 top-16 hidden lg:fixed lg:z-40 lg:flex lg:flex-col",
+          "bottom-0 top-16 hidden lg:fixed lg:z-40 lg:flex lg:flex-col transition-all ease-in-out duration-800",
         )}
       >
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border border-gray-200 bg-white px-6 pb-4">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-200 bg-white px-6 pb-4">
           <nav className="flex flex-1 flex-col pt-8">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
@@ -186,7 +192,7 @@ export default function SideBar({
                               "h-5 w-5 shrink-0 stroke-gray-400 group-hover:stroke-primary/90",
                             )}
                         <p
-                          className={cn("font-semibold", {
+                          className={cn("font-semibold truncate", {
                             hidden: closeSidebar,
                           })}
                         >
@@ -341,7 +347,7 @@ export default function SideBar({
                           </p>
                         </div>
                         <Button
-                        className="ml-2"
+                          className="ml-2"
                           variant="outline"
                           onClick={(e) => {
                             e.preventDefault();

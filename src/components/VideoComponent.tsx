@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import { Thumbnail } from ".";
@@ -5,6 +7,9 @@ import { cn } from "@/lib/utils";
 import moment from "moment";
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "./Icons/Icons";
+import { signIn, useSession } from "next-auth/react";
+import { api } from "@/trpc/react";
+import { Button } from "./ui/button";
 
 interface VideoComponentProps {
   videos: {
@@ -56,9 +61,8 @@ export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
         return (
           <Link
             key={video.id}
-            // nanti ganti ini jadi search params /video?watch=videoid
             href={`/watch?video=${video.id}`}
-            className="flex flex-col items-start justify-between hover:bg-gray-100"
+            className="flex flex-col items-start justify-between hover:bg-gray-100 rounded-2xl"
           >
             <div className="relative w-full">
               <Thumbnail thumbnailUrl={video.thumbnailUrl} />
@@ -67,11 +71,11 @@ export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
                   <UserImage image={user.image!} />
                   <div className="w-full">
                     <VideoTitle title={video.title} limitHeight={true} />
+                    <VideoUserName name={user.name!} />
                     <VideoInfo
                       views={video.views}
                       createdAt={video.createdAt}
                     />
-                    <VideoUserName name={user.name!} />
                   </div>
                 </div>
               </div>
@@ -209,7 +213,7 @@ export function UserImage({
   className?: string;
 }) {
   return (
-    <div className={`relative max-h-9 min-h-9 min-w-9 max-w-9 ${className}`}>
+    <div className={`relative ${className ? className : "max-h-9 min-h-9 min-w-9 max-w-9"}`}>
       <Image
         src={image}
         alt="user image"
@@ -277,11 +281,81 @@ export function VideoCommentSection({
   comments,
   refetch,
 }: VideoCommentSectionProps) {
+  const { data: sessionData } = useSession();
+  const [commentInput, setCommentInput] = useState("");
+  const [disable, setDisable] = useState(false);
+  const [errorInput, setErrorInput] = useState(false);
+  const [errorInputMsg, setErrorInputMsg] = useState<
+    string | string[] | undefined
+  >("");
+
+  const addCommentMutation = api.comment.addComment.useMutation();
+  const addComment = (input: { videoId: string; message: string }) => {
+    addCommentMutation.mutate(input, {
+      onError: (err) => {
+        if (err.data?.code === "BAD_REQUEST") {
+          setErrorInput(true);
+          setErrorInputMsg(err.data.zodError?.fieldErrors.message);
+        }
+        setDisable(false);
+      },
+      onSuccess: () => {
+        void refetch();
+        setCommentInput("");
+        setDisable(false);
+      },
+    });
+  };
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setDisable(true);
+    addComment({
+      videoId: videoId,
+      message: commentInput,
+    });
+  };
+
   return (
     <>
       <div className="py-5">
         <div className="flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm">
           <div className="min-w-0 flex-1 space-y-3">
+            <p className="block text-sm font-medium leading-6 text-gray-900">
+              {comments.length} <span>Comments</span>
+            </p>
+
+            <form onSubmit={handleCommentSubmit}>
+              <div className="mt-2 flex flex-row gap-2">
+                <div className="w-full">
+                  <textarea
+                    rows={1}
+                    maxLength={200}
+                    name="comment"
+                    id="comment"
+                    placeholder="Add comment"
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                    className="block w-full rounded-md border-0 p-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-200"
+                  />
+                </div>
+                <div className="flex-shrink-0">
+                  <Button
+                    aria-label="add comment"
+                    disabled={disable}
+                    onClick={() =>
+                      sessionData?.user.id ? void {} : void signIn()
+                    }
+                  >
+                    Comment
+                  </Button>
+                </div>
+              </div>
+              {errorInput && (
+                <p className="text-destructive text-sm">{errorInputMsg}</p>
+              )}
+            </form>
+
             {comments
               .sort(
                 (a, b) =>
@@ -290,10 +364,22 @@ export function VideoCommentSection({
               )
               .map(({ user, comment }) => (
                 <div className="my-6" key={comment.id}>
-                  <div className="my-4 border-t border-gray-200">
-                    <div className="flex gap-2">
-                      <UserImage image={user.image!}/>
-                      
+                  <div className="my-4 border-t border-gray-200" />
+                  <div className="flex gap-2">
+                    <UserImage image={user.image!} />
+                    <div className="flex w-full flex-col text-sm">
+                      <div className="flex flex-col">
+                        <div className="flex flex-row gap-2">
+                          <p className="w-max font-semibold leading-6 text-gray-900">
+                            {user.name}
+                          </p>
+                          <p className="text-gray-600">
+                            {moment(comment.createdAt).fromNow()}
+                          </p>
+                        </div>
+                        <p className="text-gray-600">{user.handle}</p>
+                      </div>
+                      <p className="my-2 text-gray-600">{comment.message}</p>
                     </div>
                   </div>
                 </div>

@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import NextSessionProvider from "@/providers/SessionProvider";
+import { Toaster } from "@/components/ui/toaster";
+import { Wrapper } from "@/components";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,12 +29,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>
+      <body className={`font-sans ${inter.variable} max-w-screen-2xl`}>
         <NextSessionProvider>
           <TRPCReactProvider cookies={cookies().toString()}>
-            {children}
+            <Wrapper>{children}</Wrapper>
           </TRPCReactProvider>
         </NextSessionProvider>
+        <Toaster />
       </body>
     </html>
   );
