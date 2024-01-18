@@ -21,17 +21,17 @@ export default function SaveButton({ videoId }: { videoId: string }) {
   const { data: sessionData } = useSession();
   const [open, setOpen] = useState(false);
   const [createNewOpen, setCreateNewOpen] = useState(false);
-  const [checkedStatus, setCheckedStatus] = useState<{
-    [key: string]: boolean;
-  }>({});
-  const [formData, setFormData] = useState<{ title: string; desc: string }>({
+  const [checkedStatus, setCheckedStatus] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [formData, setFormData] = useState<Record<string, string>>({
     title: "",
     desc: "",
   });
   const [errorInput, setErrorInput] = useState(false);
-  const [errorInputMsg, setErrorInputMsg] = useState<{
-    [key: string]: string;
-  }>({});
+  const [errorInputMsg, setErrorInputMsg] = useState<Record<string, string>>(
+    {},
+  );
   const { toast } = useToast();
 
   const { data: playlists, refetch: refetchPlaylists } =
@@ -45,7 +45,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
   useEffect(() => {
     if (videoId && open) {
       void refetchPlaylists();
-      const initialCheckedStatus: { [key: string]: boolean } = {};
+      const initialCheckedStatus: Record<string, boolean> = {};
       playlists?.forEach((playlist) => {
         initialCheckedStatus[playlist.id] = playlist.PlaylistHasVideo.some(
           (videoItem) => videoItem.videoId === videoId,
@@ -82,7 +82,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
 
     addNewPlaylistMutation.mutate(
       {
-        title: formData.title,
+        title: formData.title!,
         description: description,
       },
       {
@@ -90,9 +90,9 @@ export default function SaveButton({ videoId }: { videoId: string }) {
           if (err.data?.code === "BAD_REQUEST") {
             const fieldErrors = err?.data?.zodError?.fieldErrors ?? {};
 
-            const errorObject: { [key: string]: string } = Object.entries(
+            const errorObject: Record<string, string> = Object.entries(
               fieldErrors,
-            ).reduce((acc: { [key: string]: string }, [fieldName, errors]) => {
+            ).reduce((acc: Record<string, string>, [fieldName, errors]) => {
               if (errors) {
                 acc[fieldName] = errors.join(", ");
               }
@@ -105,7 +105,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
           }
         },
         onSuccess: () => {
-          void refetchPlaylists()
+          void refetchPlaylists();
           toast({ title: `Created new playlist ${formData.title}` }),
             setFormData({
               title: "",
@@ -136,16 +136,16 @@ export default function SaveButton({ videoId }: { videoId: string }) {
             Save
           </Button>
         </DialogTrigger>
-        <DialogContent className="rounded-2xl max-w-xs">
+        <DialogContent className="max-w-xs rounded-2xl">
           <DialogHeader>
             <DialogTitle>Save video to...</DialogTitle>
           </DialogHeader>
-          <div className="w-full flex flex-col items-start text-start">
+          <div className="flex w-full flex-col items-start text-start">
             {playlists?.map((playlist) => (
-              <div className="flex gap-2 items-center" key={playlist.id}>
+              <div className="flex items-center gap-2" key={playlist.id}>
                 <input
                   type="checkbox"
-                  className="h-5 w-5 shrink-0 accent-primary rounded-lg disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-5 w-5 shrink-0 rounded-lg accent-primary disabled:cursor-not-allowed disabled:opacity-50"
                   id="playlist"
                   name={playlist.title}
                   checked={checkedStatus[playlist.id] ?? false}
@@ -179,8 +179,8 @@ export default function SaveButton({ videoId }: { videoId: string }) {
           <Separator />
           {createNewOpen ? (
             <form onSubmit={handleAddNewPlaylist}>
-              <div className="w-full space-y-4 flex flex-col">
-                <div className="w-full flex flex-col gap-2">
+              <div className="flex w-full flex-col space-y-4">
+                <div className="flex w-full flex-col gap-2">
                   <Label>Name</Label>
                   <Input
                     id="title"
@@ -190,7 +190,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
                     onChange={handleChange}
                   />
                   {errorInput && errorInputMsg.title && (
-                    <p className="text-destructive text-xs">
+                    <p className="text-xs text-destructive">
                       {errorInputMsg.title}
                     </p>
                   )}
@@ -203,7 +203,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
                     onChange={handleChange}
                   />
                   {errorInput && errorInputMsg.description && (
-                    <p className="text-destructive text-xs">
+                    <p className="text-xs text-destructive">
                       {errorInputMsg.description}
                     </p>
                   )}

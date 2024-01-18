@@ -26,9 +26,9 @@ export default function Footer() {
     },
     {
       name: "History",
-      path: userId ? `/playlist/History` : "sign-in",
+      path: userId ? `/playlist/history` : "sign-in",
       icon: (className) => <ClockRewind className={className} />,
-      current: pathname === "/playlist/History",
+      current: pathname === "/playlist/history",
     },
     {
       name: "Library",

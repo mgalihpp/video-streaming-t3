@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Footer, Navbar, SideBar } from ".";
 import Menu from "./Icons/Menu";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,10 @@ export default function Wrapper({ children }: WrapperProps) {
       <Navbar>
         <button
           type="button"
-          onClick={() => setSideBarOpen(true)}
+          onClick={() => {
+            setSideBarOpen(true);
+            setCloseSidebar(false);
+          }}
           className="-mx-2 inline-flex items-center justify-center rounded-md
         p-2 focus:outline-none
         "

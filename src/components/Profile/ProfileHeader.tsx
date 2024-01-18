@@ -42,23 +42,23 @@ export default function ProfileHeader({
   const tabs = [
     {
       name: "Videos",
-      path: `/channel/${String(userId)}`,
-      current: pathname === `/channel/${String(userId)}`,
+      path: `/channel/${String(channelId)}`,
+      current: pathname === `/channel/${String(channelId)}`,
     },
     {
       name: "Playlists",
-      path: `/channel/${String(userId)}/playlists`,
-      current: pathname === `/channel/${String(userId)}/playlists`,
+      path: `/channel/${String(channelId)}/playlists`,
+      current: pathname === `/channel/${String(channelId)}/playlists`,
     },
     {
       name: "Announcements",
-      path: `/channel/${String(userId)}/post`,
-      current: pathname === `/channel/${String(userId)}/post`,
+      path: `/channel/${String(channelId)}/annoucements`,
+      current: pathname === `/channel/${String(channelId)}/annoucements`,
     },
     {
       name: "Following",
-      path: `/channel/${String(userId)}/following`,
-      current: pathname === `/channel/${String(userId)}/following`,
+      path: `/channel/${String(channelId)}/followings`,
+      current: pathname === `/channel/${String(channelId)}/followings`,
     },
   ];
 
@@ -106,7 +106,7 @@ export default function ProfileHeader({
               <div className="flex">
                 <UserImage
                   image={user?.image ?? ""}
-                  className="min-h-24 min-w-24 max-h-24 max-w-24 sm:min-h-32 sm:min-w-32 sm:max-h-32 sm:max-w-32"
+                  className="max-h-24 min-h-24 min-w-24 max-w-24 sm:max-h-32 sm:min-h-32 sm:min-w-32 sm:max-w-32"
                 />
               </div>
               <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
@@ -131,7 +131,7 @@ export default function ProfileHeader({
                         className: "ml-2 flex",
                       })}
                     >
-                      <Edit className="w-5 h-5 mr-2 shrink-0 stroke-white" />
+                      <Edit className="mr-2 h-5 w-5 shrink-0 stroke-white" />
                       Edit
                     </Link>
                   ) : (

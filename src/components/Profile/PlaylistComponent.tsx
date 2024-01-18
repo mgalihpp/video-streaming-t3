@@ -1,7 +1,42 @@
 import Link from "next/link";
-import React, { ReactNode } from "react";
-import { Thumbnail } from "..";
+import React, { type ReactNode } from "react";
+import {
+  SmallSingleColumnVideo,
+  Thumbnail,
+  UserImage,
+  VideoDescription,
+} from "..";
 import moment from "moment";
+
+interface PlaylistPageProps {
+  playlist: {
+    id: string;
+    title: string;
+    description: string;
+    videoCount: number;
+    playlistThumbnail: string;
+    createdAt: Date;
+  };
+  videos: {
+    id: string;
+    title: string;
+    thumbnailUrl: string;
+    createdAt: Date;
+    views: number;
+    videoUrl: string;
+  }[];
+  authors: {
+    id: string;
+    name: string;
+    image: string;
+  }[];
+  user: {
+    id: string;
+    image: string;
+    name: string;
+    followers: number;
+  };
+}
 
 interface PlaylistProps {
   playlists: {
@@ -10,10 +45,59 @@ interface PlaylistProps {
     description?: string | null;
     videoCount: number;
     playlistThumbnail: string;
-    createdAt: Date,
+    createdAt: Date;
   }[];
   children?: React.ReactNode;
 }
+
+export const SinglePlaylistWithVideo: React.FC<PlaylistPageProps> = ({
+  authors,
+  playlist,
+  user,
+  videos,
+}) => {
+  if (!playlist ?? !videos ?? !videos ?? !user) {
+    return <></>;
+  }
+
+  return (
+    <>
+      <main className="mx-auto gap-4 lg:flex">
+        <div className="lg:w-1/2 lg:px-0 lg:pl-6">
+          <SinglePlaylist playlist={playlist} />
+          <VideoDescription text={playlist.description} length={250} border />
+          <div className="flex flex-row place-content-between gap-x-4">
+            <Link href={`/channel/${user.id}`}>
+              <div className="mt-4 flex flex-row gap-2 items-center">
+                <UserImage image={user.image} />
+                <div className="flex flex-col justify-center">
+                  <p className="w-max text-sm font-semibold leading-6 text-gray-900">
+                    {user.name}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {user.followers}
+                    <span> Followers</span>
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+        <div className="border-b border-gray-200 mt-4" />
+        <div className="gap-4 lg:w-1/2 lg:px-0 lg:pr-6">
+          <SmallSingleColumnVideo
+            videos={videos.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
+            )}
+            users={authors}
+          />
+        </div>
+      </main>
+    </>
+  );
+};
 
 export function MultiColumnPlaylist({ playlists }: PlaylistProps) {
   return (
@@ -45,7 +129,7 @@ export function SinglePlaylist({
     description?: string | null;
     videoCount: number;
     playlistThumbnail: string;
-    createdAt: Date,
+    createdAt: Date;
   };
   children?: ReactNode;
 }) {

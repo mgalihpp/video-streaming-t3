@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -62,7 +62,7 @@ export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
           <Link
             key={video.id}
             href={`/watch?video=${video.id}`}
-            className="flex flex-col items-start justify-between hover:bg-gray-100 rounded-2xl"
+            className="flex flex-col items-start justify-between rounded-2xl hover:bg-gray-100"
           >
             <div className="relative w-full">
               <Thumbnail thumbnailUrl={video.thumbnailUrl} />
@@ -213,7 +213,11 @@ export function UserImage({
   className?: string;
 }) {
   return (
-    <div className={`relative ${className ? className : "max-h-9 min-h-9 min-w-9 max-w-9"}`}>
+    <div
+      className={`relative ${
+        className ? className : "max-h-9 min-h-9 min-w-9 max-w-9"
+      }`}
+    >
       <Image
         src={image}
         alt="user image"
@@ -301,6 +305,8 @@ export function VideoCommentSection({
       },
       onSuccess: () => {
         void refetch();
+        setErrorInput(false);
+        setErrorInputMsg("");
         setCommentInput("");
         setDisable(false);
       },
@@ -352,7 +358,7 @@ export function VideoCommentSection({
                 </div>
               </div>
               {errorInput && (
-                <p className="text-destructive text-sm">{errorInputMsg}</p>
+                <p className="text-sm text-destructive">{errorInputMsg}</p>
               )}
             </form>
 

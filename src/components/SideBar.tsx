@@ -22,7 +22,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Fragment, MouseEventHandler, useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Button } from "./ui/button";
 import { UserImage } from ".";
@@ -62,15 +62,15 @@ export default function SideBar({
     },
     {
       name: "Liked Videos",
-      path: userId ? `/playlist/LikedVideos` : "sign-in",
+      path: userId ? `/playlist/likedvideos` : "sign-in",
       icon: (className) => <ThumbsUp className={className} />,
-      current: pathname === "/playlist/LikedVideos",
+      current: pathname === "/playlist/likedvideos",
     },
     {
       name: "History",
-      path: userId ? `/playlist/History` : "sign-in",
+      path: userId ? `/playlist/history` : "sign-in",
       icon: (className) => <ClockRewind className={className} />,
-      current: pathname === "/playlist/History",
+      current: pathname === "/playlist/history",
     },
     {
       name: "Your Videos",
@@ -80,15 +80,15 @@ export default function SideBar({
     },
     {
       name: "Library",
-      path: userId ? `/${String(userId)}/ProfilePlaylists` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/playlists` : "sign-in",
       icon: (className) => <Folder className={className} />,
-      current: pathname === `/${String(userId)}/ProfilePlaylists`,
+      current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId ? `/${String(userId)}/ProfileFollowing` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/ProfileFollowing` : "sign-in",
       icon: (className) => <UserCheck className={className} />,
-      current: pathname === `/${String(userId)}/ProfileFollowing`,
+      current: pathname === `/channel/${String(userId)}/ProfileFollowing`,
     },
   ];
 
