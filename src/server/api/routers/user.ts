@@ -1,10 +1,11 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { EngagementType } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   addFollow: protectedProcedure
-    .input(z.object({ followingId: z.string()}))
+    .input(z.object({ followingId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const existingFollow = await ctx.db.followEngagement.findMany({
         where: {
@@ -33,5 +34,49 @@ export const userRouter = createTRPCRouter({
         });
         return follow;
       }
+    }),
+
+  getChannelById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        viewerId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
+
+      if (!user) {
+        throw new TRPCError({ message: "User not found", code: "NOT_FOUND" });
+      }
+
+      const followers = await ctx.db.followEngagement.count({
+        where: {
+          followingId: user.id,
+        },
+      });
+
+      const followings = await ctx.db.followEngagement.count({
+        where: {
+          followerId: user.id,
+        },
+      });
+
+      let viewerHasFollowed = false;
+      const userWithEngagement = { ...user, followers, followings };
+
+      if (input.viewerId && input.viewerId !== "") {
+        viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+          where: {
+            followingId: user.id,
+            followerId: input.viewerId,
+          },
+        }));
+      }
+      const viewer = {
+        hasFollowed: viewerHasFollowed,
+      };
+
+      return { user: userWithEngagement, viewer };
     }),
 });

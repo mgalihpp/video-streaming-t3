@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { EngagementType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
@@ -124,7 +124,7 @@ export const videoRouter = createTRPCRouter({
 
       const followers = await ctx.db.followEngagement.count({
         where: {
-          followerId: video.userId,
+          followingId: video.userId,
         },
       });
 
@@ -199,5 +199,70 @@ export const videoRouter = createTRPCRouter({
         comments: commentWithUsers,
         viewer,
       };
+    }),
+
+  addVideoToPlaylist: protectedProcedure
+    .input(z.object({ playlistId: z.string(), videoId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const videoExitsInPlaylist = await ctx.db.playlistHasVideo.findMany({
+        where: {
+          playlistId: input.playlistId,
+          videoId: input.videoId,
+        },
+      });
+
+      if (videoExitsInPlaylist.length > 0) {
+        const deleteVideo = await ctx.db.playlistHasVideo.deleteMany({
+          where: {
+            playlistId: input.playlistId,
+            videoId: input.videoId,
+          },
+        });
+        return deleteVideo;
+      } else {
+        const newVideoToPlaylist = await ctx.db.playlistHasVideo.create({
+          data: {
+            playlistId: input.playlistId,
+            videoId: input.videoId,
+          },
+        });
+        return newVideoToPlaylist;
+      }
+    }),
+
+  getVideoByUserId: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const videoWithUser = await ctx.db.video.findMany({
+        where: {
+          userId: input,
+          publish: true,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (!videoWithUser)
+        throw new TRPCError({
+          message: "User video not found",
+          code: "NOT_FOUND",
+        });
+
+      const videos = videoWithUser.map(({ user, ...video }) => video);
+      const users = videoWithUser.map(({ user }) => user);
+      const videoWithCount = await Promise.all(
+        videos.map(async (video) => {
+          const views = await ctx.db.videoEngagement.count({
+            where: { videoId: video.id, engagementType: EngagementType.VIEW },
+          });
+          return {
+            ...video,
+            views,
+          };
+        }),
+      );
+
+      return { videos: videoWithCount, users: users };
     }),
 });

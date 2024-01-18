@@ -1,7 +1,8 @@
-import { EngagementType, Prisma, type PrismaClient } from "@prisma/client";
+import { EngagementType, type Prisma, type PrismaClient } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { DefaultArgs } from "@prisma/client/runtime/library";
+import { type DefaultArgs } from "@prisma/client/runtime/library";
+import { TRPCError } from "@trpc/server";
 
 type Context = {
   db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
@@ -167,6 +168,13 @@ export const videoEngagementRouter = createTRPCRouter({
   addViewCount: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const rawVideo = await ctx.db.video.findFirst({
+        where: { id: input.id },
+      });
+
+      if (!rawVideo)
+        throw new TRPCError({ message: "Video not found", code: "NOT_FOUND" });
+
       if (ctx.session?.user.id && ctx.session.user.id !== "") {
         const playlist = await getOrCreatePlaylist(
           ctx,
