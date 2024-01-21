@@ -3,7 +3,6 @@
 import {
   ErrorMessage,
   LoadingMessage,
-  Wrapper,
   SmallSingleColumnVideo,
   VideoTitle,
   VideoInfo,
@@ -15,6 +14,7 @@ import {
   VideoCommentSection,
   SaveButton,
 } from "@/components";
+const VideoPlayer = lazy(() => import("@/components/VideoPlayer"));
 import { Skeleton } from "@/components/ui/skeleton";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { api } from "@/trpc/react";
@@ -22,7 +22,6 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, lazy, memo, useEffect, useState } from "react";
-const ReactPlayer = lazy(() => import("react-player"));
 
 function VideoPage() {
   const videoId = useSearchParams().get("video");
@@ -117,21 +116,10 @@ function VideoPage() {
             <div className="py-4">
               <Suspense
                 fallback={
-                  <Skeleton className="w-full h-[200px] sm:h-[300px] lg:h-[499px]" />
+                  <Skeleton className="h-[200px] w-full sm:h-[300px] lg:h-[499px]" />
                 }
               >
-                <ReactPlayer
-                  playing={isPlayerReady}
-                  controls
-                  style={{ borderRadius: "1rem", overflow: "hidden" }}
-                  width={"100%"}
-                  height={"100%"}
-                  url={video?.videoUrl}
-                  onReady={handlePlayerReady}
-                  config={{
-                    file: { attributes: { controlsList: "nodownload" } },
-                  }}
-                />
+                <VideoPlayer src={video?.videoUrl} />
               </Suspense>
             </div>
             <div className="flex space-x-3 rounded-2xl border border-gray-200 p-4 shadow-sm">

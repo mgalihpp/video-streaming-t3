@@ -9,10 +9,10 @@ const ChannelPlaylistsPage = async ({ params }: {params: {userId: string}}) => {
     params.userId,
   );
 
-  const errorType = !playlists ?? playlists.length < 0;
+  const errorType = !playlists ?? playlists.length <= 0;
 
   const Error = () => {
-    if (params.userId === session?.user.id && playlists.length < 0) {
+    if (params.userId === session?.user.id && playlists.length <= 0) {
       return (
         <ErrorMessage
           icon="Play"
@@ -20,12 +20,12 @@ const ChannelPlaylistsPage = async ({ params }: {params: {userId: string}}) => {
           description="You have not yet created a playlist inside your library."
         />
       );
-    } else if (errorType) {
+    } else if (playlists.length <= 0) {
       return (
         <ErrorMessage
           icon="Play"
-          message="Something wrong"
-          description="Something went wrong in server."
+          message="No Playlist found"
+          description="This user channel doesn't have any playlist."
         />
       );
     } else {
@@ -35,7 +35,7 @@ const ChannelPlaylistsPage = async ({ params }: {params: {userId: string}}) => {
 
   return (
     <>
-      {errorType ? (
+      {playlists.length <= 0 ? (
         <Error />
       ) : (
         <MultiColumnPlaylist
