@@ -1,46 +1,55 @@
 "use client";
 
 import fluidPlayer from "fluid-player";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import "fluid-player/src/css/fluidplayer.css";
 
-export default function VideoPlayer({ src }: { src: string | undefined }) {
+function VideoPlayer({ src }: { src: string | undefined }) {
   const self = useRef<HTMLVideoElement>(null);
   let player: FluidPlayerInstance | null = null;
-
-  console.log(src);
-
-  const qualities = [
-    { quality: "q_70", title: "720p" },
-    { quality: "q_50", title: "480p" },
-  ];
 
   useEffect(() => {
     // Run only once when the component mounts
     if (!player && self.current) {
-      player = fluidPlayer(self.current, {});
+      player = fluidPlayer(self.current, {
+        layoutControls: {
+          miniPlayer: {
+            enabled: false
+          },
+          playbackRateEnabled: true,
+          allowDownload: false,
+          posterImage: '',
+          doubleclickFullscreen: true
+        } 
+      });
     }
 
     // Clean up the player when the component is unmounted
     // return () => {
-    //   if (player) {
+    //   if (player && src !== undefined) {
     //     player.destroy();
     //   }
     // };
-  }, [player]);
+  }, [src]);
+
+  console.log(self);
+  
 
   return (
     <video width={"100%"} height={"100%"} ref={self}>
       <source src={src} data-fluid-hd type="video/mp4" title="1080p" />
-      {qualities.map((quality, index) => (
-        <source
-          key={index}
-          src={src?.replace("/upload/", `/upload/${quality.quality}/`)}
-          type="video/mp4"
-          title={quality.title}
-          data-fluid-sd
-        />
-      ))}
+      <source
+        src={src?.replace("/upload/", `/upload/q_70/`)}
+        type="video/mp4"
+        title="720p"
+      />
+      <source
+        src={src?.replace("/upload/", `/upload/q_50/`)}
+        type="video/mp4"
+        title="480p"
+      />
     </video>
   );
 }
+
+export default memo(VideoPlayer);
