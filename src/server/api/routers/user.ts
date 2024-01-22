@@ -124,4 +124,81 @@ export const userRouter = createTRPCRouter({
         followings: followingWithViewerFollowedStatus,
       };
     }),
+  getDashboardData: protectedProcedure
+    .input(z.string().optional())
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        include: {
+          videos: true,
+        },
+      });
+      if (!user) {
+        throw new TRPCError({
+          message: "User not found",
+          code: "NOT_FOUND",
+        });
+      }
+      const videosWithCounts = await Promise.all(
+        user.videos.map(async (video) => {
+          const likes = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.LIKE,
+            },
+          });
+
+          const dislikes = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.DISLIKE,
+            },
+          });
+
+          const views = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.VIEW,
+            },
+          });
+
+          const comments = await ctx.db.comment.count({
+            where: {
+              videoId: video.id,
+            },
+          });
+
+          return {
+            ...video,
+            likes,
+            dislikes,
+            views,
+            comments,
+          };
+        }),
+      );
+
+      const totalLikes = videosWithCounts.reduce(
+        (total, video) => total + video.likes,
+        0,
+      );
+      const totalViews = videosWithCounts.reduce(
+        (total, video) => total + video.views,
+        0,
+      );
+      const totalFollowers = await ctx.db.followEngagement.count({
+        where: {
+          followingId: ctx.session.user.id,
+        },
+      });
+      return {
+        user,
+        videos: videosWithCounts,
+        totalLikes,
+        totalViews,
+        totalFollowers,
+      };
+    }),
 });

@@ -53,19 +53,19 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <Brush className={className} />,
       name: "Creator Studio",
-      path: `/Dashboard`,
+      path: `/dashboard`,
       lineAbove: false,
     },
     {
       icon: (className) => <HelpCircle className={className} />,
       name: "Help",
-      path: `/Blog/Help`,
+      path: `/blog/help`,
       lineAbove: true,
     },
     {
       icon: (className) => <Settings className={className} />,
       name: "Settings",
-      path: `/Settings`,
+      path: `/settings`,
       lineAbove: false,
     },
     {
@@ -77,13 +77,13 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <File className={className} />,
       name: "Terms of Service",
-      path: `/Blog/TOS`,
+      path: `/blog/tos`,
       lineAbove: true,
     },
     {
       icon: (className) => <Lock className={className} />,
       name: "Privacy",
-      path: `/Blog/Privacy`,
+      path: `/blog/privacy`,
       lineAbove: false,
     },
     {
@@ -98,7 +98,7 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <HelpCircle className={className} />,
       name: "Help",
-      path: "/Blog/Help",
+      path: "/blog/help",
       lineAbove: true,
     },
     {
@@ -110,13 +110,13 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <File className={className} />,
       name: "Terms of Service",
-      path: `/Blog/TOS`,
+      path: `/blog/tos`,
       lineAbove: true,
     },
     {
       icon: (className) => <Lock className={className} />,
       name: "Privacy",
-      path: `/Blog/Privacy`,
+      path: `/blog/privacy`,
       lineAbove: false,
     },
   ];

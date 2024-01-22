@@ -1,7 +1,31 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { EngagementType } from "@prisma/client";
+import { EngagementType, type PrismaClient, type Prisma } from "@prisma/client";
+import { type DefaultArgs } from "@prisma/client/runtime/library";
 import { TRPCError } from "@trpc/server";
+
+type Context = {
+  db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
+};
+
+const checkVideoOwnerShip = async (
+  ctx: Context,
+  id: string,
+  userId: string,
+) => {
+  const video = await ctx.db.video.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  if (!video ?? video?.userId !== userId)
+    throw new TRPCError({
+      message: "video not found",
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  return video;
+};
 
 export const videoRouter = createTRPCRouter({
   getRandomVideo: publicProcedure
@@ -264,5 +288,62 @@ export const videoRouter = createTRPCRouter({
       );
 
       return { videos: videoWithCount, users: users };
+    }),
+  publishVideo: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const video = await checkVideoOwnerShip(ctx, input, ctx.session.user.id);
+
+      const publishVideo = await ctx.db.video.update({
+        where: {
+          id: video.id,
+        },
+        data: {
+          publish: !video.publish,
+        },
+      });
+
+      return publishVideo;
+    }),
+  deleteVideo: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const video = await checkVideoOwnerShip(ctx, input, ctx.session.user.id);
+
+      const deleteVideo = await ctx.db.video.delete({
+        where: {
+          id: video.id,
+        },
+      });
+      return deleteVideo;
+    }),
+  updateVideo: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        thumbnailUrl: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const video = await checkVideoOwnerShip(
+        ctx,
+        input.id,
+        ctx.session.user.id,
+      );
+
+      const updateVideo = await ctx.db.video.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          title: input.title ?? video.title,
+          description: input.description ?? video.description,
+          thumbnailUrl: input.thumbnailUrl ?? video.thumbnailUrl,
+        },
+      });
+
+      return updateVideo;
     }),
 });

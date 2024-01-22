@@ -86,9 +86,9 @@ export default function SideBar({
     },
     {
       name: "Following",
-      path: userId ? `/channel/${String(userId)}/ProfileFollowing` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/followings` : "sign-in",
       icon: (className) => <UserCheck className={className} />,
-      current: pathname === `/channel/${String(userId)}/ProfileFollowing`,
+      current: pathname === `/channel/${String(userId)}/followings`,
     },
   ];
 
@@ -102,41 +102,41 @@ export default function SideBar({
     {
       icon: (className) => <Brush className={className} />,
       name: "Creator Studio",
-      path: `/Dashboard`,
-      current: pathname === "/Dashboard",
+      path: `/dashboard`,
+      current: pathname === "/dashboard",
     },
     {
       icon: (className) => <HelpCircle className={className} />,
       name: "Help",
-      path: `/Blog/Help`,
-      current: pathname === `/Blog/Help`,
+      path: `/blog/help`,
+      current: pathname === `/blog/help`,
     },
     {
       icon: (className) => <Settings className={className} />,
       name: "Settings",
-      path: `/Settings`,
-      current: pathname === `/Settings`,
+      path: `/settings`,
+      current: pathname === `/settings`,
     },
     {
       icon: (className) => <MessagePlusSquare className={className} />,
       name: "Feedback",
       path: `mailto:muhammadgalih451@gmail.com`,
-      current: pathname === "/Feedback",
+      current: pathname === "/feedback",
     },
   ];
 
   const signOutMobileNavigation: NavigationItem[] = [
     {
       name: "Help",
-      path: "/Blog/Help",
+      path: "/blog/help",
       icon: (className) => <HelpCircle className={className} />,
-      current: pathname === "/Blog/Help",
+      current: pathname === "/blog/help",
     },
     {
       icon: (className) => <MessagePlusSquare className={className} />,
       name: "Feedback",
       path: `mailto:muhammadgalih451@gmail.com`,
-      current: pathname === "/Feedback",
+      current: pathname === "/feedback",
     },
   ];
 

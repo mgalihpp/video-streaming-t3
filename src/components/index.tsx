@@ -4,6 +4,9 @@ import FollowButton from "@/components/Buttons/FollowButton";
 import LikeDislikeButton from "@/components/Buttons/LikeDislikeButton";
 import AnnoucementButton from "@/components/Buttons/AnnoucementButton";
 import SaveButton from "@/components/Buttons/SaveButton";
+import DeleteButton from "@/components/Buttons/DeleteButton";
+import PublishButton from "@/components/Buttons/PublishButton";
+import EditButton from "@/components/Buttons/EditButton";
 import {
   UserImage,
   MultiColumnVideo,
@@ -34,6 +37,9 @@ export {
   FollowButton,
   LikeDislikeButton,
   AnnoucementButton,
+  DeleteButton,
+  EditButton,
+  PublishButton,
   UserImage,
   VideoInfo,
   VideoTitle,

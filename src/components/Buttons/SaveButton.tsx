@@ -16,10 +16,12 @@ import { api } from "@/trpc/react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { Loader2 } from "lucide-react";
 
 export default function SaveButton({ videoId }: { videoId: string }) {
   const { data: sessionData } = useSession();
   const [open, setOpen] = useState(false);
+  const [disable, setDisable] = useState(false);
   const [createNewOpen, setCreateNewOpen] = useState(false);
   const [checkedStatus, setCheckedStatus] = useState<Record<string, boolean>>(
     {},
@@ -77,6 +79,8 @@ export default function SaveButton({ videoId }: { videoId: string }) {
   const handleAddNewPlaylist = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setDisable(true);
+
     const description =
       formData.desc && formData.desc.length > 5 ? formData.desc : undefined;
 
@@ -102,6 +106,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
             //error valid
             setErrorInput(true);
             setErrorInputMsg(errorObject);
+            setDisable(false);
           }
         },
         onSuccess: () => {
@@ -111,7 +116,9 @@ export default function SaveButton({ videoId }: { videoId: string }) {
               title: "",
               desc: "",
             });
+          setDisable(false);
           setErrorInput(false);
+          setCreateNewOpen(false);
         },
       },
     );
@@ -208,7 +215,13 @@ export default function SaveButton({ videoId }: { videoId: string }) {
                     </p>
                   )}
                 </div>
-                <Button type="submit">Create</Button>
+                <Button type="submit" disabled={disable}>
+                  {disable ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
+                </Button>
               </div>
             </form>
           ) : (
