@@ -36,7 +36,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - ✨ Beautiful Loading State
 - 🎨 UI Using 'shadcn-ui' and 'Headless UI'
 - 👤 Profile Page
-- 📈 Creator Dashboard Page Coming Soon
+- 📈 Creator Dashboard Page
 - 🎥 Video Page
 - ⌛ History Page
 - 💾 Playlist Page
