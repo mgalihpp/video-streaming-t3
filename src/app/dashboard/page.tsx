@@ -1,22 +1,7 @@
-import {
-  DeleteButton,
-  EditButton,
-  PublishButton,
-  Thumbnail,
-  UploadButton,
-} from "@/components";
+import { UploadButton, VideoTables } from "@/components";
 import { GreenEye, GreenHeart, GreenUserCheck } from "@/components/Icons/Icons";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 interface StatsItem {
@@ -36,7 +21,7 @@ export default async function DashboardPage() {
 
   if (!session) return redirect("/api/auth/signin");
 
-  const { videos, totalLikes, totalViews, totalFollowers } =
+  const { totalLikes, totalViews, totalFollowers } =
     await api.user.getDashboardData.query("User Dashboard");
 
   const stats: StatsItem[] = [
@@ -94,77 +79,7 @@ export default async function DashboardPage() {
           </dl>
         </div>
 
-        <Table className="rounded-lg shadow">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[250px]">Video</TableHead>
-              <TableHead className="w-[100px] text-center">Status</TableHead>
-              <TableHead className="text-center">Date</TableHead>
-              <TableHead className="text-center">Views</TableHead>
-              <TableHead className="text-center">Comments</TableHead>
-              <TableHead className="text-center">Likes/Dislikes</TableHead>
-              <TableHead className="text-center">Options</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {videos.length <= 0 ? (
-              <div className="mx-auto flex h-[200px] items-center justify-center">
-                <p className="text-2xl font-semibold">No videos.</p>
-              </div>
-            ) : (
-              videos.map((video) => (
-                <TableRow key={video.id}>
-                  <TableCell className="flex h-[200px] w-[250px] flex-col">
-                    <Link
-                      href={`/watch?video=${video.id}`}
-                      className="relative h-1/2 w-full  "
-                    >
-                      <Thumbnail thumbnailUrl={video.thumbnailUrl} />
-                    </Link>
-                    <div className="flex h-full w-full flex-col justify-center truncate">
-                      <p className="text-base text-gray-900">{video.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {video.description}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <PublishButton video={video} />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <p className="whitespace-nowrap px-3 py-5 text-sm text-gray-600">
-                      {video.createdAt.toLocaleDateString()}
-                    </p>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <p className="whitespace-nowrap px-3 py-5 text-sm text-gray-600">
-                      {video.views}
-                    </p>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <p className="whitespace-nowrap px-3 py-5 text-sm text-gray-600">
-                      {video.comments}
-                    </p>
-                  </TableCell>
-                  <TableCell className="flex flex-col text-center">
-                    <p className="text-center text-green-700">
-                      {video.likes} Likes
-                    </p>
-                    <p className="text-center text-red-700">
-                      {video.dislikes} Dislikes
-                    </p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-row items-center justify-center">
-                      <DeleteButton videoId={video.id} />
-                      <EditButton video={video} />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <VideoTables />
       </div>
     </>
   );

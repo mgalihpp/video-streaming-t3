@@ -195,10 +195,111 @@ export const userRouter = createTRPCRouter({
       });
       return {
         user,
+        totalLikes,
+        totalViews,
+        totalFollowers,
+      };
+    }),
+  getInfiniteVideo: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number(),
+        // cursor is a reference to the last item in the previous batch
+        // it's used to fetch the next batch
+        cursor: z.string().nullish(),
+        skip: z.number().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { limit, cursor, skip } = input;
+
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        include: {
+          videos: {
+            take: limit + 1,
+            skip: skip,
+            cursor: cursor ? { id: cursor } : undefined,
+            orderBy: {
+              id: "desc",
+            },
+          },
+        },
+      });
+      if (!user) {
+        throw new TRPCError({
+          message: "User not found",
+          code: "NOT_FOUND",
+        });
+      }
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (user.videos.length > limit) {
+        const nextItem = user.videos.pop(); // return the last item from the array
+        nextCursor = nextItem?.id;
+      }
+
+      const videosWithCounts = await Promise.all(
+        user.videos.map(async (video) => {
+          const likes = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.LIKE,
+            },
+          });
+
+          const dislikes = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.DISLIKE,
+            },
+          });
+
+          const views = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.VIEW,
+            },
+          });
+
+          const comments = await ctx.db.comment.count({
+            where: {
+              videoId: video.id,
+            },
+          });
+
+          return {
+            ...video,
+            likes,
+            dislikes,
+            views,
+            comments,
+          };
+        }),
+      );
+
+      const totalLikes = videosWithCounts.reduce(
+        (total, video) => total + video.likes,
+        0,
+      );
+      const totalViews = videosWithCounts.reduce(
+        (total, video) => total + video.views,
+        0,
+      );
+      const totalFollowers = await ctx.db.followEngagement.count({
+        where: {
+          followingId: ctx.session.user.id,
+        },
+      });
+      return {
+        user,
         videos: videosWithCounts,
         totalLikes,
         totalViews,
         totalFollowers,
+        nextCursor,
       };
     }),
 });
