@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import NextSessionProvider from "@/providers/SessionProvider";
+import Providers from "@/providers/Providers";
 import { Toaster } from "@/components/ui/toaster";
 import { Wrapper } from "@/components";
 
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable} max-w-screen-2xl`}>
         <NextSessionProvider>
           <TRPCReactProvider cookies={cookies().toString()}>
-            <Wrapper>{children}</Wrapper>
+            <Providers>
+              <Wrapper>{children}</Wrapper>
+            </Providers>
           </TRPCReactProvider>
         </NextSessionProvider>
         <Toaster />
