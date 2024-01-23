@@ -16,7 +16,13 @@ import { useRouter } from "next/navigation";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Loader2 } from "lucide-react";
 import { useToast } from "../ui/use-toast";
-export default function DeleteButton({ videoId }: { videoId: string }) {
+export default function DeleteButton({
+  videoId,
+  refetch,
+}: {
+  videoId: string;
+  refetch: () => Promise<unknown>;
+}) {
   const [open, setOpen] = useState(false);
   const [disable, setDisable] = useState(false);
 
@@ -34,7 +40,7 @@ export default function DeleteButton({ videoId }: { videoId: string }) {
         });
         setOpen(false);
         setDisable(false);
-        router.refresh();
+        void refetch();
       },
     });
   };
@@ -42,7 +48,7 @@ export default function DeleteButton({ videoId }: { videoId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" variant="ghost" size='icon'>
+        <Button type="button" variant="ghost" size="icon">
           <Trash className="h-5 w-5 shrink-0 !stroke-red-500" />
         </Button>
       </DialogTrigger>

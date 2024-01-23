@@ -32,6 +32,7 @@ import { Thumbnail } from "./Thumbnail";
 import ProfileHeader from "./Profile/ProfileHeader";
 import AddAnnoucementForm from "./Profile/AddAnnoucementForm";
 import { Content } from "./Content";
+import VideoTables from "./VideoTables";
 
 export {
   Navbar,
@@ -65,4 +66,5 @@ export {
   Thumbnail,
   ProfileHeader,
   AddAnnoucementForm,
+  VideoTables,
 };

@@ -99,10 +99,10 @@ export function GreenUserCheck(props: React.SVGProps<SVGSVGElement>) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="4" y="4" width="48" height="48" rx="24" fill="#CCFBEF" />
+      <rect x="4" y="4" width="48" height="48" rx="24" fill="#000" />
       <path
         d="M28 31.5H23.5C22.1044 31.5 21.4067 31.5 20.8389 31.6722C19.5605 32.06 18.56 33.0605 18.1722 34.3389C18 34.9067 18 35.6044 18 37M32 34L34 36L38 32M30.5 23.5C30.5 25.9853 28.4853 28 26 28C23.5147 28 21.5 25.9853 21.5 23.5C21.5 21.0147 23.5147 19 26 19C28.4853 19 30.5 21.0147 30.5 23.5Z"
-        stroke="#11999E"
+        stroke="#fff"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -129,12 +129,12 @@ export function GreenHeart(props: React.SVGProps<SVGSVGElement>) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="4" y="4" width="48" height="48" rx="24" fill="#CCFBEF" />
+      <rect x="4" y="4" width="48" height="48" rx="24" fill="#000" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M27.9932 21.1358C25.9938 18.7984 22.6597 18.1696 20.1547 20.31C17.6496 22.4504 17.297 26.029 19.2642 28.5604C20.8998 30.6651 25.8498 35.1041 27.4721 36.5408C27.6536 36.7016 27.7444 36.7819 27.8502 36.8135C27.9426 36.8411 28.0437 36.8411 28.1361 36.8135C28.2419 36.7819 28.3327 36.7016 28.5142 36.5408C30.1365 35.1041 35.0865 30.6651 36.7221 28.5604C38.6893 26.029 38.3797 22.4279 35.8316 20.31C33.2835 18.1922 29.9925 18.7984 27.9932 21.1358Z"
-        stroke="#11999E"
+        stroke="#fff"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -160,17 +160,17 @@ export function GreenEye(props: React.SVGProps<SVGSVGElement>) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="4" y="4" width="48" height="48" rx="24" fill="#CCFBEF" />
+      <rect x="4" y="4" width="48" height="48" rx="24" fill="#000" />
       <path
         d="M18.4201 28.7132C18.2839 28.4975 18.2158 28.3897 18.1777 28.2234C18.1491 28.0985 18.1491 27.9015 18.1777 27.7766C18.2158 27.6103 18.2839 27.5025 18.4201 27.2868C19.5455 25.5048 22.8954 21 28.0004 21C33.1054 21 36.4553 25.5048 37.5807 27.2868C37.7169 27.5025 37.785 27.6103 37.8231 27.7766C37.8517 27.9015 37.8517 28.0985 37.8231 28.2234C37.785 28.3897 37.7169 28.4975 37.5807 28.7132C36.4553 30.4952 33.1054 35 28.0004 35C22.8954 35 19.5455 30.4952 18.4201 28.7132Z"
-        stroke="#11999E"
+        stroke="#fff"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M28.0004 31C29.6573 31 31.0004 29.6569 31.0004 28C31.0004 26.3431 29.6573 25 28.0004 25C26.3435 25 25.0004 26.3431 25.0004 28C25.0004 29.6569 26.3435 31 28.0004 31Z"
-        stroke="#11999E"
+        stroke="#fff"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

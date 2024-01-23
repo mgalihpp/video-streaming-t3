@@ -137,11 +137,11 @@ export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
             onClick={refetch}
             key={video.id}
           >
-            <div className="relative isolate my-4 flex flex-col gap-4 rounded-2xl border hover:bg-gray-100 lg:flex-row">
+            <div className="relative isolate my-4 flex flex-col lg:gap-4 rounded-2xl border hover:bg-gray-100 lg:flex-row">
               <div className="aspect-[16/9] sm:aspect-[2/1] lg:w-52 lg:shrink-0">
                 <Thumbnail thumbnailUrl={video.thumbnailUrl} />
               </div>
-              <div className="mt-2 flex w-full flex-col items-start overflow-hidden text-xs max-lg:mx-2">
+              <div className="flex w-full flex-col items-start overflow-hidden text-xs max-lg:mx-2 pb-2 lg:p-0">
                 <VideoTitle title={video.title} limitHeight limitSize />
                 <VideoInfo views={video.views} createdAt={video.createdAt} />
                 <VideoUserName name={user.name!} />

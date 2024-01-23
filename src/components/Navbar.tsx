@@ -138,19 +138,19 @@ export default function Navbar({ children }: NavbarProps) {
   return (
     <>
       <div className=" fixed z-50 w-full border border-gray-200 bg-white shadow-sm">
-        <div className="mx-auto flex max-w-full px-6 lg:px-16 xl:grid xl:grid-cols-12">
-          <div className="flex flex-shrink-0 items-center lg:static xl:col-span-2">
+        <div className="mx-auto flex max-w-full px-6 lg:px-16 flex-row justify-between">
+          <div className="flex flex-shrink-0 items-center lg:static xl:col-span-2 mr-5">
             <Link href="/#" aria-label="Home">
               <Logo width={50} height={50} />
             </Link>
           </div>
-          <div className="w-full min-w-0 flex-1 lg:px-0 xl:col-span-8">
-            <div className=" g:mx-0 flex items-center px-6 py-4 lg:max-w-none xl:mx-0 xl:px-0">
+          <div className="w-full min-w-0 flex justify-center lg:px-0 xl:col-span-8">
+            <div className="lg:mx-0 flex w-full sm:w-1/2 items-center px-6 py-4 lg:max-w-none xl:mx-0 xl:px-0">
               <div className="w-full">
                 <label htmlFor="search" className="sr-only">
                   Search
                 </label>
-                <div className="relative  ">
+                <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <Search className="h-5 w-5 stroke-gray-400" />
                   </div>

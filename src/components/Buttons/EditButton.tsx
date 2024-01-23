@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useRef, useState, DragEvent } from "react";
 import { Edit } from "../Icons/Icons";
 import { Button } from "../ui/button";
 import {
@@ -14,9 +14,11 @@ import {
 import { api } from "@/trpc/react";
 import { Cropper } from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { env } from "@/env";
+import { useDispatch, useSelector } from "react-redux";
+import { closeDialog, openDialog, selectDialogState } from "@/store/editDialog";
+import { useToast } from "../ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface EditButtonProps {
   video: {
@@ -25,15 +27,14 @@ interface EditButtonProps {
     description: string;
     thumbnailUrl: string;
   };
+  refetch: () => Promise<unknown>;
 }
 
-export default function EditButton({ video }: EditButtonProps) {
-  const [open, setOpen] = useState(false);
+export default function EditButton({ video, refetch }: EditButtonProps) {
+  const dispatch = useDispatch();
+  const dialogState = useSelector(selectDialogState);
   const [disable, setDisable] = useState(false);
-  const router = useRouter();
-
   const [currentPage, setCurrentPage] = useState(1);
-
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
@@ -42,9 +43,19 @@ export default function EditButton({ video }: EditButtonProps) {
     description: video.description,
   });
 
+  const { toast } = useToast();
+
   const cloudinaryName = env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
 
   const updateVideoMutation = api.video.updateVideo.useMutation();
+
+  const handleOpenChange = (newOpenState: boolean) => {
+    if (newOpenState) {
+      dispatch(openDialog(video.id));
+    } else {
+      dispatch(closeDialog(video.id));
+    }
+  };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -58,6 +69,16 @@ export default function EditButton({ video }: EditButtonProps) {
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setImage(e.target.files[0] ? e.target.files[0] : null);
+      setCurrentPage(2);
+    }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+
+    if (files.length > 0) {
+      setImage(files[0]!);
       setCurrentPage(2);
     }
   };
@@ -105,10 +126,14 @@ export default function EditButton({ video }: EditButtonProps) {
 
           updateVideoMutation.mutate(newVideoData, {
             onSuccess: () => {
-              setOpen(false);
+              dispatch(closeDialog(video.id));
               setCroppedImage(null);
               setDisable(false);
-              router.refresh();
+              toast({
+                title: "Update Successfully",
+                variant: "success",
+              });
+              void refetch();
             },
           });
         }
@@ -117,7 +142,10 @@ export default function EditButton({ video }: EditButtonProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={dialogState.openVideos[video.id]}
+      onOpenChange={handleOpenChange}
+    >
       <DialogTrigger asChild>
         <Button type="button" variant="ghost" size="icon">
           <Edit className="mr-2 h-5 w-5 shrink-0 stroke-gray-600" />
@@ -147,7 +175,11 @@ export default function EditButton({ video }: EditButtonProps) {
                     video. A good thumbnail will look unique and attract the
                     attention of the audience.
                   </p>
-                  <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                  <div
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                    className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+                  >
                     <div className="text-center">
                       {croppedImage ? (
                         <img src={croppedImage} alt="cropped" />
@@ -217,12 +249,16 @@ export default function EditButton({ video }: EditButtonProps) {
             </div>
             <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
               <Button disabled={disable} onClick={handleSubmit}>
-                Save
+                {disable ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Save"
+                )}
               </Button>
               <Button
                 disabled={disable}
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => dispatch(closeDialog(video.id))}
               >
                 Cancel
               </Button>

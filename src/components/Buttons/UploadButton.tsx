@@ -13,17 +13,21 @@ import {
 } from "../ui/dialog";
 import { api } from "@/trpc/react";
 import { env } from "@/env";
-import { router } from "@trpc/server";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useToast } from "../ui/use-toast";
+import { useDispatch } from "react-redux";
+import { openDialog } from "@/store/editDialog";
+import { setTriggerRefetch } from "@/store/refetchUpload";
 
 export default function UploadButton() {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [disable, setDisable] = useState(false);
   const [uploadedVideo, setUploadedVideo] = useState<File | FileList | null>(
     null,
   );
-  const router = useRouter();
+
+  const { toast } = useToast();
 
   const cloudinaryName = env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
 
@@ -79,11 +83,16 @@ export default function UploadButton() {
           };
 
           addNewVideoMutation.mutate(newVideoData, {
-            onSuccess: () => {
+            onSuccess: (video) => {
+              dispatch(setTriggerRefetch(true));
               setOpen(false);
               setUploadedVideo(null);
               setDisable(false);
-              router.refresh();
+              toast({
+                title: "Upload Successfully",
+                variant: "success",
+              });
+              dispatch(openDialog(video.id));
             },
             onError: () => {
               setDisable(false);

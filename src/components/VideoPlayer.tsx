@@ -14,13 +14,17 @@ function VideoPlayer({ src }: { src: string | undefined }) {
       player = fluidPlayer(self.current, {
         layoutControls: {
           miniPlayer: {
-            enabled: false
+            enabled: false,
           },
+          autoPlay: true,
+          allowTheatre: false,
+          loop: true,
           playbackRateEnabled: true,
           allowDownload: false,
           posterImage: '',
-          doubleclickFullscreen: true
-        } 
+          doubleclickFullscreen: true,
+          fillToContainer: false,
+        },
       });
     }
 
@@ -32,11 +36,8 @@ function VideoPlayer({ src }: { src: string | undefined }) {
     // };
   }, [src]);
 
-  console.log(self);
-  
-
   return (
-    <video width={"100%"} height={"100%"} ref={self}>
+    <video width={"100%"} height={"100%"} ref={self} className="rounded-md">
       <source src={src} data-fluid-hd type="video/mp4" title="1080p" />
       <source
         src={src?.replace("/upload/", `/upload/q_70/`)}
