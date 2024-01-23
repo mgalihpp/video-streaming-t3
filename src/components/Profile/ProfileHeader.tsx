@@ -84,7 +84,7 @@ export default function ProfileHeader({
   };
 
   useDocumentTitle({
-    title: `${user?.name ?? "Video App"}`,
+    title: `${user?.name ?? "YourTube"}`,
     description: `${user?.description ?? ""}`,
   });
 

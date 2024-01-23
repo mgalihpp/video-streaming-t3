@@ -9,8 +9,6 @@ const ChannelPlaylistsPage = async ({ params }: {params: {userId: string}}) => {
     params.userId,
   );
 
-  const errorType = !playlists ?? playlists.length <= 0;
-
   const Error = () => {
     if (params.userId === session?.user.id && playlists.length <= 0) {
       return (

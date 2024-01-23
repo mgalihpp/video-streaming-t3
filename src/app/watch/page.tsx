@@ -26,13 +26,6 @@ import { Suspense, lazy, memo, useEffect, useState } from "react";
 function VideoPage() {
   const videoId = useSearchParams().get("video");
   const { data: sessionData } = useSession();
-
-  const [isPlayerReady, setPlayerReady] = useState(false);
-
-  const handlePlayerReady = () => {
-    setPlayerReady(true);
-  };
-
   const {
     data: videoData,
     isLoading: videoLoading,
@@ -51,8 +44,6 @@ function VideoPage() {
 
   const {
     data: sideBarVideo,
-    isLoading: sideBarLoading,
-    error: sideBarError,
     refetch: refetchSideBarVideo,
   } = api.video.getRandomVideo.useQuery(20, {
     enabled: false, // this will not run automatically
@@ -85,7 +76,7 @@ function VideoPage() {
   const errorTypes = videoError ?? !video ?? !user ?? !viewer;
 
   // change metadata
-  const title = `${video?.title ?? "Video App"}`;
+  const title = `${video?.title ?? "YourTube"}`;
   const description = `${video?.description ?? " "}`;
   useDocumentTitle({ title: title, description: description });
 

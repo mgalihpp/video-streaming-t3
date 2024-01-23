@@ -346,4 +346,23 @@ export const videoRouter = createTRPCRouter({
 
       return updateVideo;
     }),
+  addNewVideo: protectedProcedure
+    .input(
+      z.object({
+        videoUrl: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const newVideo = await ctx.db.video.create({
+        data: {
+          userId: ctx.session.user.id,
+          title: "",
+          description: "",
+          thumbnailUrl: "",
+          videoUrl: input.videoUrl,
+          publish: false,
+        },
+      });
+      return newVideo;
+    }),
 });

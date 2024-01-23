@@ -205,12 +205,12 @@ export default function SideBar({
               </li>
               <li className="mt-auto">
                 <Link
-                  href="#"
+                  href=""
                   onClick={(e) => {
                     e.preventDefault();
                     {
                       sessionData
-                        ? void router.push("/Settings")
+                        ? void router.push("/settings")
                         : void signIn();
                     }
                   }}
@@ -221,7 +221,7 @@ export default function SideBar({
                   <p className={cn("", { hidden: closeSidebar })}>Settings</p>
                 </Link>
                 <Link
-                  href="/Blog/Help"
+                  href="/blog/help"
                   className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
                 >
                   <HelpCircle className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
@@ -315,14 +315,14 @@ export default function SideBar({
                     </ul>
                     <li className="mt-auto list-none border-b">
                       <Link
-                        href="/Blog/Privacy"
+                        href="/blog/privacy"
                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
                       >
                         <Lock className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
                         Privacy
                       </Link>
                       <Link
-                        href="/Blog/TOS"
+                        href="/blog/tems"
                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
                       >
                         <File className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />

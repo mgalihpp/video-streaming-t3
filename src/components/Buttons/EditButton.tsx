@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useRef, useState } from "react";
 import { Edit } from "../Icons/Icons";
 import { Button } from "../ui/button";
 import {
@@ -14,6 +14,9 @@ import {
 import { api } from "@/trpc/react";
 import { Cropper } from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { env } from "@/env";
 
 interface EditButtonProps {
   video: {
@@ -27,21 +30,26 @@ interface EditButtonProps {
 export default function EditButton({ video }: EditButtonProps) {
   const [open, setOpen] = useState(false);
   const [disable, setDisable] = useState(false);
+  const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [inputData, setInputData] = useState({
     title: video.title,
     description: video.description,
   });
 
+  const cloudinaryName = env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
+
+  const updateVideoMutation = api.video.updateVideo.useMutation();
+
   const handleInputChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) => {
-    setFormData((prev) => ({
+    setInputData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -55,10 +63,58 @@ export default function EditButton({ video }: EditButtonProps) {
   };
 
   const handleSubmit = async () => {
-    console.log("submit");
-  };
+    type UploadResponse = {
+      secure_url: string;
+    };
 
-  const updateVideoMutation = api.video.updateVideo.useMutation();
+    setDisable(true);
+
+    const videoData = {
+      id: video.id,
+      title: video.title,
+      description: video.description,
+      thumbnailUrl: video.thumbnailUrl,
+    };
+
+    const formData = new FormData();
+    formData.append("upload_preset", "user_uploads");
+    formData.append("file", croppedImage!);
+
+    fetch(
+      "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      },
+    )
+      .then((response) => response.json() as Promise<UploadResponse>)
+      .then((data) => {
+        if (
+          inputData.title !== video.title ||
+          inputData.description !== video.description ||
+          data.secure_url !== undefined
+        ) {
+          const newVideoData = {
+            ...videoData,
+            ...(data.secure_url && { thumbnailUrl: data.secure_url }),
+          };
+          if (inputData.title !== video.title)
+            newVideoData.title = inputData.title;
+          if (inputData.description !== video.description)
+            newVideoData.description = inputData.description;
+
+          updateVideoMutation.mutate(newVideoData, {
+            onSuccess: () => {
+              setOpen(false);
+              setCroppedImage(null);
+              setDisable(false);
+              router.refresh();
+            },
+          });
+        }
+      })
+      .catch((error) => console.error(error));
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -67,7 +123,7 @@ export default function EditButton({ video }: EditButtonProps) {
           <Edit className="mr-2 h-5 w-5 shrink-0 stroke-gray-600" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-screen overflow-y-scroll">
         {currentPage === 1 && (
           <>
             <div className="sm:flex sm:items-start">
@@ -75,7 +131,8 @@ export default function EditButton({ video }: EditButtonProps) {
                 <DialogHeader>
                   <DialogTitle>Edit Video</DialogTitle>
                   <DialogDescription>
-                    Update your video here don't forget to save after change.
+                    Update your video here don&apos;t forget to save after
+                    change.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="col-span-full mt-2">
@@ -134,7 +191,7 @@ export default function EditButton({ video }: EditButtonProps) {
                     type="text"
                     name="title"
                     id="title"
-                    value={formData.title}
+                    value={inputData.title}
                     onChange={handleInputChange}
                     className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
@@ -151,7 +208,7 @@ export default function EditButton({ video }: EditButtonProps) {
                     rows={4}
                     name="description"
                     id="description"
-                    value={formData.description}
+                    value={inputData.description}
                     onChange={handleInputChange}
                     className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />

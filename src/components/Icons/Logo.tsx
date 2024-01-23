@@ -7,5 +7,5 @@ export default function Logo({
   width: number;
   height: number;
 }) {
-  return <Image src={"/logo.jpg"} alt="logo" width={width} height={height} />;
+  return <Image src={"/logo.png"} alt="logo" width={width} height={height} />;
 }

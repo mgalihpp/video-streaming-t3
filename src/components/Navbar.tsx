@@ -77,7 +77,7 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <File className={className} />,
       name: "Terms of Service",
-      path: `/blog/tos`,
+      path: `/blog/tems`,
       lineAbove: true,
     },
     {
@@ -110,7 +110,7 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <File className={className} />,
       name: "Terms of Service",
-      path: `/blog/tos`,
+      path: `/blog/tems`,
       lineAbove: true,
     },
     {

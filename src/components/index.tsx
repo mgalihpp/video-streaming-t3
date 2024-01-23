@@ -7,6 +7,7 @@ import SaveButton from "@/components/Buttons/SaveButton";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import PublishButton from "@/components/Buttons/PublishButton";
 import EditButton from "@/components/Buttons/EditButton";
+import UploadButton from "@/components/Buttons/UploadButton";
 import {
   UserImage,
   MultiColumnVideo,
@@ -30,6 +31,7 @@ import { LoadingMessage, ErrorMessage } from "@/components/ErrorMessage";
 import { Thumbnail } from "./Thumbnail";
 import ProfileHeader from "./Profile/ProfileHeader";
 import AddAnnoucementForm from "./Profile/AddAnnoucementForm";
+import { Content } from "./Content";
 
 export {
   Navbar,
@@ -39,6 +41,7 @@ export {
   AnnoucementButton,
   DeleteButton,
   EditButton,
+  UploadButton,
   PublishButton,
   UserImage,
   VideoInfo,
@@ -56,6 +59,7 @@ export {
   SideBar,
   Wrapper,
   Footer,
+  Content,
   LoadingMessage,
   ErrorMessage,
   Thumbnail,

@@ -5,7 +5,7 @@ import { ErrorMessage, FollowButton, UserImage } from "@/components";
 const ChannelFollowingsPage = async ({ params }: {params: {userId: string}}) => {
   const session = await getServerAuthSession();
 
-  const { user, followings } = await api.user.getUsersFollowing.query({
+  const { followings } = await api.user.getUsersFollowing.query({
     id: params.userId,
     viewerId: session?.user.id ?? "",
   });

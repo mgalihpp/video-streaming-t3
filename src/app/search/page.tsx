@@ -1,13 +1,11 @@
 "use client";
 
 import {
-  Wrapper,
   LoadingMessage,
   ErrorMessage,
   SingleColumnVideo,
 } from "@/components";
 import { api } from "@/trpc/react";
-import { SessionProvider } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
 export default function SearchPage() {

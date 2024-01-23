@@ -17,8 +17,8 @@ const HistoryPage = () => {
   const user = data?.user;
 
   useDocumentTitle({
-    title: `${playlist?.title ?? "Video App"}`,
-    description: `${playlist?.description ?? "Video App"}`,
+    title: `${playlist?.title ?? "YourTube"}`,
+    description: `${playlist?.description ?? "YourTube"}`,
   });
 
   const Error = () => {

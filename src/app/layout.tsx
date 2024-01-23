@@ -14,10 +14,10 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Video App",
-  description: `Welcome to Video App - Your go-to platform for amazing videos!
+  title: "YourTube",
+  description: `Welcome to YourTube - Your go-to platform for amazing videos!
   Discover a world of content with our incredible features. Enjoy seamless streaming, 
-  personalized recommendations, and much more. Download Video App now and embark on a visual journey 
+  personalized recommendations, and much more. Download YourTube now and embark on a visual journey 
   like never before!`,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
