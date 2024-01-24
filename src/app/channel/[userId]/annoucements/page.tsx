@@ -30,7 +30,7 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
             description="You have not yet created a annoucement."
           />
           <Link href="/profile/edit" className={buttonVariants()}>
-            <Plus className="mr-2 h-5 w-5 shrink-0 stroke-white" />
+            <Plus className="mr-2 h-5 w-5 shrink-0 stroke-secondary" />
             Create Annoucement
           </Link>
         </div>
@@ -54,7 +54,7 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
       {annoucements.length <= 0 ? (
         <Error />
       ) : (
-        <ul role="liest" className="-pt-8 divide-y divide-gray-200">
+        <ul role="liest" className="-pt-8 divide-y divide-gray-200 dark:divide-secondary">
           {annoucements
             .sort(
               (a, b) =>
@@ -72,17 +72,17 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
                     <div className="flex w-full flex-col">
                       <div className="flex flex-col">
                         <div className="flex flex-row items-start gap-2 text-xs">
-                          <p className="w-max text-sm font-semibold leading-6 text-gray-900">
+                          <p className="w-max text-sm font-semibold leading-6 text-primary">
                             {author.name}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-primary/70">
                             {moment(annoucement.createdAt).fromNow()}
                           </p>
                         </div>
 
-                        <p className="text-sm text-gray-600">{author.handle}</p>
+                        <p className="text-sm text-primary/80">{author.handle}</p>
                       </div>
-                      <p className="my-2 text-sm text-gray-600">
+                      <p className="my-2 text-sm text-primary/90 flex-shrink-0 break-all">
                         {annoucement.message}
                       </p>
                     </div>

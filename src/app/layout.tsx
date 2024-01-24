@@ -8,6 +8,7 @@ import NextSessionProvider from "@/providers/SessionProvider";
 import Providers from "@/providers/Providers";
 import { Toaster } from "@/components/ui/toaster";
 import { Wrapper } from "@/components";
+import ThemeProviders from "@/providers/ThemeProviders";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({
         <NextSessionProvider>
           <TRPCReactProvider cookies={cookies().toString()}>
             <Providers>
-              <Wrapper>{children}</Wrapper>
+              <ThemeProviders>
+                <Wrapper>{children}</Wrapper>
+              </ThemeProviders>
             </Providers>
           </TRPCReactProvider>
         </NextSessionProvider>

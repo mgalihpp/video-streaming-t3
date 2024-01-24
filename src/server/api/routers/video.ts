@@ -356,7 +356,7 @@ export const videoRouter = createTRPCRouter({
       const newVideo = await ctx.db.video.create({
         data: {
           userId: ctx.session.user.id,
-          title: "",
+          title: "Untitled",
           description: "",
           thumbnailUrl: "",
           videoUrl: input.videoUrl,

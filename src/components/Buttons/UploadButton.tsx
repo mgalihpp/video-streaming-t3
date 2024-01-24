@@ -107,7 +107,7 @@ export default function UploadButton() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="flex">
-          <Plus className="mr-2 h-4 w-4 shrink-0 stroke-white" />
+          <Plus className="mr-2 h-4 w-4 shrink-0 stroke-secondary" />
           Upload
         </Button>
       </DialogTrigger>
@@ -120,7 +120,7 @@ export default function UploadButton() {
             </DialogHeader>
             <div className="col-span-full mt-2">
               <div
-                className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+                className="mt-2 flex justify-center rounded-lg bg-secondary border border-dashed border-primary px-6 py-10"
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
               >
@@ -130,10 +130,10 @@ export default function UploadButton() {
                   <>
                     <div className="text-center">
                       <>
-                        <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                        <div className="mt-4 flex text-sm leading-6 text-primary/80">
                           <label
                             htmlFor="file-upload"
-                            className="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/90"
+                            className="relative cursor-pointer rounded-md bg-secondary font-semibold text-primary focus-within:outline-none hover:text-primary/90"
                           >
                             <span>Upload file</span>
                             <input
@@ -146,7 +146,7 @@ export default function UploadButton() {
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
-                        <p className="text-xs leading-5 text-gray-600">MP4</p>
+                        <p className="text-xs leading-5 text-primary/80">.mp4</p>
                       </>
                     </div>
                   </>

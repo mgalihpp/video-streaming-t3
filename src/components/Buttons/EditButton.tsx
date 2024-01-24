@@ -135,6 +135,9 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
               });
               void refetch();
             },
+            onError: () => {
+              setDisable(false);
+            },
           });
         }
       })
@@ -148,7 +151,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
     >
       <DialogTrigger asChild>
         <Button type="button" variant="ghost" size="icon">
-          <Edit className="mr-2 h-5 w-5 shrink-0 stroke-gray-600" />
+          <Edit className="h-5 w-5 shrink-0 stroke-primary" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-screen overflow-y-scroll">
@@ -166,7 +169,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                 <div className="col-span-full mt-2">
                   <label
                     htmlFor="thumbnail"
-                    className="block text-sm font-medium leading-6 text-gray-900"
+                    className="block text-sm font-medium leading-6 text-primary"
                   >
                     Thumbnail
                   </label>
@@ -178,17 +181,17 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                   <div
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+                    className="mt-2 flex justify-center rounded-lg bg-secondary border border-dashed border-primary px-6 py-10"
                   >
                     <div className="text-center">
                       {croppedImage ? (
                         <img src={croppedImage} alt="cropped" />
                       ) : (
                         <>
-                          <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                          <div className="mt-4 flex text-sm leading-6 text-primary/80">
                             <label
                               htmlFor="file-upload"
-                              className="relative cursor-pointer rounded-md bg-white font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/90"
+                              className="relative cursor-pointer rounded-md bg-secondary font-semibold text-primary focus-within:outline-none hover:text-primary/90"
                             >
                               <span>Upload file</span>
                               <input
@@ -201,7 +204,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                             </label>
                             <p className="pl-1">or drag and drop</p>
                           </div>
-                          <p className="text-xs leading-5 text-gray-600">
+                          <p className="text-xs leading-5 text-primary/80">
                             PNG, JPG, GIF up to 10MB
                           </p>
                         </>
@@ -212,7 +215,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                 <div className="mt-2 flex flex-col">
                   <label
                     htmlFor="title"
-                    className="block text-sm font-medium leading-6 text-gray-900"
+                    className="block text-sm font-medium leading-6 text-primary"
                   >
                     Title
                   </label>
@@ -225,11 +228,11 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                     id="title"
                     value={inputData.title}
                     onChange={handleInputChange}
-                    className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="mt-2 block dark:bg-secondary w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
                   <label
                     htmlFor="description"
-                    className="block text-sm font-medium leading-6 text-gray-900"
+                    className="block text-sm font-medium leading-6 text-primary"
                   >
                     Description
                   </label>
@@ -242,13 +245,16 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                     id="description"
                     value={inputData.description}
                     onChange={handleInputChange}
-                    className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="mt-2 block dark:bg-secondary w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
             </div>
             <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
-              <Button disabled={disable} onClick={handleSubmit}>
+              <Button
+                disabled={disable}
+                onClick={handleSubmit}
+              >
                 {disable ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (

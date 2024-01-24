@@ -37,17 +37,17 @@ const ChannelFollowingsPage = async ({ params }: {params: {userId: string}}) => 
       {followings.length < 0 ? (
         <Error />
       ) : (
-        <ul role="list" className="-mt-8 divide-y divide-gray-200">
+        <ul role="list" className="-mt-8 divide-y divide-gray-200 dark:divide-secondary">
           {followings.map((following) => (
             <li className="py-4" key={following.following.id}>
               <div className="flex gap-2">
                 <UserImage image={following.following.image!} />
                 <div className="flex w-full flex-row justify-between">
                   <div className="flex flex-col text-sm">
-                    <p className="text-gra-600 font-semibold">
+                    <p className="text-primary font-semibold">
                       {following.following.name}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-primary/80">
                       {following.following.handle}
                     </p>
                   </div>

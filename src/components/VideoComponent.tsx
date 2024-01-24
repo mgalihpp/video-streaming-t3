@@ -62,7 +62,7 @@ export const MultiColumnVideo: React.FC<VideoComponentProps> = ({
           <Link
             key={video.id}
             href={`/watch?video=${video.id}`}
-            className="flex flex-col items-start justify-between rounded-2xl hover:bg-gray-100"
+            className="flex flex-col items-start justify-between rounded-2xl bg-background/20 hover:bg-secondary/30"
           >
             <div className="relative w-full">
               <Thumbnail thumbnailUrl={video.thumbnailUrl} />
@@ -99,7 +99,7 @@ export const SingleColumnVideo: React.FC<VideoComponentProps> = ({
       }
       return (
         <Link href={`/watch?video=${video.id}`} key={video.id}>
-          <div className="my-5 flex flex-col gap-4 hover:bg-gray-100 lg:flex-row">
+          <div className="my-5 flex flex-col gap-4 bg-background/20 hover:bg-secondary/30 lg:flex-row">
             <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:w-64 lg:shrink-0">
               <Thumbnail thumbnailUrl={video.thumbnailUrl} />
             </div>
@@ -137,7 +137,7 @@ export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
             onClick={refetch}
             key={video.id}
           >
-            <div className="relative isolate my-4 flex flex-col lg:gap-4 rounded-2xl border hover:bg-gray-100 lg:flex-row">
+            <div className="relative isolate my-4 flex flex-col lg:gap-4 rounded-2xl border bg-background/20 hover:bg-secondary/30 lg:flex-row">
               <div className="aspect-[16/9] sm:aspect-[2/1] lg:w-52 lg:shrink-0">
                 <Thumbnail thumbnailUrl={video.thumbnailUrl} />
               </div>
@@ -166,7 +166,7 @@ export function VideoTitle({
   return (
     <h1
       className={cn(
-        `max-w-md text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600`,
+        `max-w-md text-lg font-semibold leading-6 text-primary group-hover:text-gray-600`,
         {
           "text-base": limitSize,
           "max-h-12 w-full overflow-hidden": limitHeight,
@@ -187,10 +187,10 @@ export function VideoInfo({
 }) {
   return (
     <div className="mt-1 flex max-h-6 items-start overflow-hidden text-sm">
-      <p className="text-gray-600">
+      <p className="text-primary/80">
         {views} <span>Views</span>
       </p>
-      <li className="pl-2 text-sm text-gray-500">
+      <li className="pl-2 text-sm text-primary/80">
         {moment(createdAt).fromNow()}
       </li>
     </div>
@@ -199,7 +199,7 @@ export function VideoInfo({
 
 export function VideoUserName({ name }: { name: string }) {
   return (
-    <p className="max-h-5 overflow-hidden text-sm font-semibold leading-6 text-gray-600">
+    <p className="max-h-5 overflow-hidden text-sm font-semibold leading-6 text-primary/80">
       {name}
     </p>
   );
@@ -248,8 +248,8 @@ export function VideoDescription({
   } else if (text.length < length) {
     return (
       <>
-        {border ? <div className="border-b border-gray-200"></div> : null}
-        <p className="my-3 text-left text-sm font-semibold text-gray-600">
+        {border ? <div className="border-b border-gray-200 dark:border-secondary"></div> : null}
+        <p className="my-3 text-left text-sm font-semibold text-primary/80">
           {text}
         </p>
       </>
@@ -257,14 +257,14 @@ export function VideoDescription({
   } else {
     return (
       <>
-        {border ? <div className="border-b border-gray-200"></div> : null}
+        {border ? <div className="border-b border-gray-200 dark:border-secondary"></div> : null}
         <div className="relative w-full">
           <button
             onClick={toggleExpand}
             className="flex flex-row place-content-evenly"
           >
             <p
-              className={`text-left text-sm font-semibold text-gray-600 ${
+              className={`text-left text-sm font-semibold text-primary/90 break-words ${
                 !isExpanded ? "line-clamp-2" : ""
               }`}
             >
@@ -325,9 +325,9 @@ export function VideoCommentSection({
   return (
     <>
       <div className="py-5">
-        <div className="flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex space-x-3 rounded-2xl border border-gray-200 dark:border-secondary p-6 shadow-sm">
           <div className="min-w-0 flex-1 space-y-3">
-            <p className="block text-sm font-medium leading-6 text-gray-900">
+            <p className="block text-sm font-medium leading-6 text-primary">
               {comments.length} <span>Comments</span>
             </p>
 
@@ -342,7 +342,7 @@ export function VideoCommentSection({
                     placeholder="Add comment"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
-                    className="block w-full rounded-md border-0 p-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-200"
+                    className="block w-full rounded-md border-0 p-4 py-1.5 text-primary dark:bg-secondary ring-1 ring-inset ring-gray-200"
                   />
                 </div>
                 <div className="flex-shrink-0">
@@ -370,22 +370,22 @@ export function VideoCommentSection({
               )
               .map(({ user, comment }) => (
                 <div className="my-6" key={comment.id}>
-                  <div className="my-4 border-t border-gray-200" />
+                  <div className="my-4 border-t border-gray-200 dark:border-secondary" />
                   <div className="flex gap-2">
                     <UserImage image={user.image!} />
                     <div className="flex w-full flex-col text-sm">
                       <div className="flex flex-col">
                         <div className="flex flex-row gap-2">
-                          <p className="w-max font-semibold leading-6 text-gray-900">
+                          <p className="w-max font-semibold leading-6 text-primary">
                             {user.name}
                           </p>
-                          <p className="text-gray-600">
+                          <p className="text-primary/80">
                             {moment(comment.createdAt).fromNow()}
                           </p>
                         </div>
-                        <p className="text-gray-600">{user.handle}</p>
+                        <p className="text-primary/80">{user.handle}</p>
                       </div>
-                      <p className="my-2 text-gray-600">{comment.message}</p>
+                      <p className="my-2 text-primary/90">{comment.message}</p>
                     </div>
                   </div>
                 </div>

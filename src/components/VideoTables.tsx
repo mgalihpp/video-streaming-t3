@@ -127,7 +127,7 @@ export default function VideoTables() {
                       />
                     </Link>
                     <div className="flex h-full w-full flex-col justify-center truncate">
-                      <p className="text-base text-gray-900">{video.title}</p>
+                      <p className="text-base text-primary">{video.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {video.description}
                       </p>
@@ -137,18 +137,18 @@ export default function VideoTables() {
                     <PublishButton video={video} />
                   </TableCell>
                   <TableCell className="text-center">
-                    <p className="whitespace-nowrap px-3 py-5 text-sm text-gray-600">
+                    <p className="whitespace-nowrap px-3 py-5 text-sm text-primary/80">
                       {video.createdAt.toLocaleDateString()}
                     </p>
                   </TableCell>
                   <TableCell className="text-center">
-                    <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-gray-600">
-                      {video.views} <User className="h-5 w-5 stroke-gray-900" />
+                    <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-primary/80">
+                      {video.views} <User className="h-5 w-5 stroke-primary/80" />
                     </p>
                   </TableCell>
                   <TableCell className="text-center">
-                    <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-gray-600">
-                      {video.comments} <MessageCircleMore className="h-5 w-5" />
+                    <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-primary/80">
+                      {video.comments} <MessageCircleMore className="h-5 w-5 stroke-primary/80" />
                     </p>
                   </TableCell>
                   <TableCell className="flex flex-col text-center">

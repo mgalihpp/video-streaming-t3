@@ -5,7 +5,7 @@ import { api } from "@/trpc/server";
 import Link from "next/link";
 import Plus from "@/components/Icons/Plus";
 
-const ChannelPage = async ({ params }: {params: {userId: string}}) => {
+const ChannelPage = async ({ params }: { params: { userId: string } }) => {
   const session = await getServerAuthSession();
   const { videos, users } = await api.video.getVideoByUserId.query(
     params.userId,
@@ -14,7 +14,7 @@ const ChannelPage = async ({ params }: {params: {userId: string}}) => {
   const Error = () => {
     if (params.userId == session?.user.id && videos.length < 0) {
       return (
-        <div className="flex items-center justify-center flex-col gap-2">
+        <div className="flex flex-col items-center justify-center gap-2">
           <ErrorMessage
             icon="Play"
             message="No Video Uploaded"

@@ -33,6 +33,7 @@ const AddAnnoucementForm = () => {
         setDisable(false);
       },
       onSuccess: () => {
+        setInput("")
         setErrorInput(false);
         setErrorInputMsg("");
         setDisable(false);
@@ -54,7 +55,7 @@ const AddAnnoucementForm = () => {
               placeholder="Add annoucement"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="block w-full rounded-md border-0 p-4 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-200"
+              className="block w-full rounded-md border-0 p-4 py-1.5 text-primary dark:bg-secondary ring-1 ring-inset ring-gray-200"
             />
           </div>
           <div className="flex-shrink-0">

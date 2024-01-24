@@ -137,27 +137,27 @@ export default function Navbar({ children }: NavbarProps) {
 
   return (
     <>
-      <div className=" fixed z-50 w-full border border-gray-200 bg-white shadow-sm">
-        <div className="mx-auto flex max-w-full px-6 lg:px-16 flex-row justify-between">
-          <div className="flex flex-shrink-0 items-center lg:static xl:col-span-2 mr-5">
+      <div className=" fixed z-50 w-full border border-gray-300 dark:border-secondary bg-background shadow-sm">
+        <div className="mx-auto flex max-w-full flex-row justify-between px-6 lg:px-16">
+          <div className="mr-5 flex flex-shrink-0 items-center lg:static xl:col-span-2">
             <Link href="/#" aria-label="Home">
               <Logo width={50} height={50} />
             </Link>
           </div>
-          <div className="w-full min-w-0 flex justify-center lg:px-0 xl:col-span-8">
-            <div className="lg:mx-0 flex w-full sm:w-1/2 items-center px-6 py-4 lg:max-w-none xl:mx-0 xl:px-0">
+          <div className="flex w-full min-w-0 justify-center lg:px-0 xl:col-span-8">
+            <div className="flex w-full items-center px-6 py-4 sm:w-1/2 lg:mx-0 lg:max-w-none xl:mx-0 xl:px-0">
               <div className="w-full">
                 <label htmlFor="search" className="sr-only">
                   Search
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Search className="h-5 w-5 stroke-gray-400" />
+                    <Search className="h-5 w-5 stroke-primary" />
                   </div>
                   <input
                     id="search"
                     name="search"
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 "
+                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-primary/90 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-secondary sm:text-sm sm:leading-6 "
                     placeholder="Search"
                     type="search"
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -194,17 +194,17 @@ export default function Navbar({ children }: NavbarProps) {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-secondary ring-opacity-5 focus:outline-none">
                   {sessionData ? (
-                    <div className=" mx-4 my-2 flex  ">
+                    <div className="mx-4 my-2 flex">
                       {/* <div className="h-9 w-9"> */}
                       <UserImage image={sessionData?.user.image ?? ""} />
                       {/* </div> */}
                       <div className="ml-2 flex w-full flex-col justify-start truncate ">
-                        <p className="truncate text-sm font-semibold text-gray-700">
+                        <p className="truncate text-sm font-semibold text-primary">
                           {sessionData && <span>{sessionData.user?.name}</span>}
                         </p>
-                        <p className=" truncate text-sm text-gray-600">
+                        <p className=" truncate text-sm text-primary/70">
                           {sessionData && (
                             <span className="">{sessionData.user?.email}</span>
                           )}
@@ -212,7 +212,7 @@ export default function Navbar({ children }: NavbarProps) {
                       </div>
                     </div>
                   ) : (
-                    <p className="mx-4 my-2 flex text-center text-sm font-semibold text-gray-700 ">
+                    <p className="mx-4 my-2 flex text-center text-sm font-semibold text-primary ">
                       Menu
                     </p>
                   )}
@@ -230,13 +230,13 @@ export default function Navbar({ children }: NavbarProps) {
                           }}
                           href={item.path ?? "/"}
                           className={cn(
-                            active ? "bg-gray-100 " : "",
-                            "block px-4 py-2 text-sm text-gray-700",
-                            item.lineAbove ? "border-t border-gray-200" : "",
+                            active ? "bg-secondary " : "",
+                            "block px-4 py-2 text-sm text-primary",
+                            item.lineAbove ? "border-t border-gray-300 dark:border-secondary/80" : "",
                           )}
                         >
                           <div className="flex items-center ">
-                            {item.icon("h-4 w-4 stroke-gray-700")}
+                            {item.icon("h-4 w-4 stroke-primary")}
                             <div className="pl-2">{item.name}</div>
                           </div>
                         </Link>

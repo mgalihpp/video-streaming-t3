@@ -63,18 +63,18 @@ export const SinglePlaylistWithVideo: React.FC<PlaylistPageProps> = ({
   return (
     <>
       <main className="mx-auto gap-4 lg:flex">
-        <div className="lg:w-1/2 lg:px-0 lg:pl-6">
+        <div className="lg:w-3/5 lg:px-0 lg:pl-6">
           <SinglePlaylist playlist={playlist} />
           <VideoDescription text={playlist.description} length={250} border />
           <div className="flex flex-row place-content-between gap-x-4">
             <Link href={`/channel/${user.id}`}>
-              <div className="mt-4 flex flex-row gap-2 items-center">
+              <div className="mt-4 flex flex-row items-center gap-2">
                 <UserImage image={user.image} />
                 <div className="flex flex-col justify-center">
-                  <p className="w-max text-sm font-semibold leading-6 text-gray-900">
+                  <p className="w-max text-sm font-semibold leading-6 text-primary">
                     {user.name}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-primary/80">
                     {user.followers}
                     <span> Followers</span>
                   </p>
@@ -83,7 +83,7 @@ export const SinglePlaylistWithVideo: React.FC<PlaylistPageProps> = ({
             </Link>
           </div>
         </div>
-        <div className="border-b border-gray-200 mt-4" />
+        <div className="mt-4 border-b border-gray-200 dark:border-secondary" />
         <div className="gap-4 lg:w-1/2 lg:px-0 lg:pr-6">
           <SmallSingleColumnVideo
             videos={videos.sort(
@@ -106,10 +106,10 @@ export function MultiColumnPlaylist({ playlists }: PlaylistProps) {
         <Link
           key={playlist.id}
           href={`/playlist/${playlist.id}`}
-          className="flex flex-col items-start justify-between hover:bg-gray-100 rounded-2xl"
+          className="flex flex-col items-start justify-between rounded-2xl bg-background/20 hover:bg-secondary/30"
         >
           <SinglePlaylist playlist={playlist}>
-            <p className="text-regular mt-2 max-h-12 overflow-hidden text-gray-600">
+            <p className="text-regular mt-2 max-h-12 overflow-hidden text-primary/80">
               {playlist.description}
             </p>
           </SinglePlaylist>
@@ -156,9 +156,9 @@ export function SinglePlaylist({
       </div>
       <div className="max-w-lg">
         <div className="items-top relative mt-4 flex gap-x-4 ">
-          <div className=" w-full mb-4 px-4">
+          <div className=" mb-4 w-full px-4">
             <div className=" w-100 flex ">
-              <h3 className="h-auto w-full text-2xl font-medium text-gray-900 group-hover:text-gray-600">
+              <h3 className="h-auto w-full text-2xl font-medium text-primary group-hover:text-primary/90">
                 {playlist.title}
               </h3>
             </div>

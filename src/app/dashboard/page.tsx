@@ -44,14 +44,14 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8 bg-white pt-3 shadow sm:rounded-lg">
+      <div className="flex flex-col gap-8 bg-background pt-3 shadow sm:rounded-lg">
         <div className="md:flex md:items-center md:justify-between md:space-x-5">
           <div className="flex items-start space-x-5">
             <div className="pt-1.5">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-primary">
                 <span>Hello,</span> {session.user.name}!
               </h1>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium text-primary/70">
                 Manage your channel and videos here.
               </p>
             </div>
@@ -61,17 +61,17 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div>
-          <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-2xl border border-gray-200  shadow-sm   md:grid-cols-3 md:divide-x md:divide-y-0">
+          <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-2xl border border-gray-200 shadow-sm dark:divide-secondary dark:border-secondary md:grid-cols-3 md:divide-x md:divide-y-0">
             {stats.map((item) => (
               <div
                 key={item.name}
                 className="flex flex-col items-center justify-center px-4 py-5 sm:p-6"
               >
                 {item.icon("h-4 w-4 ")}
-                <dt className="text-base font-normal text-gray-900">
+                <dt className="text-base font-normal text-primary">
                   {item.name}
                 </dt>
-                <dd className="text-primary-600 mt-1 text-3xl font-semibold md:block lg:flex">
+                <dd className="mt-1 text-3xl font-semibold text-primary md:block lg:flex">
                   {item.stat}
                 </dd>
               </div>

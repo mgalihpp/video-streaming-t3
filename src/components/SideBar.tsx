@@ -163,7 +163,7 @@ export default function SideBar({
           "bottom-0 top-16 hidden lg:fixed lg:z-40 lg:flex lg:flex-col transition-all ease-in-out duration-800",
         )}
       >
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-200 bg-white px-6 pb-4">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-300 dark:border-secondary bg-background px-6 pb-4">
           <nav className="flex flex-1 flex-col pt-8">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
@@ -182,14 +182,14 @@ export default function SideBar({
                           }
                         }}
                         className={cn(
-                          "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90",
-                          { "bg-gray-50 text-primary": item.current },
+                          "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary",
+                          { "bg-secondary text-primary": item.current },
                         )}
                       >
                         {item.current
                           ? item.icon("h-5 w-5 shrink-0 stroke-primary")
                           : item.icon(
-                              "h-5 w-5 shrink-0 stroke-gray-400 group-hover:stroke-primary/90",
+                              "h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary",
                             )}
                         <p
                           className={cn("font-semibold truncate", {
@@ -214,17 +214,17 @@ export default function SideBar({
                         : void signIn();
                     }
                   }}
-                  className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
+                  className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
                 >
-                  <Settings className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
+                  <Settings className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
 
                   <p className={cn("", { hidden: closeSidebar })}>Settings</p>
                 </Link>
                 <Link
                   href="/blog/help"
-                  className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
+                  className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
                 >
-                  <HelpCircle className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
+                  <HelpCircle className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
 
                   <p className={cn("", { hidden: closeSidebar })}>Help</p>
                 </Link>
@@ -267,11 +267,11 @@ export default function SideBar({
                     variant="outline"
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <Close className="h-6 w-6" aria-hidden="true" />
+                    <Close className="h-6 w-6 stroke-primary" aria-hidden="true" />
                   </Button>
                 </div>
 
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-gray-200 bg-white px-6 pb-4">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-gray-300 dark:border-secondary bg-background px-6 pb-4">
                   <nav className="flex flex-1 flex-col pt-4 ">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                       <Logo width={50} height={50} />
@@ -291,14 +291,14 @@ export default function SideBar({
                                   }
                                 }}
                                 className={cn(
-                                  "group flex gap-x-3 rounded-md p-2 px-2 py-1.5 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90",
-                                  { "bg-gray-50 text-primary": item.current },
+                                  "group flex gap-x-3 rounded-md p-2 px-2 py-1.5 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary",
+                                  { "bg-secondary text-primary": item.current },
                                 )}
                               >
                                 {item.current
                                   ? item.icon("h-5 w-5 shrink-0 stroke-primary")
                                   : item.icon(
-                                      "h-5 w-5 shrink-0 stroke-gray-400 group-hover:stroke-primary/90",
+                                      "h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary",
                                     )}
                                 <p
                                   className={cn("font-semibold", {
@@ -316,16 +316,16 @@ export default function SideBar({
                     <li className="mt-auto list-none border-b">
                       <Link
                         href="/blog/privacy"
-                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
+                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
                       >
-                        <Lock className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
+                        <Lock className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
                         Privacy
                       </Link>
                       <Link
                         href="/blog/tems"
-                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-50 hover:text-primary/90"
+                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
                       >
-                        <File className="h-5 w-5 shrink-0 stroke-gray-500 group-hover:stroke-primary" />
+                        <File className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
                         Terms of Service
                       </Link>
                     </li>
@@ -335,12 +335,12 @@ export default function SideBar({
                           image={sessionData.user.image ?? "/profile.jpg"}
                         />
                         <div className="ml-2 flex w-full flex-col justify-center truncate text-sm">
-                          <p className="font-semibold text-gray-700">
+                          <p className="font-semibold text-primary">
                             {sessionData && (
                               <span>{sessionData.user.name}</span>
                             )}
                           </p>
-                          <p className="text-gray-600">
+                          <p className="text-primary/70">
                             {sessionData && (
                               <span>{sessionData.user.email}</span>
                             )}
@@ -354,7 +354,7 @@ export default function SideBar({
                             void signOut();
                           }}
                         >
-                          <LogOut className="h-5 w-5 stroke-gray-500" />
+                          <LogOut className="h-5 w-5 stroke-primary" />
                         </Button>
                       </div>
                     ) : (

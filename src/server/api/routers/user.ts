@@ -40,7 +40,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        viewerId: z.string(),
+        viewerId: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -301,5 +301,41 @@ export const userRouter = createTRPCRouter({
         totalFollowers,
         nextCursor,
       };
+    }),
+  updateUser: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        // email: z.string().optional(),
+        image: z.string().optional(),
+        backgroundImage: z.string().optional(),
+        handle: z.string().optional(),
+        description: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+      });
+      if (!user) {
+        throw new TRPCError({ message: "User not valid", code: "BAD_REQUEST" });
+      }
+
+      const updateUser = await ctx.db.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          name: input.name ?? user.name,
+          // email: input.email ?? user.email,
+          image: input.image ?? user.image,
+          backgroundImage: input.backgroundImage ?? user.backgroundImage,
+          handle: input.handle ?? user.handle,
+          description: input.description ?? user.description,
+        },
+      });
+      return updateUser;
     }),
 });

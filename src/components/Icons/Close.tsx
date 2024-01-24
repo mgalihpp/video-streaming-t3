@@ -8,7 +8,6 @@ export default function Close(props: React.SVGProps<SVGSVGElement>) {
     >
       <path
         d="M18 6L6 18M6 6L18 18"
-        stroke="#667085"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

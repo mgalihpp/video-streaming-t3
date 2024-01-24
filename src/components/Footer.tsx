@@ -32,27 +32,27 @@ export default function Footer() {
     },
     {
       name: "Library",
-      path: userId ? `/${String(userId)}/ProfilePlaylists` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/playlists` : "sign-in",
       icon: (className) => <Folder className={className} />,
-      current: pathname === `/${String(userId)}/ProfilePlaylists`,
+      current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId ? `/${String(userId)}/ProfileFollowing` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/followings` : "sign-in",
       icon: (className) => <UserCheck className={className} />,
-      current: pathname === `/${String(userId)}/ProfileFollowing`,
+      current: pathname === `/channel/${String(userId)}/followings`,
     },
   ];
 
   return (
-    <footer className="fixed bottom-0 z-50 w-full border border-gray-200 bg-white shadow-sm">
+    <footer className="fixed bottom-0 z-50 w-full border border-gray-200 bg-background shadow-sm dark:border-secondary">
       <nav className="isolate flex rounded-lg shadow" aria-label="Tabs">
         {tabs.map((tab) => (
           <Link
             key={tab.name}
             href="#"
             className={cn(
-              "group relative min-w-0 flex-1 overflow-hidden px-4 py-4 text-center text-xs font-medium text-gray-600 hover:bg-gray-50 focus:z-10",
+              "group relative min-w-0 flex-1 overflow-hidden px-4 py-4 text-center text-xs font-medium text-primary/80 hover:bg-secondary focus:z-10",
               {
                 "text-primary": tab.current,
               },

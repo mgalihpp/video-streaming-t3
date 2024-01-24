@@ -183,4 +183,14 @@ export const annoucementRouter = createTRPCRouter({
         },
       });
     }),
+  deleteAnnoucement: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.announcement.delete({
+        where: {
+          id: input,
+          userId: ctx.session.user.id,
+        },
+      });
+    }),
 });

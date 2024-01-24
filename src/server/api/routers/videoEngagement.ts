@@ -183,12 +183,21 @@ export const videoEngagementRouter = createTRPCRouter({
           ctx.session.user.id,
         );
 
-        await ctx.db.playlistHasVideo.create({
-          data: {
+        const isVideoExitsInPlaylist = await ctx.db.playlistHasVideo.findFirst({
+          where: {
             playlistId: playlist.id,
             videoId: input.id,
           },
         });
+
+        if (!isVideoExitsInPlaylist) {
+          await ctx.db.playlistHasVideo.create({
+            data: {
+              playlistId: playlist.id,
+              videoId: input.id,
+            },
+          });
+        }
       }
 
       return await createEngagement(

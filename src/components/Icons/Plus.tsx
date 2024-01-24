@@ -8,7 +8,6 @@ export default function Plus(props: React.SVGProps<SVGSVGElement>) {
     >
       <path
         d="M10.5 4.1665V15.8332M4.66663 9.99984H16.3333"
-        stroke="white"
         strokeWidth="1.66667"
         strokeLinecap="round"
         strokeLinejoin="round"

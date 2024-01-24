@@ -48,12 +48,12 @@ export default function LikeDislikeButton({
         className="flex items-center justify-center gap-2"
       >
         <ThumbsUp
-          className={cn(`w-5 h-5 shrink-0 stroke-gray-500`, {
-            "fill-primary stroke-white": userChoice.like,
+          className={cn(`w-5 h-5 shrink-0 stroke-primary`, {
+            "fill-primary stroke-secondary": userChoice.like,
           })}
         />
         <span
-          className={cn("text-gray-500", {
+          className={cn("stroke-secondary", {
             "text-primary": userChoice.like,
           })}
         >
@@ -73,12 +73,12 @@ export default function LikeDislikeButton({
         className="flex items-center justify-center gap-2"
       >
         <ThumbsDown
-          className={cn(`w-5 h-5 shrink-0 stroke-gray-500`, {
-            "fill-destructive stroke-white": userChoice.dislike,
+          className={cn(`w-5 h-5 shrink-0 stroke-primary`, {
+            "fill-destructive stroke-secondary": userChoice.dislike,
           })}
         />
         <span
-          className={cn("text-gray-500", {
+          className={cn("stroke-secondary", {
             "text-destructive": userChoice.dislike,
           })}
         >

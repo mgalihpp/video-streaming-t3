@@ -111,14 +111,14 @@ export default function ProfileHeader({
               </div>
               <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                 <div className="mt-6 min-w-0 flex-1 md:block">
-                  <h1 className="truncate text-2xl font-bold text-gray-900">
+                  <h1 className="truncate text-2xl font-bold text-primary">
                     {user?.name ?? ""}
                   </h1>
-                  <p className="text-regular text-gray-600">{user?.handle}</p>
+                  <p className="text-regular text-primary/80">{user?.handle}</p>
                   <div className="mb-1 flex items-center justify-start text-xs">
-                    <p className="text-gray-600">{user?.followers} Followers</p>
-                    <li className="pl-2 text-sm text-gray-500"></li>
-                    <p className="text-gray-500">
+                    <p className="text-primary/70">{user?.followers} Followers</p>
+                    <li className="pl-2 text-sm text-primary/90"></li>
+                    <p className="text-primary/70">
                       {user?.followings} Following
                     </p>
                   </div>
@@ -131,7 +131,7 @@ export default function ProfileHeader({
                         className: "ml-2 flex",
                       })}
                     >
-                      <Edit className="mr-2 h-5 w-5 shrink-0 stroke-white" />
+                      <Edit className="mr-2 h-5 w-5 shrink-0 stroke-secondary" />
                       Edit
                     </Link>
                   ) : (
@@ -145,7 +145,7 @@ export default function ProfileHeader({
             </div>
           </div>
 
-          <div className="mb-8 mt-4 overflow-x-auto border-b border-gray-200">
+          <div className="mb-8 mt-4 overflow-x-auto border-b border-gray-200 dark:border-secondary">
             <nav
               className="mb-px flex min-w-max whitespace-nowrap"
               aria-label="tabs"
@@ -158,7 +158,7 @@ export default function ProfileHeader({
                     `w-full border-b-4 px-1 py-4 text-center text-sm font-semibold`,
                     {
                       "border-primary text-primary": nav.current,
-                      "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700":
+                      "border-transparent text-primary/60 hover:border-gray-300 hover:text-primary":
                         !nav.current,
                     },
                   )}

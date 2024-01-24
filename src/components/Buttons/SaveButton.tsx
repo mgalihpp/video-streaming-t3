@@ -139,7 +139,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
               sessionData?.user.id ? void setOpen(true) : void signIn()
             }
           >
-            <FolderPlus className="mr-2 h-5 w-5 shrink-0 stroke-gray-600" />{" "}
+            <FolderPlus className="mr-2 h-5 w-5 shrink-0 stroke-primary" />{" "}
             Save
           </Button>
         </DialogTrigger>
@@ -147,12 +147,12 @@ export default function SaveButton({ videoId }: { videoId: string }) {
           <DialogHeader>
             <DialogTitle>Save video to...</DialogTitle>
           </DialogHeader>
-          <div className="flex w-full flex-col items-start text-start">
+          <div className="flex w-full flex-col items-start text-start gap-2">
             {playlists?.map((playlist) => (
               <div className="flex items-center gap-2" key={playlist.id}>
                 <input
                   type="checkbox"
-                  className="h-5 w-5 shrink-0 rounded-lg accent-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-5 w-5 shrink-0 rounded-lg accent-primary dark:accent-secondary disabled:cursor-not-allowed disabled:opacity-50"
                   id="playlist"
                   name={playlist.title}
                   checked={checkedStatus[playlist.id] ?? false}

@@ -208,8 +208,19 @@ export const playlistRouter = createTRPCRouter({
           author: video?.user,
         })) ?? [];
 
-      const videos = videoWithUser.map(({ author, ...video }) => video);
-      const users = videoWithUser.map(({ user }) => user);
+      // Filter out duplicate videos based on ID
+      const uniqueVideoWithUser = videoWithUser.reduce(
+        (acc, video) => {
+          if (!acc.some((v) => v.id === video.id)) {
+            acc.push(video);
+          }
+          return acc;
+        },
+        [] as typeof videoWithUser,
+      );
+
+      const videos = uniqueVideoWithUser.map(({ author, ...video }) => video);
+      const users = uniqueVideoWithUser.map(({ user }) => user);
       const videoWithCount = await Promise.all(
         videos.map(async (video) => {
           const views = await ctx.db.videoEngagement.count({
