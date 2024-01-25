@@ -14,14 +14,15 @@ import {
   VideoCommentSection,
   SaveButton,
 } from "@/components";
-const VideoPlayer = lazy(() => import("@/components/VideoPlayer"));
 import { Skeleton } from "@/components/ui/skeleton";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, lazy, memo, useEffect, useState } from "react";
+import { Suspense, lazy, memo, useEffect } from "react";
+import VideoPlayer from "@/components/VideoPlayer";
+import VideoJS from "@/components/VideoJsTest";
 
 function VideoPage() {
   const videoId = useSearchParams().get("video");
@@ -42,12 +43,10 @@ function VideoPage() {
     },
   );
 
-  const {
-    data: sideBarVideo,
-    refetch: refetchSideBarVideo,
-  } = api.video.getRandomVideo.useQuery(20, {
-    enabled: false, // this will not run automatically
-  });
+  const { data: sideBarVideo, refetch: refetchSideBarVideo } =
+    api.video.getRandomVideo.useQuery(20, {
+      enabled: false, // this will not run automatically
+    });
 
   const addViewCount = api.videoEngagement.addViewCount.useMutation();
 
@@ -97,6 +96,25 @@ function VideoPage() {
     }
   };
 
+  const videoJsOptions = {
+    controls: true,
+    responsive: true,
+    fluid: true,
+    poster: video?.thumbnailUrl,
+    preload: "metadata",
+    id: video?.id,
+    autoplay: true,
+    aspectRatio: "16:9",
+    playbackRates: [0.5, 1, 1.5, 2],
+    playsinline: true,
+    sources: [
+      {
+        src: video?.videoUrl,
+        type: "video/mp4",
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto lg:flex">
       {errorTypes ? (
@@ -110,10 +128,21 @@ function VideoPage() {
                   <Skeleton className="h-[200px] w-full sm:h-[300px] lg:h-[499px]" />
                 }
               >
-                <VideoPlayer src={video?.videoUrl} />
+                {/* <ReactPlayer
+                  controls
+                  playing
+                  width={"100%"}
+                  height={"100%"}
+                  url={video?.videoUrl}
+                /> */}
+                <VideoJS
+                  options={videoJsOptions}
+                  key={video?.id}
+                  src={video?.videoUrl}
+                />
               </Suspense>
             </div>
-            <div className="flex space-x-3 rounded-2xl border border-gray-200 p-4 shadow-sm">
+            <div className="flex space-x-3 rounded-2xl border border-gray-200 p-4 shadow-sm dark:border-secondary">
               <div className="min-w-0 flex-1 space-y-3 ">
                 <div className="xs:flex-wrap flex flex-row justify-between gap-4 max-md:flex-wrap">
                   <div className="flex flex-col items-start justify-center gap-1 self-stretch ">
@@ -148,7 +177,7 @@ function VideoPage() {
                       <UserImage image={user?.image ?? ""} />
                       <button className="flex flex-col">
                         <VideoUserName name={user?.name ?? ""} />
-                        <p className=" text-sm text-gray-600">
+                        <p className=" text-sm text-primary/70">
                           {user?.followers}
                           <span> Followers</span>
                         </p>

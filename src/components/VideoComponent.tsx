@@ -264,7 +264,7 @@ export function VideoDescription({
             className="flex flex-row place-content-evenly"
           >
             <p
-              className={`text-left text-sm font-semibold text-primary/90 break-words ${
+              className={`text-left text-sm font-semibold text-primary/80 break-words ${
                 !isExpanded ? "line-clamp-2" : ""
               }`}
             >

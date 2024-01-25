@@ -115,7 +115,7 @@ export function LoadingMessage({
                 </div>
               </div>
             </div>
-            <div className="my-5 flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <div className="my-5 flex space-x-3 rounded-2xl border border-gray-200 dark:border-secondary p-6 shadow-sm">
               <div className="min-w-0 flex-1 space-y-3">
                 <Skeleton className="w-1/6 h-5" />
                 <div className="mt-2 flex flex-row gap-2 w-full">
@@ -126,7 +126,7 @@ export function LoadingMessage({
                 <div className="my-6">
                   {Array.from({ length: 6 }, (_, index) => (
                     <div key={index}>
-                      <div className="my-4 border-t border-gray-200" />
+                      <div className="my-4 border-t border-gray-200 dark:border-secondary" />
                       <div className="flex gap-2">
                         <Skeleton className="w-9 h-9 rounded-full" />
                         <div className="flex w-full flex-col gap-2">

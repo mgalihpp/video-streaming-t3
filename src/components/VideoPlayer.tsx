@@ -37,7 +37,7 @@ function VideoPlayer({ src }: { src: string | undefined }) {
   }, [src]);
 
   return (
-    <video width={"100%"} height={"100%"} ref={self} className="rounded-md">
+    <video width={"100%"} height={"100%"}  ref={self} className="rounded-md max-w-[887px]">
       <source src={src} data-fluid-hd type="video/mp4" title="1080p" />
       <source
         src={src?.replace("/upload/", `/upload/q_70/`)}

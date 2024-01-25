@@ -30,11 +30,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
-import Link from "next/link";
 import { env } from "@/env";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ImageCropper } from "@/components/Buttons/EditButton";
 
 export default function SettingsPage() {
   const { data: sessionData } = useSession();
+  const [disable, setDisable] = useState(false);
   const router = useRouter();
 
   const [inputData, setInputData] = useState({
@@ -48,6 +50,8 @@ export default function SettingsPage() {
   });
 
   const updateUserMutation = api.user.updateUser.useMutation();
+
+  const { toast } = useToast();
 
   const channel = data?.user;
 
@@ -82,6 +86,51 @@ export default function SettingsPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleSubmit = () => {
+    setDisable(true);
+
+    const userData = {
+      name: channel?.name || undefined,
+      // email: channel?.email,
+      handle: channel?.handle || undefined,
+      image: channel?.image || undefined,
+      backgroundImage: channel?.backgroundImage || undefined,
+      description: channel?.description || undefined,
+    };
+
+    if (
+      inputData.name !== channel?.name ||
+      inputData.description !== channel?.description ||
+      inputData.handle !== channel?.handle
+    ) {
+      const newUserData = {
+        ...userData,
+      };
+      if (inputData.name && inputData.name !== channel?.name)
+        newUserData.name = inputData.name;
+      if (
+        inputData.description &&
+        inputData.description !== channel?.description
+      )
+        newUserData.description = inputData.description;
+      if (inputData.handle && inputData.handle !== channel?.handle)
+        newUserData.handle = inputData.handle;
+
+      updateUserMutation.mutate(newUserData, {
+        onSuccess: () => {
+          toast({
+            title: "Profile update",
+          });
+          void refetch();
+          setDisable(false);
+        },
+        onError: () => {
+          setDisable(false);
+        },
+      });
+    }
   };
 
   return (
@@ -150,7 +199,7 @@ export default function SettingsPage() {
                       name="name"
                       id="name"
                       autoComplete="family-name"
-                      value={channel?.name || ""}
+                      value={inputData?.name || ""}
                       onChange={handleInputChange}
                       className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
                     />
@@ -209,7 +258,7 @@ export default function SettingsPage() {
                         name="handle"
                         id="handle"
                         className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-primary placeholder:text-primary focus:outline-none focus:ring-0 sm:text-sm sm:leading-6"
-                        value={channel?.handle || ""}
+                        value={inputData?.handle || ""}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -228,8 +277,8 @@ export default function SettingsPage() {
                       id="description"
                       name="description"
                       rows={3}
-                      className="block w-full rounded-md border-0 bg-secondary py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                      value={channel?.description || ""}
+                      className="block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      value={inputData?.description || ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -240,10 +289,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
-              <Button
-                size="lg"
-                // onClick={() => handleSubmit()}
-              >
+              <Button type="button" onClick={() => handleSubmit()} disabled={disable}>
                 Save
               </Button>
             </div>
@@ -291,7 +337,7 @@ export function CropImageModal({
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const addUserUpdateMutation = api.user.updateUser.useMutation();
+  const updateUserMutation = api.user.updateUser.useMutation();
   const cloudinaryName = env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -306,6 +352,17 @@ export function CropImageModal({
       secure_url: string;
     };
 
+    type UserData = {
+      id: string;
+      name?: string;
+      image?: string;
+      backgroundImage?: string;
+      handle?: string;
+      description?: string;
+    };
+
+    type ImageType = "backgroundImage" | "image";
+
     const userData = {
       id: channel.id,
       [imageType]: channel[imageType] || undefined,
@@ -315,7 +372,37 @@ export function CropImageModal({
     formData.append("upload_preset", "user_uploads");
     formData.append("file", croppedDataUrl);
 
-    fetch;
+    fetch(
+      "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      },
+    )
+      .then((response) => response.json() as Promise<UploadResponse>)
+      .then((data) => {
+        if (data.secure_url !== undefined) {
+          const newUserData: {
+            [K in keyof UserData]: K extends ImageType | "id"
+              ? string | undefined
+              : never;
+          } = {
+            ...userData,
+            ...(data.secure_url && { [imageType]: data.secure_url }),
+          };
+          updateUserMutation.mutate(newUserData, {
+            onSuccess: () => {
+              setOpen(false);
+              void refetch();
+              setImage(null);
+              setCroppedImage(null);
+            },
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error);
+      });
   };
 
   return (
@@ -357,6 +444,19 @@ export function CropImageModal({
           </label>
         </>
       )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <>
+            <ImageCropper
+              image={image}
+              setCroppedImage={setCroppedImage}
+              imageType={imageType}
+              handleSubmit={handleSubmit}
+              setOpen={setOpen}
+            />
+          </>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -385,9 +485,9 @@ export const SelecForm = () => {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     dispatch(setTheme(data.theme));
     toast({
-      title: "You submitted the following values:",
+      title: "You change theme to:",
       description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-background p-4">
+        <pre className="mt-2 w-[340px] rounded-md bg-secondary p-4">
           <code className="text-primary">
             {JSON.stringify(data.theme, null, 2)}
           </code>
@@ -417,10 +517,7 @@ export const SelecForm = () => {
                   <SelectItem value="system">System</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>
-                You can manage email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
+              <FormDescription>You can manage theme</FormDescription>
               <FormMessage />
             </FormItem>
           )}
