@@ -29,7 +29,7 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
             message="No Annoucements Created"
             description="You have not yet created a annoucement."
           />
-          <Link href="/profile/edit" className={buttonVariants()}>
+          <Link href="#" className={buttonVariants()}>
             <Plus className="mr-2 h-5 w-5 shrink-0 stroke-secondary" />
             Create Annoucement
           </Link>

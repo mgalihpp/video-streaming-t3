@@ -26,19 +26,19 @@ export default function Footer() {
     },
     {
       name: "History",
-      path: userId ? `/playlist/history` : "sign-in",
+      path: userId ? `/playlist/history` : "/api/auth/signin",
       icon: (className) => <ClockRewind className={className} />,
       current: pathname === "/playlist/history",
     },
     {
       name: "Library",
-      path: userId ? `/channel/${String(userId)}/playlists` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/playlists` : "/api/auth/signin",
       icon: (className) => <Folder className={className} />,
       current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId ? `/channel/${String(userId)}/followings` : "sign-in",
+      path: userId ? `/channel/${String(userId)}/followings` : "/api/auth/signin",
       icon: (className) => <UserCheck className={className} />,
       current: pathname === `/channel/${String(userId)}/followings`,
     },
@@ -59,7 +59,7 @@ export default function Footer() {
             )}
             onClick={(e) => {
               e.preventDefault();
-              if (tab.path === "sign-out") {
+              if (tab.path === "/api/auth/signin") {
                 void signIn();
               } else {
                 void router.push(tab.path ?? "/");

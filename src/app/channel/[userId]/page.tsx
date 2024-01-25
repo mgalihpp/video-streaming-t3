@@ -21,7 +21,7 @@ const ChannelPage = async ({ params }: { params: { userId: string } }) => {
             description="Click to upload new video. You have yet to upload a video."
           />
 
-          <Link href="/profile/edit" className={buttonVariants()}>
+          <Link href="/dashboard" className={buttonVariants()}>
             <Plus className="mr-2 h-5 w-5 shrink-0 stroke-white" />
             Upload Video
           </Link>
