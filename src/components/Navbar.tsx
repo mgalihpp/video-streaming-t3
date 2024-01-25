@@ -89,7 +89,7 @@ export default function Navbar({ children }: NavbarProps) {
     {
       icon: (className) => <LogOut className={className} />,
       name: "Log Out",
-      path: `sign-out`,
+      path: `/api/auth/signout`,
       lineAbove: true,
     },
   ];
@@ -222,7 +222,7 @@ export default function Navbar({ children }: NavbarProps) {
                         <Link
                           onClick={(e) => {
                             e.preventDefault();
-                            if (item.path === "sign-out") {
+                            if (item.path === "/api/auth/signout") {
                               void signOut();
                             } else {
                               void router.push(item.path ?? "/");
