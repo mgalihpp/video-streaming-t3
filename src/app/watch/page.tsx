@@ -131,6 +131,7 @@ function VideoPage() {
                   options={videoJsOptions}
                   key={video?.id}
                   src={video?.videoUrl}
+                  poster={video?.thumbnailUrl}
                 />
               </Suspense>
             </div>

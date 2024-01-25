@@ -41,7 +41,7 @@ import { useToast } from "./ui/use-toast";
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
-  const { options, onReady, src } = props;
+  const { options, onReady, src, poster } = props;
   const [open, setOpen] = React.useState(false);
 
   const handleContextMenu = (event) => {
@@ -82,54 +82,54 @@ export const VideoJS = (props) => {
     }
   };
 
-  const captureFramesAtIntervals = async (videoUrl, intervalInSeconds) => {
-    const frames = [];
+  // const captureFramesAtIntervals = async (videoUrl, intervalInSeconds) => {
+  //   const frames = [];
 
-    try {
-      const response = await fetch(videoUrl);
-      const blob = await response.blob();
-      const video = document.createElement("video");
-      video.src = URL.createObjectURL(blob);
+  //   try {
+  //     const response = await fetch(videoUrl);
+  //     const blob = await response.blob();
+  //     const video = document.createElement("video");
+  //     video.src = URL.createObjectURL(blob);
 
-      await new Promise((resolve) => {
-        video.addEventListener("loadeddata", () => {
-          const duration = video.duration;
+  //     await new Promise((resolve) => {
+  //       video.addEventListener("loadeddata", () => {
+  //         const duration = video.duration;
 
-          for (
-            let currentTime = 0;
-            currentTime < duration;
-            currentTime += intervalInSeconds
-          ) {
-            video.currentTime = currentTime;
+  //         for (
+  //           let currentTime = 0;
+  //           currentTime < duration;
+  //           currentTime += intervalInSeconds
+  //         ) {
+  //           video.currentTime = currentTime;
 
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
+  //           const canvas = document.createElement("canvas");
+  //           const context = canvas.getContext("2d");
 
-            video.addEventListener("seeked", () => {
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //           video.addEventListener("seeked", () => {
+  //             canvas.width = video.videoWidth;
+  //             canvas.height = video.videoHeight;
+  //             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-              const imageUrl = canvas.toDataURL();
-              frames.push({ imageUrl });
-            });
+  //             const imageUrl = canvas.toDataURL();
+  //             frames.push({ imageUrl });
+  //           });
 
-            video.addEventListener("error", (error) => {
-              console.error("Error seeking video:", error);
-            });
+  //           video.addEventListener("error", (error) => {
+  //             console.error("Error seeking video:", error);
+  //           });
 
-            video.currentTime = currentTime;
-          }
+  //           video.currentTime = currentTime;
+  //         }
 
-          resolve();
-        });
-      });
-    } catch (error) {
-      console.error("Error capturing frames:", error);
-    }
+  //         resolve();
+  //       });
+  //     });
+  //   } catch (error) {
+  //     console.error("Error capturing frames:", error);
+  //   }
 
-    return frames;
-  };
+  //   return frames;
+  // };
 
   React.useEffect(() => {
     // Make sure Video.js player is only initialized once
@@ -150,17 +150,17 @@ export const VideoJS = (props) => {
 
           player.on("play", async () => {
             try {
-              console.log("Start capturing frames");
-              const frames = await captureFramesAtIntervals(src, 30);
+              // console.log("Start capturing frames");
+              // const frames = await captureFramesAtIntervals(src, 30);
 
               // Simulate waiting for a short period (adjust as needed)
-              await new Promise((resolve) => setTimeout(resolve, 1000));
+              // await new Promise((resolve) => setTimeout(resolve, 1000));
 
               player.spriteThumbnails({
                 interval: 30,
-                urlArray: frames.map((frame) => frame.imageUrl),
-                columns: frames.length,
-                rows: 1,
+                url: poster,
+                columns: 10,
+                rows: 10,
                 width: 120,
                 height: 90,
               });
