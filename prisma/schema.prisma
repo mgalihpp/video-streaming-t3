@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-    provider     = "mysql"
+    provider     = "postgresql"
     url          = env("DATABASE_URL")
+    directUrl    = env("DIRECT_URL")
     relationMode = "prisma"
 }
 
@@ -65,7 +66,7 @@ model User {
     image                  String?
     backgroundImage        String?                  @db.Text
     handle                 String?                  @unique
-    description             String?                  @db.Text
+    description            String?                  @db.Text
     accounts               Account[]
     sessions               Session[]
     videos                 Video[]
@@ -171,7 +172,7 @@ model FollowEngagement {
 model Playlist {
     id          String   @id @default(cuid())
     title       String   @db.Text
-    description String?   @db.Text
+    description String?  @db.Text
     userId      String
     createdAt   DateTime @default(now())
     updateAt    DateTime @updatedAt
