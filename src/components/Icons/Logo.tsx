@@ -14,7 +14,6 @@ export default function Logo({
       width={width}
       height={height}
       priority
-      loading="lazy"
     />
   );
 }

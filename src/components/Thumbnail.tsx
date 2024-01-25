@@ -12,7 +12,6 @@ export function Thumbnail({
     <div className="relative inset-0 h-0 w-full pb-[50%]">
       <Image
         priority
-        loading="lazy"
         src={thumbnailUrl ?? "/background.jpg"}
         alt="thumbnail"
         fill

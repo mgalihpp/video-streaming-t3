@@ -22,7 +22,7 @@ import {
 import { setTheme } from "@/store/theme";
 import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -45,8 +45,6 @@ interface CropImageModalProps {
 export default function SettingsPage() {
   const { data: sessionData } = useSession();
   const [disable, setDisable] = useState(false);
-
-  // if(!sessionData?.user?.id) return void signIn()
 
   const [inputData, setInputData] = useState({
     name: "",
@@ -415,7 +413,6 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
           />
           <Image
             priority
-            loading="lazy"
             className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
             width={2000}
             height={2000}
@@ -435,7 +432,6 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
             />
             <Image
               priority
-              loading="lazy"
               className="h-32 w-full object-cover lg:h-64"
               src={channel.backgroundImage ?? "/background.jpg"}
               width={2000}

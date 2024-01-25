@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, useRef, useState, type DragEvent } from "react";
+import { type ChangeEvent, useState, type DragEvent } from "react";
 import { Edit } from "../Icons/Icons";
 import { Button } from "../ui/button";
 import {
@@ -37,6 +37,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [isChange, setIsChange] = useState(false);
 
   const [inputData, setInputData] = useState({
     title: video.title,
@@ -64,11 +65,13 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    setIsChange(true);
   };
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setImage(e.target.files[0] ? e.target.files[0] : null);
+      setIsChange(true);
       setCurrentPage(2);
     }
   };
@@ -83,12 +86,18 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
     }
   };
 
-  const handleVideoUpdate = (newVideoData: any) => {
+  const handleVideoUpdate = (newVideoData: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnailUrl: string;
+  }) => {
     updateVideoMutation.mutate(newVideoData, {
       onSuccess: () => {
         dispatch(closeDialog(video.id));
         setCroppedImage(null);
         setDisable(false);
+        setIsChange(false);
         toast({
           title: "Update Successfully",
           variant: "success",
@@ -262,7 +271,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
               </div>
             </div>
             <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
-              <Button disabled={disable} onClick={handleSubmit}>
+              <Button disabled={disable || !isChange} onClick={handleSubmit}>
                 {disable ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (

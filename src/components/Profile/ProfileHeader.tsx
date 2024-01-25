@@ -96,7 +96,6 @@ export default function ProfileHeader({
         <>
           <Image
             priority
-            loading="lazy"
             className="h-32 w-full object-cover lg:h-64"
             src={user?.backgroundImage ?? "/background.jpg"}
             alt="user channel bg image"

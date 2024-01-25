@@ -220,7 +220,6 @@ export function UserImage({
     >
       <Image
         priority
-        loading="lazy"
         src={image}
         alt="user image"
         className="absolute rounded-full"
