@@ -155,7 +155,7 @@ export default function UploadButton() {
                 )}
               </div>
               <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
-                <Button type="button" disabled={disable} onClick={handleSubmit}>
+                <Button type="button" disabled={disable || !uploadedVideo} onClick={handleSubmit}>
                   {disable ? (
                     <>
                       <p>Uploading...</p>

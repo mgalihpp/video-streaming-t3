@@ -95,6 +95,8 @@ export default function ProfileHeader({
       ) : (
         <>
           <Image
+            priority
+            loading="lazy"
             className="h-32 w-full object-cover lg:h-64"
             src={user?.backgroundImage ?? "/background.jpg"}
             alt="user channel bg image"
@@ -116,7 +118,9 @@ export default function ProfileHeader({
                   </h1>
                   <p className="text-regular text-primary/80">{user?.handle}</p>
                   <div className="mb-1 flex items-center justify-start text-xs">
-                    <p className="text-primary/70">{user?.followers} Followers</p>
+                    <p className="text-primary/70">
+                      {user?.followers} Followers
+                    </p>
                     <li className="pl-2 text-sm text-primary/90"></li>
                     <p className="text-primary/70">
                       {user?.followings} Following

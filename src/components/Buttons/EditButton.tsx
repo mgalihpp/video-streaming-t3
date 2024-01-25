@@ -83,6 +83,24 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
     }
   };
 
+  const handleVideoUpdate = (newVideoData: any) => {
+    updateVideoMutation.mutate(newVideoData, {
+      onSuccess: () => {
+        dispatch(closeDialog(video.id));
+        setCroppedImage(null);
+        setDisable(false);
+        toast({
+          title: "Update Successfully",
+          variant: "success",
+        });
+        void refetch();
+      },
+      onError: () => {
+        setDisable(false);
+      },
+    });
+  };
+
   const handleSubmit = async () => {
     type UploadResponse = {
       secure_url: string;
@@ -96,6 +114,10 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
       description: video.description,
       thumbnailUrl: video.thumbnailUrl,
     };
+
+    if (!croppedImage) {
+      handleVideoUpdate(videoData);
+    }
 
     const formData = new FormData();
     formData.append("upload_preset", "user_uploads");
@@ -124,24 +146,13 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
           if (inputData.description !== video.description)
             newVideoData.description = inputData.description;
 
-          updateVideoMutation.mutate(newVideoData, {
-            onSuccess: () => {
-              dispatch(closeDialog(video.id));
-              setCroppedImage(null);
-              setDisable(false);
-              toast({
-                title: "Update Successfully",
-                variant: "success",
-              });
-              void refetch();
-            },
-            onError: () => {
-              setDisable(false);
-            },
-          });
+          handleVideoUpdate(newVideoData);
         }
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        setDisable(false);
+      });
   };
 
   return (

@@ -137,11 +137,11 @@ export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
             onClick={refetch}
             key={video.id}
           >
-            <div className="relative isolate my-4 flex flex-col lg:gap-4 rounded-2xl border bg-background/20 hover:bg-secondary/30 lg:flex-row">
+            <div className="relative isolate my-4 flex flex-col rounded-2xl border bg-background/20 hover:bg-secondary/30 lg:flex-row lg:gap-4">
               <div className="aspect-[16/9] sm:aspect-[2/1] lg:w-52 lg:shrink-0">
                 <Thumbnail thumbnailUrl={video.thumbnailUrl} />
               </div>
-              <div className="flex w-full flex-col items-start overflow-hidden text-xs max-lg:mx-2 pb-2 lg:p-0">
+              <div className="flex w-full flex-col items-start overflow-hidden pb-2 text-xs max-lg:mx-2 lg:p-0">
                 <VideoTitle title={video.title} limitHeight limitSize />
                 <VideoInfo views={video.views} createdAt={video.createdAt} />
                 <VideoUserName name={user.name!} />
@@ -219,6 +219,8 @@ export function UserImage({
       }`}
     >
       <Image
+        priority
+        loading="lazy"
         src={image}
         alt="user image"
         className="absolute rounded-full"
@@ -248,7 +250,9 @@ export function VideoDescription({
   } else if (text.length < length) {
     return (
       <>
-        {border ? <div className="border-b border-gray-200 dark:border-secondary"></div> : null}
+        {border ? (
+          <div className="border-b border-gray-200 dark:border-secondary"></div>
+        ) : null}
         <p className="my-3 text-left text-sm font-semibold text-primary/80">
           {text}
         </p>
@@ -257,14 +261,16 @@ export function VideoDescription({
   } else {
     return (
       <>
-        {border ? <div className="border-b border-gray-200 dark:border-secondary"></div> : null}
+        {border ? (
+          <div className="border-b border-gray-200 dark:border-secondary"></div>
+        ) : null}
         <div className="relative w-full">
           <button
             onClick={toggleExpand}
             className="flex flex-row place-content-evenly"
           >
             <p
-              className={`text-left text-sm font-semibold text-primary/80 break-words ${
+              className={`break-words text-left text-sm font-semibold text-primary/80 ${
                 !isExpanded ? "line-clamp-2" : ""
               }`}
             >
@@ -325,7 +331,7 @@ export function VideoCommentSection({
   return (
     <>
       <div className="py-5">
-        <div className="flex space-x-3 rounded-2xl border border-gray-200 dark:border-secondary p-6 shadow-sm">
+        <div className="flex space-x-3 rounded-2xl border border-gray-200 p-6 shadow-sm dark:border-secondary">
           <div className="min-w-0 flex-1 space-y-3">
             <p className="block text-sm font-medium leading-6 text-primary">
               {comments.length} <span>Comments</span>
@@ -342,7 +348,7 @@ export function VideoCommentSection({
                     placeholder="Add comment"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
-                    className="block w-full rounded-md border-0 p-4 py-1.5 text-primary dark:bg-secondary ring-1 ring-inset ring-gray-200"
+                    className="block w-full rounded-md border-0 p-4 py-1.5 text-primary ring-1 ring-inset ring-gray-200 dark:bg-secondary"
                   />
                 </div>
                 <div className="flex-shrink-0">
