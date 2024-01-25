@@ -21,8 +21,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, lazy, memo, useEffect } from "react";
-import VideoPlayer from "@/components/VideoPlayer";
-import VideoJS from "@/components/VideoJsTest";
+const VideoJS = lazy(() => import("@/components/VideoJsTest"));
 
 function VideoPage() {
   const videoId = useSearchParams().get("video");
@@ -128,13 +127,6 @@ function VideoPage() {
                   <Skeleton className="h-[200px] w-full sm:h-[300px] lg:h-[499px]" />
                 }
               >
-                {/* <ReactPlayer
-                  controls
-                  playing
-                  width={"100%"}
-                  height={"100%"}
-                  url={video?.videoUrl}
-                /> */}
                 <VideoJS
                   options={videoJsOptions}
                   key={video?.id}

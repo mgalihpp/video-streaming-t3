@@ -143,12 +143,14 @@ export default function VideoTables() {
                   </TableCell>
                   <TableCell className="text-center">
                     <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-primary/80">
-                      {video.views} <User className="h-5 w-5 stroke-primary/80" />
+                      {video.views}{" "}
+                      <User className="h-5 w-5 stroke-primary/80" />
                     </p>
                   </TableCell>
                   <TableCell className="text-center">
                     <p className="flex justify-center gap-2 whitespace-nowrap px-3 py-5 text-sm text-primary/80">
-                      {video.comments} <MessageCircleMore className="h-5 w-5 stroke-primary/80" />
+                      {video.comments}{" "}
+                      <MessageCircleMore className="h-5 w-5 stroke-primary/80" />
                     </p>
                   </TableCell>
                   <TableCell className="flex flex-col text-center">
@@ -189,7 +191,9 @@ export default function VideoTables() {
               <Button
                 variant="outline"
                 onClick={handleFetchNextPage}
-                disabled={!hasNextPage && page === data?.pages?.length! - 1}
+                disabled={
+                  !hasNextPage && page === (data?.pages?.length ?? 0) - 1
+                }
               >
                 Next
               </Button>

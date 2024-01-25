@@ -64,10 +64,10 @@ export default function BlogHelpPage() {
         <p className="text-primary-600 text-base font-semibold leading-7">
           FAQ
         </p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-primary sm:text-6xl">
           We’re here to help{" "}
         </h1>
-        <p className="mb-4 mt-6  text-lg leading-8 text-gray-600">
+        <p className="mb-4 mt-6  text-lg leading-8 text-primary/80">
           Have questions? We’re here to help.
         </p>
         <Button
@@ -77,13 +77,13 @@ export default function BlogHelpPage() {
           Contact
         </Button>
       </div>
-      <dl className="mx-auto mt-10 max-w-3xl  space-y-6 divide-y divide-gray-900/10">
+      <dl className="mx-auto mt-10 max-w-3xl  space-y-6 divide-y divide-primary/10">
         {faqs.map((faq) => (
           <Disclosure as="div" key={faq.question} className="pt-6">
             {({ open }) => (
               <>
                 <dt>
-                  <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                  <Disclosure.Button className="flex w-full items-start justify-between text-left text-primary">
                     <span className="text-base font-semibold leading-7">
                       {faq.question}
                     </span>
@@ -97,7 +97,7 @@ export default function BlogHelpPage() {
                   </Disclosure.Button>
                 </dt>
                 <Disclosure.Panel as="dd" className="mt-2 pr-12">
-                  <p className="text-base leading-7 text-gray-600">
+                  <p className="text-base leading-7 primary/80">
                     {faq.answer}
                   </p>
                 </Disclosure.Panel>

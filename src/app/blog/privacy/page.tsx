@@ -53,13 +53,13 @@ export default function BlogPrivacyPage() {
   return (
     <div className="mt-4">
       <div className="mx-auto max-w-3xl text-center ">
-        <p className="text-primary-600 text-base font-semibold leading-7">
+        <p className="text-primary/90 text-base font-semibold leading-7">
           Privacy Policy
         </p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-primary sm:text-6xl">
           We care about your privacy{" "}
         </h1>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
+        <p className="mt-6 text-lg leading-8 text-primary/80">
           Your privacy is important to us at YourTube . We respect your privacy
           regarding any information we may collect from you across our website.
         </p>

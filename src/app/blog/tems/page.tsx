@@ -72,7 +72,7 @@ export default function BlogTemsPage() {
   return (
     <div className="mt-4">
       <div className="mx-auto max-w-2xl text-center ">
-        <p className="text-primary-600 text-base font-semibold leading-7">
+        <p className="text-primary/90 text-base font-semibold leading-7">
           Current as of{" "}
           {new Date().toLocaleDateString("en-US", {
             day: "2-digit",
@@ -80,10 +80,10 @@ export default function BlogTemsPage() {
             year: "numeric",
           })}
         </p>
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+        <h1 className="mt-2 text-4xl font-bold tracking-tight text-primary sm:text-6xl">
           Terms and conditions{" "}
         </h1>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
+        <p className="mt-6 text-lg leading-8 text-primary/80">
           By accessing our website, you are agreeing to be bound by these terms
           of service, and agree that you are responsible for compliance with any
           applicable local laws.

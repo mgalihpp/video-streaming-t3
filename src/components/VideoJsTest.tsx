@@ -1,4 +1,12 @@
 // @ts-nocheck
+// @ts-ignore
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/prefer-optional-chain */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 "use client";
 
 import { createRoot } from "react-dom/client";
@@ -184,7 +192,7 @@ export const VideoJS = (props) => {
     //   player.autoplay(memoizedOptions.autoplay);
     //   player.src(memoizedOptions.sources);
     // }
-  }, [memoizedOptions, memoizedOnReady, videoRef]);
+  }, [memoizedOptions, memoizedOnReady, videoRef, src]);
 
   // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {

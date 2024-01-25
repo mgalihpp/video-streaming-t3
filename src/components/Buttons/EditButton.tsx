@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, useRef, useState, DragEvent } from "react";
+import { type ChangeEvent, useRef, useState, type DragEvent } from "react";
 import { Edit } from "../Icons/Icons";
 import { Button } from "../ui/button";
 import {
@@ -12,13 +12,13 @@ import {
   DialogDescription,
 } from "../ui/dialog";
 import { api } from "@/trpc/react";
-import { Cropper } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { env } from "@/env";
 import { useDispatch, useSelector } from "react-redux";
 import { closeDialog, openDialog, selectDialogState } from "@/store/editDialog";
 import { useToast } from "../ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { ImageCropper } from "@/components";
 
 interface EditButtonProps {
   video: {
@@ -181,7 +181,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                   <div
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    className="mt-2 flex justify-center rounded-lg bg-secondary border border-dashed border-primary px-6 py-10"
+                    className="mt-2 flex justify-center rounded-lg border border-dashed border-primary bg-secondary px-6 py-10"
                   >
                     <div className="text-center">
                       {croppedImage ? (
@@ -228,7 +228,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                     id="title"
                     value={inputData.title}
                     onChange={handleInputChange}
-                    className="mt-2 block dark:bg-secondary w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-secondary sm:text-sm sm:leading-6"
                   />
                   <label
                     htmlFor="description"
@@ -245,16 +245,13 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                     id="description"
                     value={inputData.description}
                     onChange={handleInputChange}
-                    className="mt-2 block dark:bg-secondary w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="mt-2 block w-full rounded-md border-0 p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-secondary sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
             </div>
             <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
-              <Button
-                disabled={disable}
-                onClick={handleSubmit}
-              >
+              <Button disabled={disable} onClick={handleSubmit}>
                 {disable ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
@@ -282,72 +279,5 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
         )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-export function ImageCropper({
-  image,
-  setCroppedImage,
-  handleSubmit,
-  imageType,
-  setCurrentPage,
-  setOpen,
-}: {
-  setCurrentPage?: (page: number) => void;
-  setCroppedImage: (image: string | null) => void;
-  image: File | null | string;
-  handleSubmit?: (croppedDataUrl: string) => void;
-  imageType?: "backgroundImage" | "image";
-  setOpen?: (open: boolean) => void;
-}) {
-  interface CropperImageElement extends HTMLImageElement {
-    cropper?: Cropper;
-  }
-
-  const cropperRef = useRef<CropperImageElement>(null);
-
-  const cropImage = () => {
-    if (cropperRef.current && cropperRef.current !== null) {
-      const imageElement: CropperImageElement | null = cropperRef.current;
-      const cropper: Cropper | undefined = imageElement.cropper;
-      if (cropper) {
-        const croppedDataUrl = cropper.getCroppedCanvas().toDataURL();
-        setCroppedImage(croppedDataUrl);
-        handleSubmit ? handleSubmit(croppedDataUrl) : null;
-      }
-    }
-  };
-
-  const completeCrop = () => {
-    cropImage();
-    setCurrentPage ? setCurrentPage(1) : null;
-  };
-  const cancelCrop = () => {
-    setCurrentPage ? setCurrentPage(1) : null;
-    setOpen ? setOpen(false) : null;
-  };
-
-  return (
-    <div className="sm:flex sm:items-start">
-      <div className="mt-3 w-full text-center sm:ml-4 sm:mt-0 sm:text-left">
-        {image && (
-          <div className="mt-5">
-            <Cropper
-              ref={cropperRef}
-              src={image instanceof File ? URL.createObjectURL(image) : image}
-              style={{ height: "100%", width: "100%" }}
-              aspectRatio={imageType === "image" ? 1 : 16 / 9}
-              guides
-            />
-            <div className="mt-5 flex justify-end gap-2">
-              <Button variant="outline" onClick={cancelCrop}>
-                Cancel
-              </Button>
-              <Button onClick={completeCrop}>Crop Image</Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
   );
 }

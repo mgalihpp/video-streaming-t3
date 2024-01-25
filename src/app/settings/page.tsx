@@ -19,25 +19,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RootState } from "@/store/store";
 import { setTheme } from "@/store/theme";
 import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ImageCropper } from "@/components/Buttons/EditButton";
+import { ImageCropper } from "@/components";
+
+interface CropImageModalProps {
+  channel: {
+    id: string;
+    image?: string;
+    backgroundImage?: string;
+  };
+  refetch: () => Promise<unknown>;
+  imageType: "backgroundImage" | "image";
+}
 
 export default function SettingsPage() {
   const { data: sessionData } = useSession();
   const [disable, setDisable] = useState(false);
-  const router = useRouter();
 
   const [inputData, setInputData] = useState({
     name: "",
@@ -57,11 +64,11 @@ export default function SettingsPage() {
 
   const errorTypes = !data ?? !channel;
 
-  useEffect(() => {
-    if (sessionData?.user.id) {
-      router.replace(`/settings?${sessionData?.user.id}`);
-    }
-  }, [router, sessionData?.user.id]);
+  // useEffect(() => {
+  //   if (sessionData?.user.id) {
+  //     router.replace(`/settings?${sessionData?.user.id}`);
+  //   }
+  // }, [router, sessionData?.user.id]);
 
   useEffect(() => {
     if (channel) {
@@ -92,12 +99,12 @@ export default function SettingsPage() {
     setDisable(true);
 
     const userData = {
-      name: channel?.name || undefined,
+      name: channel?.name ?? undefined,
       // email: channel?.email,
-      handle: channel?.handle || undefined,
-      image: channel?.image || undefined,
-      backgroundImage: channel?.backgroundImage || undefined,
-      description: channel?.description || undefined,
+      handle: channel?.handle ?? undefined,
+      image: channel?.image ?? undefined,
+      backgroundImage: channel?.backgroundImage ?? undefined,
+      description: channel?.description ?? undefined,
     };
 
     if (
@@ -138,9 +145,9 @@ export default function SettingsPage() {
       <div>
         <CropImageModal
           channel={{
-            id: channel?.id || "",
-            image: channel?.image || "",
-            backgroundImage: channel?.backgroundImage || "/background.jpg",
+            id: channel?.id ?? "",
+            image: channel?.image ?? "",
+            backgroundImage: channel?.backgroundImage ?? "/background.jpg",
           }}
           refetch={refetch}
           imageType="backgroundImage"
@@ -151,9 +158,9 @@ export default function SettingsPage() {
             <div className="flex items-center justify-center">
               <CropImageModal
                 channel={{
-                  id: channel?.id || "",
-                  image: channel?.image || "",
-                  backgroundImage: channel?.backgroundImage || "",
+                  id: channel?.id ?? "",
+                  image: channel?.image ?? "",
+                  backgroundImage: channel?.backgroundImage ?? "",
                 }}
                 refetch={refetch}
                 imageType="image"
@@ -289,7 +296,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
-              <Button type="button" onClick={() => handleSubmit()} disabled={disable}>
+              <Button
+                type="button"
+                onClick={() => handleSubmit()}
+                disabled={disable}
+              >
                 Save
               </Button>
             </div>
@@ -319,21 +330,11 @@ export default function SettingsPage() {
   );
 }
 
-interface CropImageModalProps {
-  channel: {
-    id: string;
-    image?: string;
-    backgroundImage?: string;
-  };
-  refetch: () => Promise<unknown>;
-  imageType: "backgroundImage" | "image";
-}
-
-export function CropImageModal({
+const CropImageModal: React.FC<CropImageModalProps> = ({
   channel,
   refetch,
   imageType,
-}: CropImageModalProps) {
+}) => {
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -353,7 +354,6 @@ export function CropImageModal({
     };
 
     type UserData = {
-      id: string;
       name?: string;
       image?: string;
       backgroundImage?: string;
@@ -361,11 +361,9 @@ export function CropImageModal({
       description?: string;
     };
 
-    type ImageType = "backgroundImage" | "image";
-
     const userData = {
       id: channel.id,
-      [imageType]: channel[imageType] || undefined,
+      [imageType]: channel[imageType] ?? undefined,
     };
 
     const formData = new FormData();
@@ -382,11 +380,7 @@ export function CropImageModal({
       .then((response) => response.json() as Promise<UploadResponse>)
       .then((data) => {
         if (data.secure_url !== undefined) {
-          const newUserData: {
-            [K in keyof UserData]: K extends ImageType | "id"
-              ? string | undefined
-              : never;
-          } = {
+          const newUserData: UserData & { id: string } = {
             ...userData,
             ...(data.secure_url && { [imageType]: data.secure_url }),
           };
@@ -436,7 +430,7 @@ export function CropImageModal({
             />
             <Image
               className="h-32 w-full object-cover lg:h-64"
-              src={channel.backgroundImage || "/background.jpg"}
+              src={channel.backgroundImage ?? "/background.jpg"}
               width={2000}
               height={2000}
               alt="error"
@@ -459,13 +453,10 @@ export function CropImageModal({
       </Dialog>
     </>
   );
-}
+};
 
-export const SelecForm = () => {
+const SelecForm = () => {
   const dispatch = useDispatch();
-  const selectedTheme = useSelector(
-    (state: RootState) => state.theme.selectedTheme,
-  );
   const { toast } = useToast();
   const FormSchema = z.object({
     theme: z

@@ -25,8 +25,6 @@ export default function DeleteButton({
 }) {
   const [open, setOpen] = useState(false);
   const [disable, setDisable] = useState(false);
-
-  const router = useRouter();
   const { toast } = useToast();
   const deleteVideoMutation = api.video.deleteVideo.useMutation();
 

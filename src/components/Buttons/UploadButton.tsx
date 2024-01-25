@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, DragEvent, useState } from "react";
+import { type ChangeEvent, type DragEvent, useState } from "react";
 import { Plus } from "../Icons/Icons";
 import { Button } from "../ui/button";
 import {
@@ -120,7 +120,7 @@ export default function UploadButton() {
             </DialogHeader>
             <div className="col-span-full mt-2">
               <div
-                className="mt-2 flex justify-center rounded-lg bg-secondary border border-dashed border-primary px-6 py-10"
+                className="mt-2 flex justify-center rounded-lg border border-dashed border-primary bg-secondary px-6 py-10"
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
               >
@@ -146,7 +146,9 @@ export default function UploadButton() {
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
-                        <p className="text-xs leading-5 text-primary/80">.mp4</p>
+                        <p className="text-xs leading-5 text-primary/80">
+                          .mp4
+                        </p>
                       </>
                     </div>
                   </>
