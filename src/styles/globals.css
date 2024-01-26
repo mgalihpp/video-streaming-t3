@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
 
 @layer base {
   :root {
@@ -50,7 +49,6 @@
   }
 }
 
- 
 @layer base {
   * {
     @apply border-border;
@@ -58,4 +56,29 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* background: */
+progress::-webkit-progress-bar {
+  background-color: hsl(var(--background));
+  width: 100%;
+  border-radius: 8px;
+}
+progress {
+  background-color: hsl(var(--background));
+  border-radius: 8px;
+}
+
+/* value: */
+progress::-webkit-progress-value {
+  background-color: hsl(var(--primary)) !important;
+  border-radius: 8px;
+}
+progress::-moz-progress-bar {
+  background-color: hsl(var(--primary)) !important;
+  border-radius: 8px;
+}
+progress {
+  color: hsl(var(--primary));
+  border-radius: 8px;
 }

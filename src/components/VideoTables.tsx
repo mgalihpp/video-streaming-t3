@@ -23,12 +23,14 @@ import { Skeleton } from "./ui/skeleton";
 import { User } from "./Icons/Icons";
 import { MessageCircleMore } from "lucide-react";
 import { Button } from "./ui/button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { setTriggerRefetch } from "@/store/refetchUpload";
 
 export default function VideoTables() {
-  const [page, setPage] = useState(0);
+  const dispatch = useDispatch();
   const isRefetch = useSelector((state: RootState) => state.refetch.isRefetch);
+  const [page, setPage] = useState(0);
 
   const {
     data,
@@ -52,6 +54,7 @@ export default function VideoTables() {
   useEffect(() => {
     if (isRefetch) {
       void refetch();
+      dispatch(setTriggerRefetch(false));
     }
   }, [isRefetch]);
 

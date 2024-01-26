@@ -23,6 +23,6 @@ const editDialogSlice = createSlice({
 });
 
 export const { openDialog, closeDialog } = editDialogSlice.actions;
-export const selectDialogState = (state: RootState) => state.dialog;
+export const selectDialogState = (state: RootState) => state.dialog.openVideos;
 
 export default editDialogSlice.reducer;

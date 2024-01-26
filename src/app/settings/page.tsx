@@ -226,7 +226,6 @@ export default function SettingsPage() {
                       name="email"
                       type="email"
                       autoComplete="email"
-                      defaultValue={channel?.email ?? ""}
                       value={channel?.email ?? ""}
                       className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
                     />
@@ -442,7 +441,7 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
         </>
       )}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-screen overflow-y-auto overflow-x-hidden">
           <>
             <ImageCropper
               image={image}

@@ -18,6 +18,7 @@ import { useToast } from "../ui/use-toast";
 import { useDispatch } from "react-redux";
 import { openDialog } from "@/store/editDialog";
 import { setTriggerRefetch } from "@/store/refetchUpload";
+import { Progress } from "../ui/progress";
 
 export default function UploadButton() {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ export default function UploadButton() {
   const [uploadedVideo, setUploadedVideo] = useState<File | FileList | null>(
     null,
   );
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { toast } = useToast();
 
@@ -48,11 +50,28 @@ export default function UploadButton() {
     }
   };
 
+  const startSimulatedProgress = () => {
+    setUploadProgress(0);
+
+    const interval = setInterval(() => {
+      setUploadProgress((prevProgress) => {
+        if (prevProgress >= 95) {
+          clearInterval(interval);
+          return prevProgress;
+        }
+        return prevProgress + 5;
+      });
+    }, 500);
+
+    return interval;
+  };
+
   const handleSubmit = () => {
     type UploadResponse = {
       secure_url: string;
     };
 
+    const progress = startSimulatedProgress();
     setDisable(true);
 
     const videoData = {
@@ -92,6 +111,7 @@ export default function UploadButton() {
                 title: "Upload Successfully",
                 variant: "success",
               });
+              clearInterval(progress);
               dispatch(openDialog(video.id));
             },
             onError: () => {
@@ -125,7 +145,24 @@ export default function UploadButton() {
                 onDragOver={(e) => e.preventDefault()}
               >
                 {uploadedVideo ? (
-                  <p>Your video has been attached.</p>
+                  <>
+                    <div className="justify-centers flex flex-col items-center gap-4">
+                      {!disable && <p>Your video has been attached.</p>}
+                      {disable && (
+                        <>
+                          <p>Uploading...</p>
+                          <p>Please don&apos;t leave this window.</p>
+                          <Progress
+                            value={uploadProgress}
+                            indicatorColor={
+                              uploadProgress === 100 ? "bg-green-500" : ""
+                            }
+                            className="h-1 w-full bg-background"
+                          />
+                        </>
+                      )}
+                    </div>
+                  </>
                 ) : (
                   <>
                     <div className="text-center">
@@ -141,6 +178,7 @@ export default function UploadButton() {
                               name="file-upload"
                               id="file-upload"
                               className="sr-only"
+                              accept=".mp4"
                               onChange={onFileChange}
                             />
                           </label>
@@ -155,7 +193,11 @@ export default function UploadButton() {
                 )}
               </div>
               <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
-                <Button type="button" disabled={disable || !uploadedVideo} onClick={handleSubmit}>
+                <Button
+                  type="button"
+                  disabled={disable || !uploadedVideo}
+                  onClick={handleSubmit}
+                >
                   {disable ? (
                     <>
                       <p>Uploading...</p>

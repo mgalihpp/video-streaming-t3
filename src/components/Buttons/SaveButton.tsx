@@ -139,20 +139,19 @@ export default function SaveButton({ videoId }: { videoId: string }) {
               sessionData?.user.id ? void setOpen(true) : void signIn()
             }
           >
-            <FolderPlus className="mr-2 h-5 w-5 shrink-0 stroke-primary" />{" "}
-            Save
+            <FolderPlus className="mr-2 h-5 w-5 shrink-0 stroke-primary" /> Save
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-xs rounded-2xl">
           <DialogHeader>
             <DialogTitle>Save video to...</DialogTitle>
           </DialogHeader>
-          <div className="flex w-full flex-col items-start text-start gap-2">
+          <div className="flex w-full flex-col items-start gap-2 text-start">
             {playlists?.map((playlist) => (
               <div className="flex items-center gap-2" key={playlist.id}>
                 <input
                   type="checkbox"
-                  className="h-5 w-5 shrink-0 rounded-lg accent-primary dark:accent-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-5 w-5 shrink-0 rounded-lg accent-primary disabled:cursor-not-allowed disabled:opacity-50 dark:accent-secondary"
                   id="playlist"
                   name={playlist.title}
                   checked={checkedStatus[playlist.id] ?? false}
@@ -188,7 +187,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
             <form onSubmit={handleAddNewPlaylist}>
               <div className="flex w-full flex-col space-y-4">
                 <div className="flex w-full flex-col gap-2">
-                  <Label>Name</Label>
+                  <Label htmlFor="title">Name</Label>
                   <Input
                     id="title"
                     name="title"
@@ -201,7 +200,7 @@ export default function SaveButton({ videoId }: { videoId: string }) {
                       {errorInputMsg.title}
                     </p>
                   )}
-                  <Label>Description</Label>
+                  <Label htmlFor="desc">Description</Label>
                   <Input
                     id="desc"
                     name="desc"

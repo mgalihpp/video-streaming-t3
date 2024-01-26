@@ -82,6 +82,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
 
     if (files.length > 0) {
       setImage(files[0]!);
+      setIsChange(true);
       setCurrentPage(2);
     }
   };
@@ -165,16 +166,13 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
   };
 
   return (
-    <Dialog
-      open={dialogState.openVideos[video.id]}
-      onOpenChange={handleOpenChange}
-    >
+    <Dialog open={dialogState[video.id]} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button type="button" variant="ghost" size="icon">
           <Edit className="h-5 w-5 shrink-0 stroke-primary" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-screen overflow-y-scroll">
+      <DialogContent className="max-h-screen overflow-y-auto overflow-x-hidden">
         {currentPage === 1 && (
           <>
             <div className="sm:flex sm:items-start">
@@ -187,10 +185,7 @@ export default function EditButton({ video, refetch }: EditButtonProps) {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="col-span-full mt-2">
-                  <label
-                    htmlFor="thumbnail"
-                    className="block text-sm font-medium leading-6 text-primary"
-                  >
+                  <label className="block text-sm font-medium leading-6 text-primary">
                     Thumbnail
                   </label>
                   <p className="text-xs text-muted-foreground">
