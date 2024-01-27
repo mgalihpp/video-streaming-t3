@@ -71,56 +71,153 @@ export default function UploadButton() {
       secure_url: string;
     };
 
+    if (!uploadedVideo) console.error("select file please");
+
     const progress = startSimulatedProgress();
     setDisable(true);
 
     const videoData = {
       videoUrl: "",
     };
+    const uniqueUploadId = generateUniqueUploadId();
+    const chunkSize = 5 * 1024 * 1024;
+    const totalChunks = Math.ceil((uploadedVideo as File).size / chunkSize);
+    let currentChunk = 0;
 
-    const formData = new FormData();
+    const UploadChunk = async (start: number, end: number) => {
+      const formData = new FormData();
+      formData.append("upload_preset", "user_uploads");
+      formData.append("file", (uploadedVideo as File).slice(start, end));
+      const contentRange = `bytes ${start}-${end - 1}/${
+        (uploadedVideo as File).size
+      }`;
 
-    formData.append("upload_preset", "user_uploads");
+      console.log(
+        `Uploading chunk for file: ${
+          (uploadedVideo as File).name
+        }; start: ${start}, end: ${end - 1}`,
+      );
 
-    if (uploadedVideo) {
-      formData.append("file", uploadedVideo as File);
-    }
-
-    fetch(
-      "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/video/upload",
-      {
-        method: "POST",
-        body: formData,
-      },
-    )
-      .then((response) => response.json() as Promise<UploadResponse>)
-      .then((data) => {
-        if (data.secure_url !== undefined) {
-          const newVideoData = {
-            ...videoData,
-            ...(data.secure_url && { videoUrl: data.secure_url }),
-          };
-
-          addNewVideoMutation.mutate(newVideoData, {
-            onSuccess: (video) => {
-              dispatch(setTriggerRefetch(true));
-              setOpen(false);
-              setUploadedVideo(null);
-              setDisable(false);
-              toast({
-                title: "Upload Successfully",
-                variant: "success",
-              });
-              clearInterval(progress);
-              dispatch(openDialog(video.id));
+      try {
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/auto/upload",
+          {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-Unique-Upload-Id": uniqueUploadId,
+              "Content-Range": contentRange,
             },
-            onError: () => {
-              setDisable(false);
-            },
-          });
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Chunk upload failed");
         }
-      })
-      .catch((error) => console.error(error));
+
+        currentChunk++;
+
+        if (currentChunk < totalChunks) {
+          const nextStart = currentChunk * chunkSize;
+          const nextEnd = Math.min(
+            nextStart + chunkSize,
+            (uploadedVideo as File).size,
+          );
+          UploadChunk(nextStart, nextEnd);
+        } else {
+          clearInterval(progress);
+          setUploadProgress(100);
+
+          toast({
+            title: "Upload Successfully",
+            variant: "success",
+          });
+
+          const fetchResponse = (await response.json()) as UploadResponse;
+
+          if (fetchResponse.secure_url !== undefined) {
+            const newVideoData = {
+              ...videoData,
+              ...(fetchResponse.secure_url && {
+                videoUrl: fetchResponse.secure_url,
+              }),
+            };
+
+            addNewVideoMutation.mutate(newVideoData, {
+              onSuccess: (video) => {
+                dispatch(setTriggerRefetch(true));
+                setOpen(false);
+                setUploadedVideo(null);
+                setDisable(false);
+                dispatch(openDialog(video.id));
+              },
+              onError: () => {
+                setDisable(false);
+              },
+            });
+          }
+
+          console.info("File upload completed.");
+        }
+      } catch (error) {
+        console.error("Error uploading chunk:", error);
+        setDisable(false);
+      }
+
+      // const formData = new FormData();
+
+      // formData.append("upload_preset", "user_uploads");
+
+      // if (uploadedVideo) {
+      //   formData.append("file", uploadedVideo as File);
+      // }
+
+      // fetch(
+      //   "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/video/upload",
+      //   {
+      //     method: "POST",
+      //     body: formData,
+      //   },
+      // )
+      //   .then((response) => response.json() as Promise<UploadResponse>)
+      //   .then((data) => {
+      //     if (data.secure_url !== undefined) {
+      //       const newVideoData = {
+      //         ...videoData,
+      //         ...(data.secure_url && { videoUrl: data.secure_url }),
+      //       };
+
+      //       addNewVideoMutation.mutate(newVideoData, {
+      //         onSuccess: (video) => {
+      //           toast({
+      //             title: "Upload Successfully",
+      //             variant: "success",
+      //           });
+      //           clearInterval(progress);
+      //           setTimeout(() => {
+      //             dispatch(setTriggerRefetch(true));
+      //             setOpen(false);
+      //             setUploadedVideo(null);
+      //             setDisable(false);
+      //             dispatch(openDialog(video.id));
+      //           }, 1000);
+      //         },
+      //         onError: () => {
+      //           setDisable(false);
+      //         },
+      //       });
+      //     }
+      //   })
+      //   .catch((error) => console.error(error));
+    };
+
+    const starts = 0;
+    const ends = Math.min(chunkSize, (uploadedVideo as File).size);
+    UploadChunk(starts, ends);
+  };
+
+  const generateUniqueUploadId = () => {
+    return `uqid-${Date.now()}`;
   };
 
   return (
@@ -155,7 +252,9 @@ export default function UploadButton() {
                           <Progress
                             value={uploadProgress}
                             indicatorColor={
-                              uploadProgress === 100 ? "bg-green-500" : ""
+                              uploadProgress === 100
+                                ? "bg-green-500"
+                                : "bg-primary"
                             }
                             className="h-1 w-full bg-background"
                           />
@@ -185,7 +284,7 @@ export default function UploadButton() {
                           <p className="pl-1">or drag and drop</p>
                         </div>
                         <p className="text-xs leading-5 text-primary/80">
-                          .mp4
+                          .mp4 Max to 100MB
                         </p>
                       </>
                     </div>
@@ -207,7 +306,13 @@ export default function UploadButton() {
                     "Upload"
                   )}
                 </Button>
-                <Button variant="outline" onClick={() => setOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    setUploadedVideo(null);
+                  }}
+                >
                   Cancel
                 </Button>
               </div>
