@@ -66,7 +66,7 @@ export default function UploadButton() {
     return interval;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     type UploadResponse = {
       secure_url: string;
     };
@@ -123,7 +123,7 @@ export default function UploadButton() {
             nextStart + chunkSize,
             (uploadedVideo as File).size,
           );
-          UploadChunk(nextStart, nextEnd);
+          await UploadChunk(nextStart, nextEnd);
         } else {
           clearInterval(progress);
           setUploadProgress(100);
@@ -213,7 +213,7 @@ export default function UploadButton() {
 
     const starts = 0;
     const ends = Math.min(chunkSize, (uploadedVideo as File).size);
-    UploadChunk(starts, ends);
+    await UploadChunk(starts, ends);
   };
 
   const generateUniqueUploadId = () => {
