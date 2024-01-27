@@ -139,7 +139,7 @@ export default function ProfileHeader({
                     </Link>
                   ) : (
                     <FollowButton
-                      followingId={userId}
+                      followingId={channelId}
                       viewer={{ hasFollowed: viewer?.hasFollowed ?? false }}
                     />
                   )}
