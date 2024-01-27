@@ -8,6 +8,7 @@ import NextSessionProvider from "@/providers/SessionProvider";
 import Providers from "@/providers/Providers";
 import { Toaster } from "@/components/ui/toaster";
 import { Wrapper } from "@/components";
+import NextTopLoader from "nextjs-toploader";
 import ThemeProviders from "@/providers/ThemeProviders";
 
 const inter = Inter({
@@ -41,6 +42,7 @@ export default function RootLayout({
             </Providers>
           </TRPCReactProvider>
         </NextSessionProvider>
+        <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
         <Toaster />
       </body>
     </html>
