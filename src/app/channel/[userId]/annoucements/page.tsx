@@ -11,7 +11,11 @@ import { Plus } from "@/components/Icons/Icons";
 import { buttonVariants } from "@/components/ui/button";
 import moment from "moment";
 
-const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) => {
+const ChannelAnnoucementsPage = async ({
+  params,
+}: {
+  params: { userId: string };
+}) => {
   const session = await getServerAuthSession();
 
   const { annoucements, user } =
@@ -54,7 +58,10 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
       {annoucements.length <= 0 ? (
         <Error />
       ) : (
-        <ul role="liest" className="-pt-8 divide-y divide-gray-200 dark:divide-secondary">
+        <ul
+          role="liest"
+          className="-pt-8 divide-y divide-gray-200 dark:divide-secondary"
+        >
           {annoucements
             .sort(
               (a, b) =>
@@ -70,33 +77,37 @@ const ChannelAnnoucementsPage = async ({ params }: {params: {userId: string}}) =
                   <div className="flex gap-2">
                     <UserImage image={author.image!} />
                     <div className="flex w-full flex-col">
-                      <div className="flex flex-col">
-                        <div className="flex flex-row items-start gap-2 text-xs">
-                          <p className="w-max text-sm font-semibold leading-6 text-primary">
+                      <div className="flex items-start justify-between text-xs sm:items-center sm:gap-2">
+                        <div className="flex flex-col">
+                          <p className="text-sm font-semibold leading-6 text-primary">
                             {author.name}
                           </p>
-                          <p className="text-sm text-primary/70">
-                            {moment(annoucement.createdAt).fromNow()}
+                          <p className="text-sm text-primary/80">
+                            {author.handle}
                           </p>
                         </div>
-
-                        <p className="text-sm text-primary/80">{author.handle}</p>
+                        <AnnoucementButton
+                          channel={{
+                            userId: params.userId,
+                          }}
+                          EngagementData={{
+                            id: annoucement.id,
+                            likes: annoucement.likes,
+                            dislikes: annoucement.dislikes,
+                          }}
+                          viewer={{
+                            hasLiked: annoucement.viewer.hasLiked,
+                            hasDisliked: annoucement.viewer.hasDisliked,
+                          }}
+                        />
                       </div>
-                      <p className="my-2 text-sm text-primary/90 flex-shrink-0 break-all">
+                      <p className="my-2 break-all text-sm text-primary/90">
                         {annoucement.message}
                       </p>
+                      <p className="self-end text-sm text-primary/70">
+                        {moment(annoucement.createdAt).fromNow()}
+                      </p>
                     </div>
-                    <AnnoucementButton
-                      EngagementData={{
-                        id: annoucement.id,
-                        likes: annoucement.likes,
-                        dislikes: annoucement.dislikes,
-                      }}
-                      viewer={{
-                        hasLiked: annoucement.viewer.hasLiked,
-                        hasDisliked: annoucement.viewer.hasDisliked,
-                      }}
-                    />
                   </div>
                 </li>
               );

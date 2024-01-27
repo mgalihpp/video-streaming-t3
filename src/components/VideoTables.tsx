@@ -24,7 +24,7 @@ import { User } from "./Icons/Icons";
 import { MessageCircleMore } from "lucide-react";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { type RootState } from "@/store/store";
 import { setTriggerRefetch } from "@/store/refetchUpload";
 
 export default function VideoTables() {

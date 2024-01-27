@@ -11,6 +11,9 @@ import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 
 interface AnnoucementButtonProps {
+  channel: {
+    userId: string;
+  };
   EngagementData: {
     id: string;
     likes: number;
@@ -23,6 +26,7 @@ interface AnnoucementButtonProps {
 }
 
 export default function AnnoucementButton({
+  channel,
   EngagementData,
   viewer,
 }: AnnoucementButtonProps) {
@@ -100,35 +104,37 @@ export default function AnnoucementButton({
           {dislikeCount}
         </span>
       </Button>
-      <Menu as="div">
-        <div>
-          <Menu.Button className={buttonVariants({ variant: "ghost" })}>
-            <DotsVertical className="h-5 w-5 stroke-primary" />
-          </Menu.Button>
-        </div>
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items className="absolute right-10 z-10 mt-2 w-fit origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-secondary ring-opacity-5 focus:outline-none">
-            <Menu.Item>
-              <Button
-                className="flex gap-2"
-                variant="ghost"
-                onClick={() => handleDeleteAnnoucement(EngagementData.id)}
-              >
-                <Trash className="h-4 w-4 stroke-destructive" />
-                Delete
-              </Button>
-            </Menu.Item>
-          </Menu.Items>
-        </Transition>
-      </Menu>
+      {sessionData?.user.id === channel.userId && (
+        <Menu as="div">
+          <div>
+            <Menu.Button className={buttonVariants({ variant: "ghost" })}>
+              <DotsVertical className="h-5 w-5 stroke-primary" />
+            </Menu.Button>
+          </div>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items className="absolute right-10 z-10 mt-2 w-fit origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-secondary ring-opacity-5 focus:outline-none">
+              <Menu.Item>
+                <Button
+                  className="flex gap-2"
+                  variant="ghost"
+                  onClick={() => handleDeleteAnnoucement(EngagementData.id)}
+                >
+                  <Trash className="h-4 w-4 stroke-destructive" />
+                  Delete
+                </Button>
+              </Menu.Item>
+            </Menu.Items>
+          </Transition>
+        </Menu>
+      )}
     </div>
   );
 }

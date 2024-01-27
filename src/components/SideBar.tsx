@@ -26,6 +26,7 @@ import { Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Button } from "./ui/button";
 import { UserImage } from ".";
+import { TrendingUp } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -80,13 +81,17 @@ export default function SideBar({
     },
     {
       name: "Library",
-      path: userId ? `/channel/${String(userId)}/playlists` : "/api/auth/signin",
+      path: userId
+        ? `/channel/${String(userId)}/playlists`
+        : "/api/auth/signin",
       icon: (className) => <Folder className={className} />,
       current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId ? `/channel/${String(userId)}/followings` : "/api/auth/signin",
+      path: userId
+        ? `/channel/${String(userId)}/followings`
+        : "/api/auth/signin",
       icon: (className) => <UserCheck className={className} />,
       current: pathname === `/channel/${String(userId)}/followings`,
     },
@@ -160,10 +165,10 @@ export default function SideBar({
         onMouseLeave={() => setCloseSideBar(true)}
         className={cn(
           closeSidebar ? "lg:w-20 " : "lg:w-56",
-          "bottom-0 top-16 hidden lg:fixed lg:z-40 lg:flex lg:flex-col transition-all ease-in-out duration-800",
+          "duration-800 bottom-0 top-16 hidden transition-all ease-in-out lg:fixed lg:z-40 lg:flex lg:flex-col",
         )}
       >
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-300 dark:border-secondary bg-background px-6 pb-4">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-300 bg-background px-6 pb-4 dark:border-secondary">
           <nav className="flex flex-1 flex-col pt-8">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
@@ -192,7 +197,7 @@ export default function SideBar({
                               "h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary",
                             )}
                         <p
-                          className={cn("font-semibold truncate", {
+                          className={cn("truncate font-semibold", {
                             hidden: closeSidebar,
                           })}
                         >
@@ -202,6 +207,15 @@ export default function SideBar({
                     </li>
                   ))}
                 </ul>
+              </li>
+              <li className="mt-4 py-2 border-t  border-gray-300 dark:border-secondary">
+                <Link
+                  href="/feed/trending"
+                  className="group -mx-2 flex gap-x-3 items-center rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
+                >
+                  <TrendingUp className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
+                  <p className={cn("", { hidden: closeSidebar })}>Trending</p>
+                </Link>
               </li>
               <li className="mt-auto">
                 <Link
@@ -267,11 +281,14 @@ export default function SideBar({
                     variant="outline"
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <Close className="h-6 w-6 stroke-primary" aria-hidden="true" />
+                    <Close
+                      className="h-6 w-6 stroke-primary"
+                      aria-hidden="true"
+                    />
                   </Button>
                 </div>
 
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-gray-300 dark:border-secondary bg-background px-6 pb-4">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-gray-300 bg-background px-6 pb-4 dark:border-secondary">
                   <nav className="flex flex-1 flex-col pt-4 ">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                       <Logo width={50} height={50} />

@@ -12,7 +12,6 @@ import {
 import { Button } from "../ui/button";
 import { RedTrash, Trash } from "../Icons/Icons";
 import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Loader2 } from "lucide-react";
 import { useToast } from "../ui/use-toast";

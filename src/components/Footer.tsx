@@ -1,8 +1,9 @@
 import { signIn, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { ClockRewind, Folder, Home, UserCheck } from "./Icons/Icons";
+import { Folder, Home, UserCheck } from "./Icons/Icons";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { TrendingUp } from "lucide-react";
 
 interface NavigationItem {
   name: string;
@@ -25,22 +26,26 @@ export default function Footer() {
       current: pathname === "/",
     },
     {
-      name: "History",
-      path: userId ? `/playlist/history` : "/api/auth/signin",
-      icon: (className) => <ClockRewind className={className} />,
-      current: pathname === "/playlist/history",
-    },
-    {
       name: "Library",
-      path: userId ? `/channel/${String(userId)}/playlists` : "/api/auth/signin",
+      path: userId
+        ? `/channel/${String(userId)}/playlists`
+        : "/api/auth/signin",
       icon: (className) => <Folder className={className} />,
       current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId ? `/channel/${String(userId)}/followings` : "/api/auth/signin",
+      path: userId
+        ? `/channel/${String(userId)}/followings`
+        : "/api/auth/signin",
       icon: (className) => <UserCheck className={className} />,
       current: pathname === `/channel/${String(userId)}/followings`,
+    },
+    {
+      name: "Trending",
+      path: userId ? `/feed/trending` : "/api/auth/signin",
+      icon: (className) => <TrendingUp className={className} />,
+      current: pathname === `/feed/trending`,
     },
   ];
 

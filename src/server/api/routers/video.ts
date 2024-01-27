@@ -365,4 +365,66 @@ export const videoRouter = createTRPCRouter({
       });
       return newVideo;
     }),
+  getTrendingVideo: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const getVideos = await ctx.db.video.findMany({
+        where: {
+          publish: true,
+        },
+      });
+
+      const currentDate = new Date();
+      const twentyFourHoursAgo = new Date(
+        currentDate.getTime() - 24 * 60 * 60 * 1000,
+      );
+      const twoDaysAgo = new Date(
+        currentDate.getTime() - 2 * 24 * 60 * 60 * 1000,
+      );
+
+      const videoWithCount = await Promise.all(
+        getVideos.map(async (video) => {
+          const views = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.VIEW,
+            },
+          });
+          const trendViews = await ctx.db.videoEngagement.count({
+            where: {
+              videoId: video.id,
+              engagementType: EngagementType.VIEW,
+              createdAt: {
+                gte: input === "old" ? twoDaysAgo : twentyFourHoursAgo,
+              },
+            },
+          });
+
+          const users = await ctx.db.user.findFirst({
+            where: {
+              id: video.userId,
+            },
+          });
+
+          return {
+            ...video,
+            views,
+            trendViews,
+            users,
+          };
+        }),
+      );
+
+      const videos = videoWithCount.filter((video) => video.trendViews >= 2);
+
+      const trendingVideos = videos.map(
+        ({ users, trendViews, ...video }) => video,
+      );
+      const users = videos.map(({ users }) => users);
+
+      return {
+        videos: trendingVideos,
+        users: users,
+      };
+    }),
 });
