@@ -5,11 +5,21 @@ import Link from "next/link";
 import { Thumbnail } from ".";
 import { cn } from "@/lib/utils";
 import moment from "moment";
-import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from "./Icons/Icons";
+import React, { Fragment, useState } from "react";
+import { ChevronDown, ChevronUp, DotsVertical } from "./Icons/Icons";
 import { signIn, useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
+import { Menu, Transition } from "@headlessui/react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  openReplies,
+  selectExpandRepliesState,
+  selectRepliesState,
+  unExpandReplies,
+  expandReplies,
+  closeReplies,
+} from "@/store/replies";
 
 interface VideoComponentProps {
   videos: {
@@ -31,6 +41,19 @@ interface CommentProps {
     id: string;
     message: string | null;
     createdAt: Date;
+    replies: {
+      repliesComment: {
+        id: string;
+        message: string | null;
+        createdAt: Date;
+        user: {
+          id: string | null;
+          name: string | null;
+          image: string | null;
+          handle: string | null;
+        };
+      } | null;
+    }[];
   };
   user: {
     id: string | null;
@@ -292,13 +315,19 @@ export function VideoCommentSection({
 }: VideoCommentSectionProps) {
   const { data: sessionData } = useSession();
   const [commentInput, setCommentInput] = useState("");
+  const [replyInput, setReplyInput] = useState("");
   const [disable, setDisable] = useState(false);
   const [errorInput, setErrorInput] = useState(false);
   const [errorInputMsg, setErrorInputMsg] = useState<
     string | string[] | undefined
   >("");
+  const dispatch = useDispatch();
+  const openReplies = useSelector(selectRepliesState);
+  const expandReply = useSelector(selectExpandRepliesState);
 
   const addCommentMutation = api.comment.addComment.useMutation();
+  const addReplyMutation = api.comment.addReplyComment.useMutation();
+
   const addComment = (input: { videoId: string; message: string }) => {
     addCommentMutation.mutate(input, {
       onError: (err) => {
@@ -318,12 +347,33 @@ export function VideoCommentSection({
     });
   };
 
+  const addReply = (input: { commentId: string; message: string }) => {
+    addReplyMutation.mutate(input, {
+      onSuccess: () => {
+        void refetch();
+        setErrorInput(false);
+        setErrorInputMsg("");
+        setCommentInput("");
+        setDisable(false);
+      },
+    });
+  };
+
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setDisable(true);
     addComment({
       videoId: videoId,
       message: commentInput,
+    });
+  };
+
+  const handleReplySubmit = (e: React.FormEvent, commentId: string) => {
+    e.preventDefault();
+    setDisable(true);
+    addReply({
+      commentId: commentId,
+      message: replyInput,
     });
   };
 
@@ -392,12 +442,149 @@ export function VideoCommentSection({
                       </div>
                       <p className="my-2 text-primary/90">{comment.message}</p>
                     </div>
+                    <div>
+                      <LikeDislikeReplyButton commentId={comment.id} />
+                    </div>
                   </div>
+                  <>
+                    {openReplies[comment.id] && (
+                      <div className="w-full">
+                        <form
+                          onSubmit={(e) => handleReplySubmit(e, comment.id)}
+                        >
+                          <div className="flex flex-col gap-2">
+                            <textarea
+                              rows={1}
+                              maxLength={200}
+                              name="replies"
+                              id="replies"
+                              placeholder="Add replies"
+                              value={replyInput}
+                              onChange={(e) => setReplyInput(e.target.value)}
+                              className="block max-h-[100px] w-full rounded-md border-0 p-4 py-1.5 text-primary ring-1 ring-inset ring-gray-200 dark:bg-secondary"
+                            />
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                onClick={() =>
+                                  dispatch(closeReplies(comment.id))
+                                }
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                disabled={replyInput.length === 0 || disable}
+                              >
+                                Reply
+                              </Button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                    {comment.replies.length > 0 && (
+                      <div className="mt-4">
+                        {expandReply[comment.id] ? (
+                          <div className="mx-12 space-y-4">
+                            {comment.replies.map((replie) => {
+                              const replyComment = replie.repliesComment;
+                              const replyUser = replie.repliesComment?.user;
+
+                              return (
+                                <div key={replyComment?.id}>
+                                  <div className="my-4 border-t border-gray-200 dark:border-secondary" />
+                                  <div className="flex gap-2">
+                                    <UserImage image={replyUser?.image ?? ""} />
+                                    <div className="flex w-full flex-col text-sm">
+                                      <div className="flex flex-col">
+                                        <div className="flex flex-row gap-2">
+                                          <p className="w-max font-semibold leading-6 text-primary">
+                                            {user.name}
+                                          </p>
+                                          <p className="text-primary/80">
+                                            {moment(
+                                              replyComment?.createdAt,
+                                            ).fromNow()}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <p className="my-2 text-primary/90">
+                                        {replyComment?.message}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                dispatch(unExpandReplies(comment.id))
+                              }
+                            >
+                              Close replies...
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            onClick={() => dispatch(expandReplies(comment.id))}
+                          >
+                            See replies...
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </>
                 </div>
               ))}
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+interface LikeDislikeReplyButtonProps {
+  commentId: string;
+  triggerOpen?: (commentId: string) => void;
+}
+
+export function LikeDislikeReplyButton({
+  commentId,
+}: LikeDislikeReplyButtonProps) {
+  const dispatch = useDispatch();
+
+  return (
+    <>
+      <Menu as="div">
+        <div>
+          <Menu.Button className={buttonVariants({ variant: "ghost" })}>
+            <DotsVertical className="h-5 w-5 stroke-primary" />
+          </Menu.Button>
+        </div>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute z-10 mt-2 w-fit rounded-md bg-background py-1 shadow-lg ring-1 ring-secondary ring-opacity-5 focus:outline-none">
+            <Menu.Item>
+              <Button
+                className="flex gap-2"
+                variant="ghost"
+                onClick={() => dispatch(openReplies(commentId))}
+              >
+                Reply
+              </Button>
+            </Menu.Item>
+          </Menu.Items>
+        </Transition>
+      </Menu>
     </>
   );
 }

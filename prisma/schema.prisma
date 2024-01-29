@@ -77,6 +77,7 @@ model User {
     followers              FollowEngagement[]       @relation("Followings")
     followings             FollowEngagement[]       @relation("Followers")
     Playlist               Playlist[]
+    RepliesComment         RepliesComment[]
 }
 
 model Video {
@@ -121,11 +122,38 @@ model Comment {
     createdAt DateTime @default(now())
     updateAt  DateTime @updatedAt
 
-    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-    video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    video   Video               @relation(fields: [videoId], references: [id], onDelete: Cascade)
+    replies CommentHasReplies[]
 
     @@index([userId])
     @@index([videoId])
+}
+
+model RepliesComment {
+    id        String   @id @default(cuid())
+    message   String?  @db.Text
+    userId    String
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
+
+    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    replies CommentHasReplies[]
+
+    @@index([userId])
+}
+
+model CommentHasReplies {
+    id               String  @id @default(cuid())
+    commentId        String
+    repliesCommentId String?
+
+    comments       Comment?        @relation(fields: [commentId], references: [id], onDelete: Cascade)
+    repliesComment RepliesComment? @relation(fields: [repliesCommentId], references: [id])
+
+    @@index([commentId, repliesCommentId])
+    @@index([commentId])
+    @@index([repliesCommentId])
 }
 
 model Announcement {

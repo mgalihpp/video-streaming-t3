@@ -135,6 +135,15 @@ export const videoRouter = createTRPCRouter({
           Comment: {
             include: {
               user: true,
+              replies: {
+                select: {
+                  repliesComment: {
+                    include: {
+                      user: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },

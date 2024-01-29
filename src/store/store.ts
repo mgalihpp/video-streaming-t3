@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import editDialog from "./editDialog";
 import refetchUpload from "./refetchUpload";
 import themeSlice from "./theme";
+import replies from "./replies";
 
 // interface ThemeState {
 //   selectedTheme: string;
@@ -17,6 +18,7 @@ import themeSlice from "./theme";
 const store = configureStore({
   reducer: {
     dialog: editDialog,
+    replies: replies,
     refetch: refetchUpload,
     theme: themeSlice,
   },

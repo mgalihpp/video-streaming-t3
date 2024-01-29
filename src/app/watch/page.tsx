@@ -199,6 +199,7 @@ function VideoPage() {
                     id: comment.id,
                     message: comment.message,
                     createdAt: comment.createdAt,
+                    replies: comment.replies
                   },
                   user: {
                     id: user.id,
