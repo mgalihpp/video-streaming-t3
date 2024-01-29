@@ -353,7 +353,7 @@ export function VideoCommentSection({
         void refetch();
         setErrorInput(false);
         setErrorInputMsg("");
-        setCommentInput("");
+        setReplyInput("");
         setDisable(false);
       },
     });
@@ -499,7 +499,7 @@ export function VideoCommentSection({
                                       <div className="flex flex-col">
                                         <div className="flex flex-row gap-2">
                                           <p className="w-max font-semibold leading-6 text-primary">
-                                            {user.name}
+                                            {replyUser?.name}
                                           </p>
                                           <p className="text-primary/80">
                                             {moment(
