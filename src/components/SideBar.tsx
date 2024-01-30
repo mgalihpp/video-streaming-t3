@@ -59,6 +59,10 @@ export default function SideBar({
 
   const { data: userFollowings } = api.user.getUsersFollowingProtected.useQuery(
     userId ?? "",
+    {
+      enabled: !!userId,
+      refetchOnWindowFocus: false,
+    },
   );
 
   const DesktopNavigation: NavigationItem[] = [

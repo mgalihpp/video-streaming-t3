@@ -165,7 +165,6 @@ export const userRouter = createTRPCRouter({
       );
 
       return {
-        user,
         followings: followingWithViewerFollowedStatus,
       };
     }),
