@@ -28,6 +28,8 @@ import { Button } from "./ui/button";
 import { UserImage } from ".";
 import { TrendingUp } from "lucide-react";
 import { api } from "@/trpc/react";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/store/store";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -53,6 +55,7 @@ export default function SideBar({
   const { data: sessionData } = useSession();
   const userId = sessionData?.user.id;
   const router = useRouter();
+  const theme = useSelector((state: RootState) => state.theme.selectedTheme);
 
   const { data: userFollowings } = api.user.getUsersFollowingProtected.useQuery(
     userId ?? "",
@@ -175,7 +178,9 @@ export default function SideBar({
         <div
           className={`flex grow flex-col gap-y-5 ${
             closeSidebar ? "overflow-y-hidden" : "overflow-auto"
-          } overflow-x-hidden border border-gray-300 bg-background px-6 pb-4 dark:border-secondary`}
+          } overflow-x-hidden border ${
+            theme === "dark" ? "dark" : ""
+          } border-gray-300 bg-background px-6 pb-4 dark:border-secondary`}
         >
           <nav className="flex flex-1 flex-col pt-8">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">

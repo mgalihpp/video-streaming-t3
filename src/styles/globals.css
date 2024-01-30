@@ -87,24 +87,25 @@ progress {
   border-radius: 8px;
 }
 
-/* .scroll-dark { */
-  /* scrollbar-width: thin;
-  scrollbar-color: #888888 #111111;
-
-  /* Define scrollbar track and thumb styles */
-  /* For WebKit browsers (Chrome, Safari) */
-  /* scrollbar-track-color: #111111; */
-  /* scrollbar-thumb-color: #888888; */
-
-  /* For Firefox */
-  /* scrollbar-color: #888888 #111111; */
-/* } */
-
-::-webkit-scrollbar-thumb{
+/* .dark::-webkit-scrollbar-thumb{
   background-color: rgb(44, 44, 46);
 }
 
-::-webkit-scrollbar{ 
+:root::-webkit-scrollbar-thumb{ 
+  background-color: var(--destructive) !important;
+  width: 12px;
+}
+
+:root::-webkit-scrollbar{ 
+  background-color: var(--background);
+  width: 12px;
+} */
+
+.dark::-webkit-scrollbar-thumb{
+  background-color: rgb(44, 44, 46);
+}
+
+.dark::-webkit-scrollbar{ 
   background-color: var(--background);
   width: 12px;
 }
