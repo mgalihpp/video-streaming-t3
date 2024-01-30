@@ -124,6 +124,51 @@ export const userRouter = createTRPCRouter({
         followings: followingWithViewerFollowedStatus,
       };
     }),
+  getUsersFollowingProtected: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        include: {
+          followings: {
+            include: {
+              following: {
+                include: {
+                  followings: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!user)
+        throw new TRPCError({ message: "User not found", code: "NOT_FOUND" });
+
+      const followings = user.followings;
+
+      const followingWithViewerFollowedStatus = await Promise.all(
+        followings.map(async (following) => {
+          let viewerHasFollowed = false;
+          if (input && input !== "") {
+            viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+              where: {
+                followingId: following.following.id,
+                followerId: input,
+              },
+            }));
+          }
+          return { ...following, viewerHasFollowed };
+        }),
+      );
+
+      return {
+        user,
+        followings: followingWithViewerFollowedStatus,
+      };
+    }),
   getDashboardData: protectedProcedure
     .input(z.string().optional())
     .query(async ({ ctx, input }) => {

@@ -27,6 +27,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Button } from "./ui/button";
 import { UserImage } from ".";
 import { TrendingUp } from "lucide-react";
+import { api } from "@/trpc/react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -51,8 +52,11 @@ export default function SideBar({
   const pathname = usePathname();
   const { data: sessionData } = useSession();
   const userId = sessionData?.user.id;
-
   const router = useRouter();
+
+  const { data: userFollowings } = api.user.getUsersFollowingProtected.useQuery(
+    userId ?? "",
+  );
 
   const DesktopNavigation: NavigationItem[] = [
     {
@@ -164,11 +168,15 @@ export default function SideBar({
         onMouseEnter={() => setCloseSideBar(false)}
         onMouseLeave={() => setCloseSideBar(true)}
         className={cn(
-          closeSidebar ? "lg:w-20 " : "lg:w-56",
+          closeSidebar ? "lg:w-20" : "lg:w-56",
           "duration-800 bottom-0 top-16 hidden transition-all ease-in-out lg:fixed lg:z-40 lg:flex lg:flex-col",
         )}
       >
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto overflow-x-hidden border border-gray-300 bg-background px-6 pb-4 dark:border-secondary">
+        <div
+          className={`flex grow flex-col gap-y-5 ${
+            closeSidebar ? "overflow-y-hidden" : "overflow-auto"
+          } overflow-x-hidden border border-gray-300 bg-background px-6 pb-4 dark:border-secondary`}
+        >
           <nav className="flex flex-1 flex-col pt-8">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
@@ -208,15 +216,41 @@ export default function SideBar({
                   ))}
                 </ul>
               </li>
-              <li className="mt-4 py-2 border-t  border-gray-300 dark:border-secondary">
+              <li className="mt-4 border-t border-gray-300  py-2 dark:border-secondary">
                 <Link
                   href="/feed/trending"
-                  className="group -mx-2 flex gap-x-3 items-center rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
+                  className="group -mx-2 flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
                 >
                   <TrendingUp className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
-                  <p className={cn("", { hidden: closeSidebar })}>Trending</p>
+                  <p
+                    className={cn("truncate font-semibold", {
+                      hidden: closeSidebar,
+                    })}
+                  >
+                    Trending
+                  </p>
                 </Link>
               </li>
+              <ul role="list" className="-mx-2 space-y-1">
+                <li className="mt-4 border-t border-gray-300  py-2 dark:border-secondary" />
+                {userFollowings?.followings.map((following) => (
+                  <li key={following.following.id}>
+                    <Link
+                      href={`/channel/${following.following.id}`}
+                      className="group -mx-2 flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/40 hover:bg-secondary hover:text-primary"
+                    >
+                      <UserImage image={following.following.image ?? ""} />
+                      <p
+                        className={cn("truncate font-semibold", {
+                          hidden: closeSidebar,
+                        })}
+                      >
+                        {following.following.name}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <li className="mt-auto">
                 <Link
                   href=""
@@ -232,7 +266,13 @@ export default function SideBar({
                 >
                   <Settings className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
 
-                  <p className={cn("", { hidden: closeSidebar })}>Settings</p>
+                  <p
+                    className={cn("truncate font-semibold", {
+                      hidden: closeSidebar,
+                    })}
+                  >
+                    Settings
+                  </p>
                 </Link>
                 <Link
                   href="/blog/help"
@@ -240,7 +280,13 @@ export default function SideBar({
                 >
                   <HelpCircle className="h-5 w-5 shrink-0 stroke-primary/40 group-hover:stroke-primary" />
 
-                  <p className={cn("", { hidden: closeSidebar })}>Help</p>
+                  <p
+                    className={cn("truncate font-semibold", {
+                      hidden: closeSidebar,
+                    })}
+                  >
+                    Help
+                  </p>
                 </Link>
               </li>
             </ul>
