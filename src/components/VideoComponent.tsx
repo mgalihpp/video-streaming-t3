@@ -292,7 +292,7 @@ export function VideoDescription({
             className="flex flex-row place-content-evenly"
           >
             <p
-              className={`break-words text-left text-sm font-semibold text-primary/80 ${
+              className={`break-words whitespace-pre-wrap text-left text-sm font-semibold text-primary/80 ${
                 !isExpanded ? "line-clamp-2" : ""
               }`}
             >
