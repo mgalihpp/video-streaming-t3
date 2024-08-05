@@ -289,10 +289,10 @@ export function VideoDescription({
         <div className="relative w-full">
           <button
             onClick={toggleExpand}
-            className="flex flex-row place-content-evenly"
+            className="flex flex-row place-content-evenly w-full"
           >
             <p
-              className={`break-words whitespace-pre-wrap text-left text-sm font-semibold text-primary/80 ${
+              className={`break-words whitespace-pre-wrap w-full text-left text-sm font-semibold text-primary/80 ${
                 !isExpanded ? "line-clamp-2" : ""
               }`}
             >
