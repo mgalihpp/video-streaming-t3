@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Disclosure } from "@headlessui/react";
+import { Disclosure, DisclosureButton } from "@headlessui/react";
 import { Minus, Plus } from "lucide-react";
 
 export default function BlogHelpPage() {
@@ -59,15 +59,15 @@ export default function BlogHelpPage() {
   ];
 
   return (
-    <div className="mt-4">
-      <div className="mx-auto max-w-3xl text-center ">
+    <div className="mt-4 px-2">
+      <div className="mx-auto max-w-3xl text-center">
         <p className="text-primary-600 text-base font-semibold leading-7">
           FAQ
         </p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-primary sm:text-6xl">
           We’re here to help{" "}
         </h1>
-        <p className="mb-4 mt-6  text-lg leading-8 text-primary/80">
+        <p className="mb-4 mt-6 text-lg leading-8 text-primary/80">
           Have questions? We’re here to help.
         </p>
         <Button
@@ -77,13 +77,13 @@ export default function BlogHelpPage() {
           Contact
         </Button>
       </div>
-      <dl className="mx-auto mt-10 max-w-3xl  space-y-6 divide-y divide-primary/10">
+      <dl className="mx-auto mt-10 max-w-3xl space-y-6 divide-y divide-primary/10">
         {faqs.map((faq) => (
           <Disclosure as="div" key={faq.question} className="pt-6">
             {({ open }) => (
               <>
                 <dt>
-                  <Disclosure.Button className="flex w-full items-start justify-between text-left text-primary">
+                  <DisclosureButton className="flex w-full items-start justify-between text-left text-primary">
                     <span className="text-base font-semibold leading-7">
                       {faq.question}
                     </span>
@@ -94,12 +94,10 @@ export default function BlogHelpPage() {
                         <Plus className="h-6 w-6" aria-hidden="true" />
                       )}
                     </span>
-                  </Disclosure.Button>
+                  </DisclosureButton>
                 </dt>
                 <Disclosure.Panel as="dd" className="mt-2 pr-12">
-                  <p className="text-base leading-7 primary/80">
-                    {faq.answer}
-                  </p>
+                  <p className="primary/80 text-base leading-7">{faq.answer}</p>
                 </Disclosure.Panel>
               </>
             )}

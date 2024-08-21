@@ -1,9 +1,10 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
-import { Footer, Navbar, SideBar } from ".";
-import Menu from "./Icons/Menu";
+import { useState, type ReactNode } from "react";
+import Menu from "@/components/Icons/Menu";
 import { cn } from "@/lib/utils";
+import Navbar from "@/components/navbar/Navbar";
+import SideBar from "@/components/navbar/Sidebar";
 
 interface WrapperProps {
   children: JSX.Element | ReactNode;
@@ -23,9 +24,7 @@ export default function Wrapper({ children }: WrapperProps) {
             setSideBarOpen(true);
             setCloseSidebar(false);
           }}
-          className="-mx-2 inline-flex items-center justify-center rounded-md
-        p-2 focus:outline-none
-        "
+          className="-mx-2 inline-flex items-center justify-center rounded-md p-2 focus:outline-none"
         >
           <Menu className="h-6 w-6 stroke-gray-500" aria-hidden="true" />
         </button>
@@ -36,14 +35,12 @@ export default function Wrapper({ children }: WrapperProps) {
         closeSidebar={closeSidebar}
         setCloseSideBar={setCloseSidebar}
       />
-      <div className="lg:hidden">
-        <Footer />
-      </div>
+      <div className="lg:hidden">{/* <Footer /> */}</div>
       <div className={cn("lg:pl-56", { "lg:pl-20": closeSidebar })}>
-        <main className="py-24">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="space-x-4">{children}</div>
-          </div>
+        <main className="container py-4 max-sm:p-0">
+            {children}
+          <div>
+            </div>
         </main>
       </div>
     </>

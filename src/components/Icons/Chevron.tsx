@@ -1,6 +1,7 @@
 export function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -21,6 +22,7 @@ export function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
 export function ChevronUp(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+    {...props}
       width="24"
       height="24"
       viewBox="0 0 24 24"

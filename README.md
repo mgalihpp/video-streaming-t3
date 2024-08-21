@@ -11,6 +11,7 @@ If you are not familiar with the different technologies used in this project, pl
 - [Next.js](https://nextjs.org)
 - [NextAuth.js](https://next-auth.js.org)
 - [Prisma](https://prisma.io)
+- [Drizzle](https://orm.drizzle.team)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
@@ -28,16 +29,6 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
 
-## Features
-
-- 🔒 Authentication
-- 🔧 Modern Data Fetching Using tRPC & zod
-- 📊 Prisma
-- ✨ Beautiful Loading State
-- 🎨 UI Using 'shadcn-ui' and 'Headless UI'
-- 👤 Profile Page
-- 📈 Creator Dashboard Page
-- 🎥 Video Page
-- ⌛ History Page
-- 💾 Playlist Page
-- 🔎Search Page
+    // "@trpc/client": "^11.0.0-rc.446",
+    // "@trpc/react-query": "^11.0.0-rc.446",
+    // "@trpc/server": "^11.0.0-rc.446",

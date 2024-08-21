@@ -1,4 +1,4 @@
-import { Content } from "@/components";
+import { Content } from "@/components/Content";
 
 export default function BlogPrivacyPage() {
   const sections = [
@@ -51,7 +51,7 @@ export default function BlogPrivacyPage() {
   ];
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 px-2">
       <div className="mx-auto max-w-3xl text-center ">
         <p className="text-primary/90 text-base font-semibold leading-7">
           Privacy Policy

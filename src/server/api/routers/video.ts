@@ -1,56 +1,44 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { EngagementType, type PrismaClient, type Prisma } from "@prisma/client";
-import { type DefaultArgs } from "@prisma/client/runtime/library";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
+import {
+  addNewVideoInputSchema,
+  getRandomVideoInputSchema,
+  getVideoByIdInputSchema,
+  videoDetailSchema,
+} from "@/lib/schema/video";
+import { EngagementType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-
-type Context = {
-  db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
-};
-
-const checkVideoOwnerShip = async (
-  ctx: Context,
-  id: string,
-  userId: string,
-) => {
-  const video = await ctx.db.video.findUnique({
-    where: {
-      id: id,
-    },
-  });
-
-  if (!video ?? video?.userId !== userId)
-    throw new TRPCError({
-      message: "video not found",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  return video;
-};
+import { addNewVideo, getRawVideo, updateVideo } from "@/services/videoService";
+import { z } from "zod";
 
 export const videoRouter = createTRPCRouter({
   getRandomVideo: publicProcedure
-    .input(z.number())
+    .input(getRandomVideoInputSchema)
     .query(async ({ ctx, input }) => {
-      const videoWithUser = await ctx.db.video.findMany({
+      const videosWithUser = await ctx.db.video.findMany({
         where: {
           publish: true,
+          NOT: {
+            id: input.excludedVideoId,
+          },
         },
         include: {
           user: true,
         },
       });
 
-      const videos = videoWithUser.map(({ user, ...video }) => video);
-      const users = videoWithUser.map(({ user }) => user);
-
-      const videoWithCount = await Promise.all(
-        videos.map(async (video) => {
+      const videoViews = await Promise.all(
+        videosWithUser.map(async (video) => {
           const views = await ctx.db.videoEngagement.count({
             where: {
               videoId: video.id,
               engagementType: EngagementType.VIEW,
             },
           });
+
           return {
             ...video,
             views,
@@ -58,212 +46,219 @@ export const videoRouter = createTRPCRouter({
         }),
       );
 
-      const indices = Array.from(
-        { length: videoWithCount.length },
-        (_, i) => i,
-      );
+      const indices = Array.from({ length: videoViews.length }, (_, i) => i);
 
-      //shuffle array
+      // shuffle
+
       for (let i = indices.length - 1; i > 0; i--) {
         if (indices[i] !== undefined) {
           const j = Math.floor(Math.random() * (i + 1));
 
           if (indices[j] !== undefined) {
-            [indices[i], indices[j]] = [indices[j]!, indices[i]!];
+            [indices[i], indices[j]] = [indices[j], indices[i]!];
           }
         }
       }
-      const shuffleVideoWithCounts = indices.map((i) => videoWithCount[i]);
-      const shuffleUsers = indices.map((i) => users[i]);
 
-      const randomVideos = shuffleVideoWithCounts.slice(0, input);
-      const randomUsers = shuffleUsers.slice(0, input);
+      const shuffleVideoWithCounts = indices.map((i) => videoViews[i]);
 
-      return { videos: randomVideos, users: randomUsers };
+      const randomVideos = shuffleVideoWithCounts.slice(0, input.many);
+
+      return { randomVideos };
     }),
-
-  getVideoBySearch: publicProcedure
-    .input(z.string())
+  getVideobyId: publicProcedure
+    .input(getVideoByIdInputSchema)
     .query(async ({ ctx, input }) => {
-      const videoWithUser = await ctx.db.video.findMany({
-        where: {
-          publish: true,
-          title: {
-            contains: input,
-          },
-        },
-        take: 10,
-        include: {
-          user: true,
-        },
-      });
-
-      const videos = videoWithUser.map(({ user, ...video }) => video);
-      const users = videoWithUser.map(({ user }) => user);
-
-      const videoWithCount = await Promise.all(
-        videos.map(async (video) => {
-          const views = await ctx.db.videoEngagement.count({
-            where: {
-              videoId: video.id,
-              engagementType: EngagementType.VIEW,
-            },
-          });
-          return {
-            ...video,
-            views,
-          };
-        }),
-      );
-      return { videos: videoWithCount, users: users };
-    }),
-
-  getVideoById: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        viewerId: z.string().optional(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const rawVideo = await ctx.db.video.findUnique({
-        where: {
-          id: input.id,
-        },
-        include: {
-          user: true,
-          Comment: {
-            include: {
-              user: true,
-              replies: {
-                select: {
-                  repliesComment: {
-                    include: {
-                      user: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-
-      if (!rawVideo) {
-        throw new TRPCError({ message: "Video not found", code: "NOT_FOUND" });
-      }
-
-      const { user, Comment, ...video } = rawVideo;
-
-      const followers = await ctx.db.followEngagement.count({
-        where: {
-          followingId: video.userId,
-        },
-      });
-
-      const likes = await ctx.db.videoEngagement.count({
-        where: {
-          videoId: video.id,
-          engagementType: EngagementType.LIKE,
-        },
-      });
-
-      const dislikes = await ctx.db.videoEngagement.count({
-        where: {
-          videoId: video.id,
-          engagementType: EngagementType.DISLIKE,
-        },
-      });
-
-      const views = await ctx.db.videoEngagement.count({
-        where: {
-          videoId: video.id,
-          engagementType: EngagementType.VIEW,
-        },
-      });
-
       let viewerHasFollowed = false;
       let viewerHasLikes = false;
       let viewerHasDislikes = false;
 
-      if (input.viewerId && input.viewerId !== "") {
-        viewerHasLikes = !!(await ctx.db.videoEngagement.findFirst({
-          where: {
-            videoId: rawVideo.id,
-            userId: input.viewerId,
-            engagementType: EngagementType.LIKE,
-          },
-        }));
-        viewerHasDislikes = !!(await ctx.db.videoEngagement.findFirst({
-          where: {
-            videoId: rawVideo.id,
-            userId: input.viewerId,
-            engagementType: EngagementType.DISLIKE,
-          },
-        }));
-        viewerHasFollowed = !!(await ctx.db.followEngagement.findFirst({
+      try {
+        const rawVideo = await getRawVideo(ctx, input.id);
+
+        if (!rawVideo.id) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Sorry this video does not exist",
+          });
+        }
+
+        const { comments, ...videoEx } = rawVideo;
+
+        const followers = await ctx.db.followEngagement.count({
           where: {
             followingId: rawVideo.userId,
-            followerId: input.viewerId,
+            engagementType: EngagementType.FOLLOW,
           },
-        }));
-      } else {
-        viewerHasDislikes = false;
-        viewerHasLikes = false;
-        viewerHasFollowed = false;
+        });
+
+        const likes = await ctx.db.videoEngagement.count({
+          where: {
+            videoId: rawVideo.id,
+            engagementType: EngagementType.LIKE,
+          },
+        });
+
+        const dislikes = await ctx.db.videoEngagement.count({
+          where: {
+            videoId: rawVideo.id,
+            engagementType: EngagementType.DISLIKE,
+          },
+        });
+        0;
+
+        const views = await ctx.db.videoEngagement.count({
+          where: {
+            videoId: rawVideo.id,
+            engagementType: EngagementType.VIEW,
+          },
+        });
+
+        const commentsWithLikesAndDislikes = await Promise.all(
+          comments.map(async (comment) => {
+            // Fetch likes and dislikes counts in parallel
+            const [likes, dislikes] = await Promise.all([
+              ctx.db.commentEngagement.count({
+                where: {
+                  commentId: comment.id,
+                  engagementType: EngagementType.LIKE,
+                },
+              }),
+              ctx.db.commentEngagement.count({
+                where: {
+                  commentId: comment.id,
+                  engagementType: EngagementType.DISLIKE,
+                },
+              }),
+            ]);
+
+            const repliesWithEngagement = await Promise.all(
+              comment.replies.map(async (reply) => {
+                const [likes, dislikes, user] = await Promise.all([
+                  ctx.db.commentEngagement.count({
+                    where: {
+                      commentId: reply.id,
+                      engagementType: EngagementType.LIKE,
+                    },
+                  }),
+                  ctx.db.commentEngagement.count({
+                    where: {
+                      commentId: reply.id,
+                      engagementType: EngagementType.DISLIKE,
+                    },
+                  }),
+                  ctx.db.user.findUnique({
+                    where: {
+                      id: reply.userId,
+                    },
+                  }),
+                ]);
+                return {
+                  ...reply,
+                  user,
+                  likes,
+                  dislikes,
+                };
+              }),
+            );
+
+            const { replies: commentReplies, ...commentWithoutReplies } =
+              comment;
+
+            return {
+              ...commentWithoutReplies,
+              likes,
+              dislikes,
+              replies: repliesWithEngagement,
+            };
+          }),
+        );
+
+        if (input.viewerId && input.viewerId !== "") {
+          const [like, dislike, follow] = await Promise.all([
+            ctx.db.videoEngagement.findFirst({
+              where: {
+                videoId: rawVideo.id,
+                userId: input.viewerId,
+                engagementType: EngagementType.LIKE,
+              },
+            }),
+            ctx.db.videoEngagement.findFirst({
+              where: {
+                videoId: rawVideo.id,
+                userId: input.viewerId,
+                engagementType: EngagementType.DISLIKE,
+              },
+            }),
+            ctx.db.followEngagement.findFirst({
+              where: {
+                followingId: rawVideo.userId,
+                followerId: input.viewerId,
+              },
+            }),
+          ]);
+
+          viewerHasLikes = !!like;
+          viewerHasDislikes = !!dislike;
+          viewerHasFollowed = !!follow;
+        } else {
+          viewerHasLikes = false;
+          viewerHasDislikes = false;
+          viewerHasFollowed = false;
+        }
+
+        const viewer = {
+          hasFollowed: viewerHasFollowed,
+          hasLiked: viewerHasLikes,
+          hasDisliked: viewerHasDislikes,
+        };
+
+        const video = {
+          ...videoEx,
+          comments: commentsWithLikesAndDislikes,
+          followers,
+          likes,
+          dislikes,
+          views,
+          viewer,
+        };
+
+        return { video };
+      } catch (error) {
+        if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+          // Handle server side errors to not get crash the app
+          return null;
+        }
       }
-
-      const viewer = {
-        hasFollowed: viewerHasFollowed,
-        hasLiked: viewerHasLikes,
-        hasDisliked: viewerHasDislikes,
-      };
-
-      const userWithFollowers = { ...user, followers };
-      const videoWithLikeDislikesViews = { ...video, likes, dislikes, views };
-      const commentWithUsers = Comment.map(({ user, ...comment }) => ({
-        user,
-        comment,
-      }));
-
-      return {
-        video: videoWithLikeDislikesViews,
-        user: userWithFollowers,
-        comments: commentWithUsers,
-        viewer,
-      };
     }),
-
-  addVideoToPlaylist: protectedProcedure
-    .input(z.object({ playlistId: z.string(), videoId: z.string() }))
+  addNewVideo: protectedProcedure
+    .input(addNewVideoInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const videoExitsInPlaylist = await ctx.db.playlistHasVideo.findMany({
+      return await addNewVideo(ctx, input.videoUrl);
+    }),
+  updateVideo: protectedProcedure
+    .input(videoDetailSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await updateVideo(
+        ctx,
+        input.id!,
+        input.title,
+        input.description!,
+        input.thumbnailUrl!,
+        input.publish,
+      );
+    }),
+  getFreshVideoById: protectedProcedure
+    .input(getVideoByIdInputSchema)
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.video.findFirst({
         where: {
-          playlistId: input.playlistId,
-          videoId: input.videoId,
+          id: input.id,
+          userId: ctx.session.user.id,
         },
       });
-
-      if (videoExitsInPlaylist.length > 0) {
-        const deleteVideo = await ctx.db.playlistHasVideo.deleteMany({
-          where: {
-            playlistId: input.playlistId,
-            videoId: input.videoId,
-          },
-        });
-        return deleteVideo;
-      } else {
-        const newVideoToPlaylist = await ctx.db.playlistHasVideo.create({
-          data: {
-            playlistId: input.playlistId,
-            videoId: input.videoId,
-          },
-        });
-        return newVideoToPlaylist;
-      }
     }),
-
-  getVideoByUserId: publicProcedure
+  getVideoByUserId: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const videoWithUser = await ctx.db.video.findMany({
@@ -282,10 +277,8 @@ export const videoRouter = createTRPCRouter({
           code: "NOT_FOUND",
         });
 
-      const videos = videoWithUser.map(({ user, ...video }) => video);
-      const users = videoWithUser.map(({ user }) => user);
       const videoWithCount = await Promise.all(
-        videos.map(async (video) => {
+        videoWithUser.map(async (video) => {
           const views = await ctx.db.videoEngagement.count({
             where: { videoId: video.id, engagementType: EngagementType.VIEW },
           });
@@ -296,144 +289,6 @@ export const videoRouter = createTRPCRouter({
         }),
       );
 
-      return { videos: videoWithCount, users: users };
-    }),
-  publishVideo: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const video = await checkVideoOwnerShip(ctx, input, ctx.session.user.id);
-
-      const publishVideo = await ctx.db.video.update({
-        where: {
-          id: video.id,
-        },
-        data: {
-          publish: !video.publish,
-        },
-      });
-
-      return publishVideo;
-    }),
-  deleteVideo: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const video = await checkVideoOwnerShip(ctx, input, ctx.session.user.id);
-
-      const deleteVideo = await ctx.db.video.delete({
-        where: {
-          id: video.id,
-        },
-      });
-      return deleteVideo;
-    }),
-  updateVideo: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        thumbnailUrl: z.string().optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const video = await checkVideoOwnerShip(
-        ctx,
-        input.id,
-        ctx.session.user.id,
-      );
-
-      const updateVideo = await ctx.db.video.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          title: input.title ?? video.title,
-          description: input.description ?? video.description,
-          thumbnailUrl: input.thumbnailUrl ?? video.thumbnailUrl,
-        },
-      });
-
-      return updateVideo;
-    }),
-  addNewVideo: protectedProcedure
-    .input(
-      z.object({
-        videoUrl: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const newVideo = await ctx.db.video.create({
-        data: {
-          userId: ctx.session.user.id,
-          title: "Untitled",
-          description: "",
-          thumbnailUrl: "",
-          videoUrl: input.videoUrl,
-          publish: false,
-        },
-      });
-      return newVideo;
-    }),
-  getTrendingVideo: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const getVideos = await ctx.db.video.findMany({
-        where: {
-          publish: true,
-        },
-      });
-
-      const currentDate = new Date();
-      const twentyFourHoursAgo = new Date(
-        currentDate.getTime() - 24 * 60 * 60 * 1000,
-      );
-      const twoDaysAgo = new Date(
-        currentDate.getTime() - 2 * 24 * 60 * 60 * 1000,
-      );
-
-      const videoWithCount = await Promise.all(
-        getVideos.map(async (video) => {
-          const views = await ctx.db.videoEngagement.count({
-            where: {
-              videoId: video.id,
-              engagementType: EngagementType.VIEW,
-            },
-          });
-          const trendViews = await ctx.db.videoEngagement.count({
-            where: {
-              videoId: video.id,
-              engagementType: EngagementType.VIEW,
-              createdAt: {
-                gte: input === "old" ? twoDaysAgo : twentyFourHoursAgo,
-              },
-            },
-          });
-
-          const users = await ctx.db.user.findFirst({
-            where: {
-              id: video.userId,
-            },
-          });
-
-          return {
-            ...video,
-            views,
-            trendViews,
-            users,
-          };
-        }),
-      );
-
-      const videos = videoWithCount.filter((video) => video.trendViews >= 2);
-
-      const trendingVideos = videos.map(
-        ({ users, trendViews, ...video }) => video,
-      );
-      const users = videos.map(({ users }) => users);
-
-      return {
-        videos: trendingVideos,
-        users: users,
-      };
+      return videoWithCount;
     }),
 });

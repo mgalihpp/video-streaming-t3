@@ -33,5 +33,6 @@ export {
   GreenHeart,
   GreenUserCheck,
 } from "./GreenIcons";
+export { default as PlusVideo } from "./PlusVideo";
 
 export { default as Close } from "./Close";

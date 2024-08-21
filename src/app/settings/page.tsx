@@ -19,18 +19,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { setTheme } from "@/store/theme";
 import { api } from "@/trpc/react";
-import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { z } from "zod";
-import { useToast } from "@/components/ui/use-toast";
-import { env } from "@/env";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ImageCropper } from "@/components";
+import { ImageCropper } from "@/components/ImageCropper";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
+import { updateUserInputSchema } from "@/lib/schema/user";
 
 interface CropImageModalProps {
   channel: {
@@ -44,97 +42,73 @@ interface CropImageModalProps {
 
 export default function SettingsPage() {
   const { data: sessionData } = useSession();
-  const [disable, setDisable] = useState(false);
 
-  const [inputData, setInputData] = useState({
-    name: "",
-    handle: "",
-    description: "",
+  const {
+    data: channel,
+    isLoading,
+    refetch,
+  } = api.user.getUserChannel.useQuery(
+    {
+      id: sessionData?.user.id ?? "",
+    },
+    {
+      enabled: !!sessionData,
+    },
+  );
+
+  const form = useForm<z.infer<typeof updateUserInputSchema>>({
+    resolver: zodResolver(updateUserInputSchema),
+    defaultValues: {
+      name: channel?.user.name ?? "",
+      handle: channel?.user.handle ?? "",
+      image: channel?.user.image ?? "",
+      backgroundImage: channel?.user.backgroundImage ?? "",
+      description: channel?.user.description ?? "",
+    },
   });
 
-  const { data, isLoading, refetch } = api.user.getChannelById.useQuery({
-    id: sessionData?.user.id ?? "",
-  });
-
-  const updateUserMutation = api.user.updateUser.useMutation();
-
-  const { toast } = useToast();
-
-  const channel = data?.user;
-
-  const errorTypes = !data ?? !channel;
-
-  // useEffect(() => {
-  //   if (sessionData?.user.id) {
-  //     router.replace(`/settings?${sessionData?.user.id}`);
-  //   }
-  // }, [router, sessionData?.user.id]);
+  const { mutate: updateUser, isPending } = api.user.updateUser.useMutation();
 
   useEffect(() => {
     if (channel) {
-      setInputData({
-        name: channel.name ?? "",
-        handle: channel.handle ?? "",
-        description: channel.description ?? "",
-      });
+      form.setValue("name", channel.user.name ?? "");
+      form.setValue("handle", channel.user.handle ?? "");
+      form.setValue("description", channel.user.description ?? "");
     }
-  }, [channel]);
+  }, [channel, form]);
 
-  if (errorTypes || isLoading) {
-    return (
-      <Loader2 className="flex h-5 w-5 animate-spin items-center justify-center" />
-    );
-  }
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-  ) => {
-    setInputData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = () => {
-    setDisable(true);
-
+  const handleSubmit = (data: z.infer<typeof updateUserInputSchema>) => {
     const userData = {
-      name: channel?.name ?? undefined,
+      name: channel?.user.name ?? undefined,
       // email: channel?.email,
-      handle: channel?.handle ?? undefined,
-      image: channel?.image ?? undefined,
-      backgroundImage: channel?.backgroundImage ?? undefined,
-      description: channel?.description ?? undefined,
+      handle: channel?.user.handle ?? undefined,
+      image: channel?.user.image ?? undefined,
+      backgroundImage: channel?.user.backgroundImage ?? undefined,
+      description: channel?.user.description ?? undefined,
     };
 
     if (
-      inputData.name !== channel?.name ||
-      inputData.description !== channel?.description ||
-      inputData.handle !== channel?.handle
+      data.name !== channel?.user.name ||
+      data.description !== channel?.user.description ||
+      data.handle !== channel?.user.handle
     ) {
       const newUserData = {
         ...userData,
       };
-      if (inputData.name && inputData.name !== channel?.name)
-        newUserData.name = inputData.name;
-      if (
-        inputData.description &&
-        inputData.description !== channel?.description
-      )
-        newUserData.description = inputData.description;
-      if (inputData.handle && inputData.handle !== channel?.handle)
-        newUserData.handle = inputData.handle;
+      if (data.name && data.name !== channel?.user.name)
+        newUserData.name = data.name;
+      if (data.description && data.description !== channel?.user.description)
+        newUserData.description = data.description;
+      if (data.handle && data.handle !== channel?.user.handle)
+        newUserData.handle = data.handle;
 
-      updateUserMutation.mutate(newUserData, {
+      updateUser(newUserData, {
         onSuccess: () => {
-          toast({
-            title: "Profile update",
-          });
+          toast.success("Updated successfully");
           void refetch();
-          setDisable(false);
         },
         onError: () => {
-          setDisable(false);
+          toast.error("Failed to update");
         },
       });
     }
@@ -145,22 +119,22 @@ export default function SettingsPage() {
       <div>
         <CropImageModal
           channel={{
-            id: channel?.id ?? "",
-            image: channel?.image ?? "",
-            backgroundImage: channel?.backgroundImage ?? "/background.jpg",
+            id: channel?.user.id ?? "",
+            image: channel?.user.image ?? "",
+            backgroundImage: channel?.user.backgroundImage ?? "",
           }}
           refetch={refetch}
           imageType="backgroundImage"
         />
 
-        <div className="mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mt-10 px-4 sm:px-6 lg:px-8">
           <div className="!-mt-6 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
             <div className="flex items-center justify-center">
               <CropImageModal
                 channel={{
-                  id: channel?.id ?? "",
-                  image: channel?.image ?? "",
-                  backgroundImage: channel?.backgroundImage ?? "",
+                  id: channel?.user.id ?? "",
+                  image: channel?.user.image ?? "",
+                  backgroundImage: channel?.user.backgroundImage ?? "",
                 }}
                 refetch={refetch}
                 imageType="image"
@@ -169,158 +143,181 @@ export default function SettingsPage() {
             <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
               <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                 <h1 className="truncate text-2xl font-bold text-primary">
-                  {channel?.name}
+                  {channel?.user.name}
                 </h1>
                 <p className="text-regular text-primary/80">
-                  {channel?.handle}
+                  {channel?.user.handle}
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="space-y-10 divide-y divide-primary/5">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
-          <div className="px-4 sm:px-0">
-            <h2 className="text-base font-semibold leading-7 text-primary">
-              Personal Info
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-primary/80">
-              Update your photo and personal details.
-            </p>
-          </div>
-
-          <form className="bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-            <div className="px-4 py-6 sm:p-8">
-              <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium leading-6 text-primary"
-                  >
-                    Name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      autoComplete="family-name"
-                      value={inputData?.name || ""}
-                      onChange={handleInputChange}
-                      className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-4">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium leading-6 text-primary"
-                  >
-                    Email address
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      value={channel?.email ?? ""}
-                      className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="space-y-10 divide-y divide-primary/5">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
+              <div className="px-4 sm:px-0">
+                <h2 className="text-base font-semibold leading-7 text-primary">
+                  Personal Info
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-primary/80">
+                  Update your photo and personal details.
+                </p>
               </div>
-            </div>
-          </form>
-        </div>
-        <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
-          <div className="mt-4 px-4 sm:px-0">
-            <h2 className="text-base font-semibold leading-7 text-primary">
-              Profile
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-primary/80">
-              This information will be displayed publicly so be careful what you
-              share.
-            </p>
-          </div>
-          <form className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-            <div className="px-4 py-6 sm:p-8">
-              <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-4">
-                  <label
-                    htmlFor="handle"
-                    className="block text-sm font-medium leading-6 text-primary"
-                  >
-                    Handle
-                  </label>
-                  <div className="mt-2">
-                    <div className="flex rounded-md bg-secondary shadow-sm ring-1 ring-inset ring-primary focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary sm:max-w-md">
-                      <span className="flex select-none items-center pl-3 text-primary/70 sm:text-sm">
-                        YourTube .com/
-                      </span>
-                      <input
-                        type="text"
-                        name="handle"
-                        id="handle"
-                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-primary placeholder:text-primary focus:outline-none focus:ring-0 sm:text-sm sm:leading-6"
-                        value={inputData?.handle || ""}
-                        onChange={handleInputChange}
-                      />
+
+              <div className="bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+                <div className="px-4 py-6 sm:p-8">
+                  <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div className="sm:col-span-3">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium leading-6 text-primary"
+                      >
+                        Name
+                      </label>
+                      <div className="mt-2">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <input
+                                  {...field}
+                                  autoComplete="family-name"
+                                  className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-4">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium leading-6 text-primary"
+                      >
+                        Email address
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                          value={channel?.user.email ?? ""}
+                          readOnly
+                          className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+              <div className="mt-4 px-4 sm:px-0">
+                <h2 className="text-base font-semibold leading-7 text-primary">
+                  Profile
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-primary/80">
+                  This information will be displayed publicly so be careful what
+                  you share.
+                </p>
+              </div>
+              <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+                <div className="px-4 py-6 sm:p-8">
+                  <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div className="sm:col-span-4">
+                      <label
+                        htmlFor="handle"
+                        className="block text-sm font-medium leading-6 text-primary"
+                      >
+                        Handle
+                      </label>
+                      <div className="mt-2">
+                        <div className="flex rounded-md bg-secondary shadow-sm ring-1 ring-inset ring-primary focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary sm:max-w-md">
+                          <span className="flex select-none items-center pl-3 text-primary/70 sm:text-sm">
+                            YourTube .com/
+                          </span>
+                          <FormField
+                            control={form.control}
+                            name="handle"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <input
+                                    {...field}
+                                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-primary placeholder:text-primary focus:outline-none focus:ring-0 sm:text-sm sm:leading-6"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="col-span-full">
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium leading-6 text-primary"
-                  >
-                    About
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="description"
-                      name="description"
-                      rows={3}
-                      className="block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                      value={inputData?.description || ""}
-                      onChange={handleInputChange}
-                    />
+                    <div className="col-span-full">
+                      <label
+                        htmlFor="description"
+                        className="block text-sm font-medium leading-6 text-primary"
+                      >
+                        About
+                      </label>
+                      <div className="mt-2">
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <textarea
+                                  {...field}
+                                  rows={3}
+                                  className="block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-primary/80">
+                        Write a few sentences about yourself.
+                      </p>
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-primary/80">
-                    Write a few sentences about yourself.
-                  </p>
+                </div>
+                <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
+                  <Button type="submit" disabled={isPending}>
+                    Save
+                  </Button>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
-              <Button
-                type="button"
-                onClick={() => handleSubmit()}
-                disabled={disable}
-              >
-                Save
-              </Button>
-            </div>
-          </form>
-        </div>
-        <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
-          <div className="mt-4 px-4 sm:px-0">
-            <h1 className="text-base font-semibold leading-7 text-primary">
-              Preferences
-            </h1>
-            <p className="mt-1 text-sm leading-6 text-primary/80">
-              Change theme.
-            </p>
           </div>
-          <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-            <div className="px-4 py-6 sm:p-8">
-              <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-4">
-                  <SelecForm />
-                </div>
+        </form>
+      </Form>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+        <div className="mt-4 px-4 sm:px-0">
+          <h1 className="text-base font-semibold leading-7 text-primary">
+            Preferences
+          </h1>
+          <p className="mt-1 text-sm leading-6 text-primary/80">
+            Change theme.
+          </p>
+        </div>
+        <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+          <div className="px-4 py-6 sm:p-8">
+            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="sm:col-span-4">
+                <SelecTheme />
               </div>
             </div>
           </div>
@@ -338,8 +335,7 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
   const [image, setImage] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const updateUserMutation = api.user.updateUser.useMutation();
-  const cloudinaryName = env.NEXT_PUBLIC_CLOUDINARY_NAME ?? "";
+  const { mutate: updateUser } = api.user.updateUser.useMutation();
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -367,16 +363,13 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
     };
 
     const formData = new FormData();
-    formData.append("upload_preset", "user_uploads");
+    formData.append("upload_preset", "ml_image");
     formData.append("file", croppedDataUrl);
 
-    fetch(
-      "https://api.cloudinary.com/v1_1/" + cloudinaryName + "/image/upload",
-      {
-        method: "POST",
-        body: formData,
-      },
-    )
+    fetch("https://api.cloudinary.com/v1_1/ddhvywd6h/image/upload", {
+      method: "POST",
+      body: formData,
+    })
       .then((response) => response.json() as Promise<UploadResponse>)
       .then((data) => {
         if (data.secure_url !== undefined) {
@@ -384,7 +377,7 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
             ...userData,
             ...(data.secure_url && { [imageType]: data.secure_url }),
           };
-          updateUserMutation.mutate(newUserData, {
+          updateUser(newUserData, {
             onSuccess: () => {
               setOpen(false);
               void refetch();
@@ -395,6 +388,7 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
         }
       })
       .catch((error) => {
+        toast.error("Failed to update image");
         console.error("An error occurred:", error);
       });
   };
@@ -430,12 +424,12 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
               onChange={onFileChange}
             />
             <Image
-              priority
-              className="h-32 w-full object-cover lg:h-64"
+              className="w-full object-cover"
               src={channel.backgroundImage ?? "/background.jpg"}
-              width={2000}
-              height={2000}
-              alt="error"
+              style={{ aspectRatio: "1366/200", objectFit: "cover" }}
+              alt="background image"
+              width="1366"
+              height="200"
             />
           </label>
         </>
@@ -457,9 +451,9 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
   );
 };
 
-const SelecForm = () => {
-  const dispatch = useDispatch();
-  const { toast } = useToast();
+const SelecTheme = () => {
+  const { setTheme } = useTheme();
+
   const FormSchema = z.object({
     theme: z
       .string()
@@ -473,20 +467,14 @@ const SelecForm = () => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      theme: "light",
+    },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    dispatch(setTheme(data.theme));
-    toast({
-      title: "You change theme to:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-secondary p-4">
-          <code className="text-primary">
-            {JSON.stringify(data.theme, null, 2)}
-          </code>
-        </pre>
-      ),
-    });
+    setTheme(data.theme);
+    toast.success(`You changed theme to: ${data.theme}`);
   }
 
   return (

@@ -1,83 +1,55 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import {
-  ErrorMessage,
-  LoadingMessage,
-  SinglePlaylistWithVideo,
-} from "@/components";
-import useDocumentTitle from "@/hooks/useDocumentTitle";
+import { SinglePlaylistColumn } from "../_components/SinglePlaylistColumn";
+import { PlaylistLoading } from "../_components/PlaylistLoading";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
-const HistoryPage = () => {
-  const { data, isLoading, error } = api.playlist.getPlaylistByTitle.useQuery('History');
-
-  const playlist = data?.playlist;
-  const videos = data?.videos;
-  const authors = data?.authors;
-  const user = data?.user;
-
-  useDocumentTitle({
-    title: `${playlist?.title ?? "YourTube"}`,
-    description: `${playlist?.description ?? "YourTube"}`,
+export default function PlaylistHistoryPage() {
+  const {
+    data: playlistData,
+    isLoading,
+    error,
+  } = api.playlist.getPlaylistsByTitle.useQuery({
+    title: "History",
   });
 
-  const Error = () => {
-    if (isLoading) {
-      return <LoadingMessage small count={5}/>;
-    } else if (error ?? !data) { 
-      return (
+  return (
+    <>
+      {isLoading ? (
+        <PlaylistLoading />
+      ) : (error ?? !playlistData) ? (
         <ErrorMessage
           icon="Play"
           message="Playlist not found"
           description="Sorry there is no playlist found"
         />
-      );
-    } else {
-      return <></>;
-    }
-  };
-
-  return (
-    <>
-      {!data ?? error ? (
-        <Error />
       ) : (
-        <SinglePlaylistWithVideo
+        <SinglePlaylistColumn
           playlist={{
-            id: playlist?.id ?? "",
-            title: playlist?.title ?? "",
-            description: playlist?.description ?? "",
-            videoCount: videos?.length ?? 0,
-            createdAt: playlist?.createdAt ?? new Date(),
-            playlistThumbnail: videos?.[0]?.thumbnailUrl ?? "",
+            id: playlistData.id ?? "",
+            createdAt: playlistData.createdAt ?? "",
+            description: playlistData.description ?? "",
+            playlistThumbnail:
+              playlistData.PlaylistHasVideo[0]?.thumbnailUrl ?? "",
+            title: playlistData.title,
+            videoCount: playlistData.PlaylistHasVideo.length ?? 0,
           }}
-          videos={
-            videos?.map((video) => ({
-              id: video?.id ?? "",
-              title: video?.title ?? "",
-              videoUrl: video?.videoUrl ?? "",
-              createdAt: video?.createdAt ?? new Date(),
-              thumbnailUrl: video?.thumbnailUrl ?? "",
-              views: video?.views ?? 0,
-            })) ?? []
-          }
-          authors={
-            authors?.map((author) => ({
-              id: author?.id ?? "",
-              name: author?.name ?? "",
-              image: author?.image ?? "",
-            })) ?? []
-          }
-          user={{
-            id: user?.id ?? "",
-            image: user?.image ?? "",
-            name: user?.name ?? "",
-            followers: user?.followers ?? 0,
-          }}
+          user={playlistData.user}
+          videos={playlistData.PlaylistHasVideo.map((video) => ({
+            id: video.id ?? "",
+            title: video.title ?? "",
+            thumbnailUrl: video.thumbnailUrl ?? "",
+            videoUrl: video.videoUrl ?? "",
+            createdAt: video.createdAt ?? new Date(),
+            views: video.views ?? 0,
+            user: {
+              name: video.user?.name ?? "",
+              image: video.user?.image ?? "",
+            },
+          }))}
         />
       )}
     </>
   );
-};
-
-export default HistoryPage;
+}

@@ -1,66 +1,94 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { TRPCError } from "@trpc/server";
+import { EngagementType } from "@prisma/client";
+import { addCommentInputSchema } from "@/lib/schema/comment";
+import {
+  addDislikeCountInputSchema,
+  addLikeCountInputSchema,
+} from "@/lib/schema/videoEngagement";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  addNewComment,
+  createEngagement,
+  deleteEngagementIfExits,
+  getComments,
+  getExitsDislike,
+  getExitsLike,
+} from "@/services/commentService";
 
 export const commentRouter = createTRPCRouter({
   addComment: protectedProcedure
-    .input(
-      z.object({
-        videoId: z.string(),
-        message: z.string().max(200).min(1),
-      }),
-    )
+    .input(addCommentInputSchema)
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.comment.create({
-        data: {
-          videoId: input.videoId,
-          userId: ctx.session.user.id,
-          message: input.message,
-        },
-      });
-      const getAllNewComments = await ctx.db.comment.findMany({
-        where: {
-          videoId: input.videoId,
-        },
-      });
-      return getAllNewComments;
+      await addNewComment(
+        ctx,
+        input.videoId,
+        ctx.session.user.id,
+        input.message,
+        input.parentId!,
+      );
+
+      return await getComments(ctx, input.videoId);
     }),
-  addReplyComment: protectedProcedure
-    .input(
-      z.object({
-        commentId: z.string(),
-        message: z.string(),
-      }),
-    )
+  addLikeCount: protectedProcedure
+    .input(addLikeCountInputSchema)
     .mutation(async ({ ctx, input }) => {
-      if (input.message !== "") {
-        const comment = await ctx.db.comment.findFirst({
-          where: {
-            id: input.commentId,
-          },
-        });
+      await deleteEngagementIfExits(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+        EngagementType.DISLIKE,
+      );
 
-        if (!comment)
-          throw new TRPCError({
-            message: "Comment not found",
-            code: "NOT_FOUND",
-          });
+      const existingLike = await getExitsLike(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+      );
 
-        const addReply = await ctx.db.repliesComment.create({
-          data: {
-            userId: ctx.session.user.id,
-            message: input.message,
-          },
-        });
+      if (existingLike.length > 0) {
+        return await deleteEngagementIfExits(
+          ctx,
+          input.id,
+          ctx.session.user.id,
+          EngagementType.LIKE,
+        );
+      } else {
+        return await createEngagement(
+          ctx,
+          input.id,
+          ctx.session.user.id,
+          EngagementType.LIKE,
+        );
+      }
+    }),
+  addDislikeCount: protectedProcedure
+    .input(addDislikeCountInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      await deleteEngagementIfExits(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+        EngagementType.LIKE,
+      );
+      const existingDislike = await getExitsDislike(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+      );
 
-        const newReplyComment = await ctx.db.commentHasReplies.create({
-          data: {
-            commentId: comment.id,
-            repliesCommentId: addReply.id,
-          },
-        });
-
-        return newReplyComment;
+      if (existingDislike.length > 0) {
+        return await deleteEngagementIfExits(
+          ctx,
+          input.id,
+          ctx.session.user.id,
+          EngagementType.DISLIKE,
+        );
+      } else {
+        return await createEngagement(
+          ctx,
+          input.id,
+          ctx.session.user.id,
+          EngagementType.DISLIKE,
+        );
       }
     }),
 });
