@@ -15,6 +15,7 @@ interface onUploadProps {
   };
   refetch?: () => unknown;
   updateParams?: boolean;
+  type: "video" | "image";
 }
 
 export function useVideoUpload() {
@@ -61,6 +62,7 @@ export function useVideoUpload() {
     data,
     refetch,
     updateParams,
+    type,
   }: onUploadProps) => {
     type UploadResponse = {
       secure_url: string;
@@ -75,7 +77,22 @@ export function useVideoUpload() {
       ];
     };
 
-    if (!fileToUpload) toast.error("Please select a file to upload");
+    if (!fileToUpload) {
+      toast.error("Please select a file to upload");
+      return;
+    }
+    if (type === "video") {
+      if (!(fileToUpload as File).type.includes("video/mp4")) {
+        toast.error("File type not supported");
+        return;
+      }
+    }
+    if (type === "image") {
+      if (!(fileToUpload as File).type.includes("image/")) {
+        toast.error("File type not supported");
+        return;
+      }
+    }
 
     setUploadProgress(0);
     setIsUploading(true);

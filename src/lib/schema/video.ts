@@ -23,9 +23,14 @@ const videoDetailSchema = z.object({
   publish: z.boolean().default(false),
 });
 
+const getVideoBySearchInputSchema = z.object({
+  title: z.string().optional(),
+});
+
 export {
   getRandomVideoInputSchema,
   getVideoByIdInputSchema,
   addNewVideoInputSchema,
   videoDetailSchema,
+  getVideoBySearchInputSchema,
 };

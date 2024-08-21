@@ -110,6 +110,7 @@ export default function EditPage() {
         publish: data.publish,
       },
       refetch,
+      type: "image",
     });
   };
 
@@ -149,7 +150,7 @@ export default function EditPage() {
       <div>
         <div className="sm:flex sm:items-start">
           <div className="mt-3 w-full text-left">
-            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+            <div className="flex flex-col space-y-1.5 text-start sm:text-left">
               <h3 className="text-lg font-semibold leading-none tracking-tight sm:text-xl">
                 Video Details
               </h3>

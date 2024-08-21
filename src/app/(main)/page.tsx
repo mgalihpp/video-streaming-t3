@@ -12,7 +12,7 @@ export default function Home() {
     data: randomVideoData,
     isLoading: isRandomVideoDataLoading,
     error: isDataError,
-  } = api.video.getRandomVideo.useQuery({ many: 10 });
+  } = api.video.getRandomVideo.useQuery({ many: 20 });
 
   return (
     <>
@@ -23,6 +23,12 @@ export default function Home() {
           icon="Play"
           message="No videos"
           description="Something went wrong. Please try again later."
+        />
+      ) : randomVideoData.randomVideos.length <= 0 ? (
+        <ErrorMessage
+          icon="Play"
+          message="No videos"
+          description="Sorry we can't find any videos"
         />
       ) : (
         <MultiColumnVideo

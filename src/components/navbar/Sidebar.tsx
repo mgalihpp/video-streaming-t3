@@ -79,19 +79,19 @@ export default function SideBar({
     },
     {
       name: "Liked Videos",
-      path: userId ? `/playlist/likedvideos` : "/api/auth/signin",
+      path: userId ? `/playlist/likedvideos` : "/login",
       icon: (className) => <ThumbsUp className={className} />,
       current: pathname === "/playlist/likedvideos",
     },
     {
       name: "History",
-      path: userId ? `/playlist/history` : "/api/auth/signin",
+      path: userId ? `/playlist/history` : "/login",
       icon: (className) => <ClockRewind className={className} />,
       current: pathname === "/playlist/history",
     },
     {
       name: "Your Videos",
-      path: userId ? `/channel/${String(userId)}` : "/api/auth/signin",
+      path: userId ? `/channel/${String(userId)}` : "/login",
       icon: (className) => <VideoRecorder className={className} />,
       current: pathname === `/channel/${String(userId)}`,
     },
@@ -99,7 +99,7 @@ export default function SideBar({
       name: "Library",
       path: userId
         ? `/channel/${String(userId)}/playlists`
-        : "/api/auth/signin",
+        : "/login",
       icon: (className) => <Folder className={className} />,
       current: pathname === `/channel/${String(userId)}/playlists`,
     },
@@ -107,7 +107,7 @@ export default function SideBar({
       name: "Following",
       path: userId
         ? `/channel/${String(userId)}/followings`
-        : "/api/auth/signin",
+        : "/login",
       icon: (className) => <UserCheck className={className} />,
       current: pathname === `/channel/${String(userId)}/followings`,
     },
@@ -202,7 +202,7 @@ export default function SideBar({
                         onClick={(e) => {
                           e.preventDefault();
 
-                          if (item.path === "/api/auth/signin") {
+                          if (item.path === "/api/auth/login") {
                             void signIn();
                           } else {
                             void router.push(item.path!);
@@ -384,7 +384,7 @@ export default function SideBar({
                                   e.preventDefault();
                                   setSidebarOpen(false);
 
-                                  if (item.path === "/api/auth/signin") {
+                                  if (item.path === "/api/authlogin") {
                                     void signIn();
                                   } else {
                                     void router.push(item.path!);

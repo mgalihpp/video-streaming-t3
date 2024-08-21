@@ -116,7 +116,7 @@ export const UploadButton = () => {
             "https://res.cloudinary.com/ddhvywd6h/image/upload/v1723974681/qw7lplxygrqjjmhcody3.png",
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             toast.success("Video updated successfully");
             void refetch();
 
@@ -142,6 +142,7 @@ export const UploadButton = () => {
       cb: setCurrentStep,
       updateParams: true,
       refetch,
+      type: "image",
     });
   };
 
@@ -263,6 +264,7 @@ export const UploadButton = () => {
                       onUpload({
                         cb: setCurrentStep,
                         fileToUpload: uploadFile,
+                        type: "video",
                       })
                     }
                   >

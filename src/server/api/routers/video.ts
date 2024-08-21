@@ -7,6 +7,7 @@ import {
   addNewVideoInputSchema,
   getRandomVideoInputSchema,
   getVideoByIdInputSchema,
+  getVideoBySearchInputSchema,
   videoDetailSchema,
 } from "@/lib/schema/video";
 import { EngagementType } from "@prisma/client";
@@ -290,5 +291,36 @@ export const videoRouter = createTRPCRouter({
       );
 
       return videoWithCount;
+    }),
+  getVideoBySearch: publicProcedure
+    .input(getVideoBySearchInputSchema)
+    .query(async ({ ctx, input }) => {
+      const videos = await ctx.db.video.findMany({
+        where: {
+          publish: true,
+          title: {
+            contains: input.title,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const videoWithCount = await Promise.all(
+        videos.map(async (video) => {
+          const views = await ctx.db.videoEngagement.count({
+            where: { videoId: video.id, engagementType: EngagementType.VIEW },
+          });
+          return {
+            ...video,
+            views,
+          };
+        }),
+      );
+
+      return {
+        videos: videoWithCount,
+      };
     }),
 });

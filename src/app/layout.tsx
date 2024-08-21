@@ -5,7 +5,6 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import NextAuthProvider from "@/providers/NextAuthProvider";
-import Wrapper from "@/components/Wrapper";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
@@ -25,12 +24,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${GeistSans.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <TRPCReactProvider>
           <NextAuthProvider>
             <ThemeProvider defaultTheme="light" enableSystem={false}>
-              <Wrapper>{children}</Wrapper>
+              {children}
             </ThemeProvider>
           </NextAuthProvider>
           <Toaster position="bottom-right" />
