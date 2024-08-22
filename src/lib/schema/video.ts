@@ -27,10 +27,17 @@ const getVideoBySearchInputSchema = z.object({
   title: z.string().optional(),
 });
 
+const getInfiniteVideosInputSchema = z.object({
+  cursor: z.string().optional().nullish(),
+  limit: z.number().int(),
+  skip: z.number().int().optional(),
+});
+
 export {
   getRandomVideoInputSchema,
   getVideoByIdInputSchema,
   addNewVideoInputSchema,
   videoDetailSchema,
   getVideoBySearchInputSchema,
+  getInfiniteVideosInputSchema,
 };

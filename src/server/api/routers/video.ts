@@ -5,6 +5,7 @@ import {
 } from "@/server/api/trpc";
 import {
   addNewVideoInputSchema,
+  getInfiniteVideosInputSchema,
   getRandomVideoInputSchema,
   getVideoByIdInputSchema,
   getVideoBySearchInputSchema,
@@ -369,4 +370,61 @@ export const videoRouter = createTRPCRouter({
 
     return videosWithViewCount;
   }),
+  getInfiniteVideos: publicProcedure
+    .input(getInfiniteVideosInputSchema)
+    .query(async ({ ctx, input }) => {
+      const rawVideos = await ctx.db.video.findMany({
+        where: {
+          publish: true,
+        },
+        include: {
+          user: true,
+        },
+        take: input.limit + 1,
+        skip: input.skip,
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      });
+
+      let nextCursor: typeof input.cursor | undefined = undefined;
+
+      if (rawVideos.length > input.limit) {
+        const nextItem = rawVideos.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      const videoViews = await Promise.all(
+        rawVideos.map(async (video) => {
+          const views = await ctx.db.videoEngagement.count({
+            where: { videoId: video.id, engagementType: EngagementType.VIEW },
+          });
+          return {
+            ...video,
+            views,
+          };
+        }),
+      );
+
+      const indices = Array.from({ length: videoViews.length }, (_, i) => i);
+
+      // shuffle
+
+      for (let i = indices.length - 1; i > 0; i--) {
+        if (indices[i] !== undefined) {
+          const j = Math.floor(Math.random() * (i + 1));
+
+          if (indices[j] !== undefined) {
+            [indices[i], indices[j]] = [indices[j], indices[i]!];
+          }
+        }
+      }
+
+      const shuffleVideoWithCounts = indices.map((i) => videoViews[i]);
+
+      const randomVideos = shuffleVideoWithCounts.slice(0, input.limit);
+
+      return {
+        videos: randomVideos,
+        nextCursor,
+      };
+    }),
 });
