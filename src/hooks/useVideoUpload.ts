@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { generateThumbnails } from "@/helpers/generateThumbnails";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
@@ -94,6 +95,8 @@ export function useVideoUpload() {
       }
     }
 
+    const cloudName = env.NEXT_PUBLIC_CLOUDINARY_NAME;
+
     setUploadProgress(0);
     setIsUploading(true);
 
@@ -131,7 +134,7 @@ export function useVideoUpload() {
 
       try {
         const response = await fetch(
-          "https://api.cloudinary.com/v1_1/ddhvywd6h/auto/upload",
+          `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
           {
             method: "POST",
             body: formData,
