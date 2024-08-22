@@ -50,7 +50,7 @@ const signedInNavigation = (userId: string): NavigationItem[] => [
   {
     icon: (className) => <File className={className} />,
     name: "Terms of Service",
-    path: `/blog/tems`,
+    path: `/blog/terms`,
     lineAbove: true,
   },
   {
@@ -83,7 +83,7 @@ const signOutNavigation: NavigationItem[] = [
   {
     icon: (className) => <File className={className} />,
     name: "Terms of Service",
-    path: `/blog/tems`,
+    path: `/blog/terms`,
     lineAbove: true,
   },
   {

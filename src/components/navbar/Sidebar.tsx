@@ -422,7 +422,7 @@ export default function SideBar({
                         Privacy
                       </Link>
                       <Link
-                        href="/blog/tems"
+                        href="/blog/terms"
                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-primary/60 hover:bg-secondary hover:text-primary"
                       >
                         <File className="h-5 w-5 shrink-0 stroke-primary/60 group-hover:stroke-primary" />
