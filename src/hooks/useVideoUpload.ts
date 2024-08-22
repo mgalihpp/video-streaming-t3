@@ -67,6 +67,7 @@ export function useVideoUpload() {
   }: onUploadProps) => {
     type UploadResponse = {
       secure_url: string;
+      playback_url: string;
       eager: [
         {
           transformation: string;
@@ -166,9 +167,19 @@ export function useVideoUpload() {
           const fetchResponse = (await response.json()) as UploadResponse;
 
           if (fetchResponse.eager) {
-            const newVideoData = {
-              videoUrl: fetchResponse.eager[0].secure_url,
+            let newVideoData = {
+              videoUrl: "",
             };
+
+            if (fetchResponse.eager[0].secure_url) {
+              newVideoData = {
+                videoUrl: fetchResponse.eager[0].secure_url,
+              };
+            } else {
+              newVideoData = {
+                videoUrl: fetchResponse.playback_url,
+              };
+            }
 
             addNewVideo(newVideoData, {
               onSuccess: (data) => {
