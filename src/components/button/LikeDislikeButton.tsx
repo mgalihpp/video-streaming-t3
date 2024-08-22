@@ -3,10 +3,11 @@
 import { useEngagementButton } from "@/hooks/useEngagement";
 import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { ThumbsDown, ThumbsUp } from "@/components/Icons/Icons";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
 
 interface LikeDislikeButtonProps {
   EngagementData: {
@@ -26,6 +27,8 @@ export default function LikeDislikeButton({
 }: LikeDislikeButtonProps) {
   const { data: sessionData } = useSession();
 
+  const router = useRouter();
+
   const { likeCount, dislikeCount, handleDislike, handleLike, userChoice } =
     useEngagementButton({
       EngagementData,
@@ -44,7 +47,7 @@ export default function LikeDislikeButton({
             ? void handleLike({
                 id: EngagementData.id,
               })
-            : void signIn()
+            : router.push("/login")
         }
         className="flex items-center justify-center gap-2 rounded-s-full border-none hover:bg-accent"
       >
@@ -70,7 +73,7 @@ export default function LikeDislikeButton({
             ? void handleDislike({
                 id: EngagementData.id,
               })
-            : void signIn()
+            : router.push("/login")
         }
         className="flex items-center justify-center gap-2 rounded-e-full border-none hover:bg-accent"
       >

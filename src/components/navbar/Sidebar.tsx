@@ -21,7 +21,7 @@ import {
 } from "@/components/Icons/Icons";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Fragment, useEffect } from "react";
 import {
   Dialog,
@@ -97,17 +97,13 @@ export default function SideBar({
     },
     {
       name: "Library",
-      path: userId
-        ? `/channel/${String(userId)}/playlists`
-        : "/login",
+      path: userId ? `/channel/${String(userId)}/playlists` : "/login",
       icon: (className) => <Folder className={className} />,
       current: pathname === `/channel/${String(userId)}/playlists`,
     },
     {
       name: "Following",
-      path: userId
-        ? `/channel/${String(userId)}/followings`
-        : "/login",
+      path: userId ? `/channel/${String(userId)}/followings` : "/login",
       icon: (className) => <UserCheck className={className} />,
       current: pathname === `/channel/${String(userId)}/followings`,
     },
@@ -203,7 +199,7 @@ export default function SideBar({
                           e.preventDefault();
 
                           if (item.path === "/api/auth/login") {
-                            void signIn();
+                            router.push("/login");
                           } else {
                             void router.push(item.path!);
                           }
@@ -285,7 +281,7 @@ export default function SideBar({
                     {
                       sessionData
                         ? void router.push("/settings")
-                        : void signIn();
+                        : router.push("/login");
                     }
                   }}
                   className={cn(
@@ -356,7 +352,7 @@ export default function SideBar({
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-[200px]"
             >
-              <DialogPanel className="max-xs:max-w-[260px] relative mr-16 flex w-full max-w-xs flex-1">
+              <DialogPanel className="relative mr-16 flex w-full max-w-xs flex-1 max-xs:max-w-[260px]">
                 <div className="absolute left-full top-0 w-16 justify-center pt-5">
                   <Button
                     className="ml-2 rounded-full p-2"
@@ -384,8 +380,8 @@ export default function SideBar({
                                   e.preventDefault();
                                   setSidebarOpen(false);
 
-                                  if (item.path === "/api/authlogin") {
-                                    void signIn();
+                                  if (item.path === "/api/auth/ogin") {
+                                    router.push("/login");
                                   } else {
                                     void router.push(item.path!);
                                   }
@@ -463,7 +459,7 @@ export default function SideBar({
                           className="w-full"
                           onClick={(e) => {
                             e.preventDefault();
-                            void signIn();
+                            router.push("/login");
                           }}
                         >
                           Log in

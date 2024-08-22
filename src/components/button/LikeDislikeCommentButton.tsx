@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "@/components/Icons/Icons";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { useEngagementButton } from "@/hooks/useEngagement";
 import { api } from "@/trpc/react";
 import { useState } from "react";
 import { VideoCommentForm } from "@/components/video/VideoCommentForm";
+import { useRouter } from "next/navigation";
 
 interface LikeDislikeCommentButtonProps {
   id: string;
@@ -34,8 +35,9 @@ export const LikeDislikeCommentButton = ({
   isCanReply,
 }: LikeDislikeCommentButtonProps) => {
   const { data: session } = useSession();
-
   const [isReplying, setIsReplying] = useState(false);
+
+  const router = useRouter();
 
   const { likeCount, dislikeCount, handleDislike, handleLike, userChoice } =
     useEngagementButton({
@@ -58,7 +60,7 @@ export const LikeDislikeCommentButton = ({
               ? void handleLike({
                   id,
                 })
-              : void signIn()
+              : router.push("/login")
           }
         >
           <div className="flex items-center rounded-full p-2 group-hover:bg-accent">
@@ -86,7 +88,7 @@ export const LikeDislikeCommentButton = ({
               ? void handleDislike({
                   id,
                 })
-              : void signIn()
+              : router.push("/login")
           }
         >
           <div className="flex items-center rounded-full p-2 group-hover:bg-accent">

@@ -379,6 +379,13 @@ export const videoRouter = createTRPCRouter({
         },
         include: {
           user: true,
+          _count: {
+            select: {
+              VideoEngagement: {
+                where: { engagementType: EngagementType.VIEW },
+              },
+            },
+          },
         },
         take: input.limit + 1,
         skip: input.skip,
@@ -392,38 +399,31 @@ export const videoRouter = createTRPCRouter({
         nextCursor = nextItem?.id;
       }
 
-      const videoViews = await Promise.all(
-        rawVideos.map(async (video) => {
-          const views = await ctx.db.videoEngagement.count({
-            where: { videoId: video.id, engagementType: EngagementType.VIEW },
-          });
-          return {
-            ...video,
-            views,
-          };
-        }),
-      );
+      // Map the videos with view counts
+      const videoViews = rawVideos.map((video) => ({
+        ...video,
+        views: video._count.VideoEngagement ?? 0,
+      }));
 
-      const indices = Array.from({ length: videoViews.length }, (_, i) => i);
-
-      // shuffle
-
-      for (let i = indices.length - 1; i > 0; i--) {
-        if (indices[i] !== undefined) {
-          const j = Math.floor(Math.random() * (i + 1));
-
-          if (indices[j] !== undefined) {
-            [indices[i], indices[j]] = [indices[j], indices[i]!];
+      // Utility function to shuffle an array
+      function shuffleArray<T>(array: T[]): T[] {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.min(
+            Math.floor(Math.random() * (i + 1)),
+            array.length - 1,
+          );
+          if (array[j] !== undefined) {
+            [array[i], array[j]] = [array[j], array[i]!];
           }
         }
+        return array;
       }
 
-      const shuffleVideoWithCounts = indices.map((i) => videoViews[i]);
-
-      const randomVideos = shuffleVideoWithCounts.slice(0, input.limit);
+      // Shuffle the videos
+      const shuffledVideos = shuffleArray(videoViews).slice(0, input.limit);
 
       return {
-        videos: randomVideos,
+        videos: shuffledVideos,
         nextCursor,
       };
     }),

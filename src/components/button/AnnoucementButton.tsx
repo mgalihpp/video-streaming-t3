@@ -73,7 +73,7 @@ export default function AnnoucementButton({
             ? void handleLike({
                 id: EngagementData.id,
               })
-            : void signIn()
+            : router.push("/login")
         }
         className="flex items-center justify-center gap-2 rounded-s-full border-none hover:bg-accent"
       >
@@ -98,7 +98,7 @@ export default function AnnoucementButton({
             ? void handleDislike({
                 id: EngagementData.id,
               })
-            : void signIn()
+            : void router.push("/login")
         }
         className="flex items-center justify-center gap-2 rounded-e-full border-none hover:bg-accent"
       >
@@ -116,7 +116,7 @@ export default function AnnoucementButton({
         </span>
       </Button>
       {sessionData?.user.id === channel.userId && (
-        <Menu as="div" className='relative'>
+        <Menu as="div" className="relative">
           <div>
             <MenuButton className={buttonVariants({ variant: "ghost" })}>
               <DotsVertical className="size-4 stroke-primary" />

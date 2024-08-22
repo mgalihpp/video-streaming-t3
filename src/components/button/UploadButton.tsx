@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import { Check, Loader2, PlayIcon } from "lucide-react";
+import { Check, Info, Loader2, PlayIcon } from "lucide-react";
 import { useVideoUpload } from "@/hooks/useVideoUpload";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -149,7 +149,7 @@ export const UploadButton = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 max-md:w-full">
           <PlusVideo className="size-5 fill-white stroke-none" />
           Upload Video
         </Button>
@@ -179,18 +179,6 @@ export const UploadButton = () => {
             </div>
           ))}
         </div>
-        {/* {!complete && (
-          <button
-            className="btn"
-            onClick={() => {
-              currentStep === steps.length
-                ? setComplete(true)
-                : setCurrentStep((prev) => prev + 1);
-            }}
-          >
-            {currentStep === steps.length ? "Finish" : "Next"}
-          </button>
-        )} */}
 
         {steps[currentStep - 1] === "Upload Video" && (
           <div className="sm:flex sm:items-start">
@@ -256,6 +244,13 @@ export const UploadButton = () => {
                     </>
                   )}
                 </div>
+                <span className="mt-1 inline-flex items-center gap-2 text-xs">
+                  <Info className="size-3 max-sm:hidden" />
+                  <p>
+                    Upload can take while to complete. It&apos;s depends on
+                    encoding service speed and your internet speed ;)
+                  </p>
+                </span>
                 <div className="relative mt-5 flex flex-row-reverse gap-2 sm:mt-4">
                   <Button
                     type="button"

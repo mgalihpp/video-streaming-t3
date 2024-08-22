@@ -14,7 +14,8 @@ export default function Home() {
 
   const { ref, entry } = useIntersection({
     root: lastPostRef.current,
-    threshold: 1,
+    rootMargin: "40px",
+    threshold: 0.9,
   });
 
   const {
@@ -26,7 +27,7 @@ export default function Home() {
     hasNextPage,
   } = api.video.getInfiniteVideos.useInfiniteQuery(
     {
-      limit: 9,
+      limit: 9, // 6 or 9 or 12
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,

@@ -1,12 +1,13 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { UserPlus } from "../Icons/Icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface FollowButton {
   followingId: string;
@@ -25,6 +26,8 @@ export default function FollowButton({
   const [userChoice, setUserChoice] = useState({
     following: viewer.hasFollowed,
   });
+
+  const router = useRouter();
 
   const addFollowMutation = api.user.addFollow.useMutation();
   const handleFollow = (input: { followingId: string }) => {
@@ -57,7 +60,7 @@ export default function FollowButton({
                   handleFollow({
                     followingId: followingId,
                   })
-              : () => void signIn()
+              : () => router.push("/login")
           }
           className="flex items-center justify-center gap-2"
         >

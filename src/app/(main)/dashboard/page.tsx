@@ -43,7 +43,7 @@ export default async function Dashboard() {
 
   return (
     <div className="flex flex-col space-y-4 p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <div className="flex w-full flex-col">
           <h2 className="text-lg font-bold md:text-3xl">
             Welcome, {session?.user.name}
@@ -53,7 +53,7 @@ export default async function Dashboard() {
           </p>
         </div>
 
-        <div>
+        <div className="max-md:w-full">
           <Suspense>
             <UploadButton />
           </Suspense>
@@ -102,7 +102,8 @@ export default async function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">
                 {(
-                  (userStatsData.totalLikes / userStatsData.totalViews) *
+                  ((userStatsData.totalLikes ?? 0) /
+                    (userStatsData.totalViews ?? 0)) *
                   100
                 ).toFixed(2)}
                 %
