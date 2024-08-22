@@ -156,7 +156,7 @@ export default function Navbar({ children }: NavbarProps) {
                 <Button
                   className="ml-4"
                   size="sm"
-                  onClick={!sessionData ? () => void signIn() : void {}}
+                  onClick={!sessionData ? () => router.push('/login') : void {}}
                 >
                   Log in
                 </Button>
