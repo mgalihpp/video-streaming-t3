@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { EngagementType } from "@prisma/client";
+import { createAnnoucementInputSchema } from "@/lib/schema/annoucement";
 
 export const annoucementRouter = createTRPCRouter({
   getAnnoucementByUserId: publicProcedure
@@ -174,12 +179,12 @@ export const annoucementRouter = createTRPCRouter({
       }
     }),
   addAnnoucement: protectedProcedure
-    .input(z.string().max(200).min(1))
+    .input(createAnnoucementInputSchema)
     .mutation(async ({ ctx, input }) => {
       await ctx.db.announcement.create({
         data: {
           userId: ctx.session.user.id,
-          message: input,
+          message: input.message,
         },
       });
     }),

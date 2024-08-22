@@ -1,67 +1,22 @@
-import { EngagementType, type Prisma, type PrismaClient } from "@prisma/client";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { z } from "zod";
-import { type DefaultArgs } from "@prisma/client/runtime/library";
+import {
+  addDislikeCountInputSchema,
+  addLikeCountInputSchema,
+  addViewCountInputSchema,
+} from "@/lib/schema/videoEngagement";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import {
+  createEngagement,
+  deleteEngagementIfExits,
+  getExitsDislike,
+  getExitsLike,
+} from "@/services/engagementService";
+import { getOrCreatePlaylist } from "@/services/playlistService";
+import { EngagementType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-
-type Context = {
-  db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
-};
-
-async function getOrCreatePlaylist(
-  ctx: Context,
-  title: string,
-  description: string,
-  userId: string,
-) {
-  let playlist = await ctx.db.playlist.findFirst({
-    where: { title, userId },
-  });
-
-  if (playlist === null || playlist === undefined) {
-    playlist = await ctx.db.playlist.create({
-      data: { title, description, userId },
-    });
-  }
-
-  return playlist;
-}
-
-async function createEngagement(
-  ctx: Context,
-  id: string,
-  userId: string,
-  type: EngagementType,
-) {
-  return await ctx.db.videoEngagement.create({
-    data: {
-      videoId: id,
-      userId,
-      engagementType: type,
-    },
-  });
-}
-
-async function deleteEngagementIfExits(
-  ctx: Context,
-  id: string,
-  userId: string,
-  type: EngagementType,
-) {
-  const existingEngagement = await ctx.db.videoEngagement.findMany({
-    where: { videoId: id, userId, engagementType: type },
-  });
-
-  if (existingEngagement.length > 0) {
-    await ctx.db.videoEngagement.deleteMany({
-      where: { videoId: id, userId, engagementType: type },
-    });
-  }
-}
 
 export const videoEngagementRouter = createTRPCRouter({
   addLikeCount: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(addLikeCountInputSchema)
     .mutation(async ({ ctx, input }) => {
       await deleteEngagementIfExits(
         ctx,
@@ -70,13 +25,11 @@ export const videoEngagementRouter = createTRPCRouter({
         EngagementType.DISLIKE,
       );
 
-      const existingLike = await ctx.db.videoEngagement.findMany({
-        where: {
-          videoId: input.id,
-          userId: ctx.session.user.id,
-          engagementType: EngagementType.LIKE,
-        },
-      });
+      const existingLike = await getExitsLike(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+      );
 
       const playlist = await getOrCreatePlaylist(
         ctx,
@@ -117,7 +70,7 @@ export const videoEngagementRouter = createTRPCRouter({
     }),
 
   addDislikeCount: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(addDislikeCountInputSchema)
     .mutation(async ({ ctx, input }) => {
       await deleteEngagementIfExits(
         ctx,
@@ -125,14 +78,11 @@ export const videoEngagementRouter = createTRPCRouter({
         ctx.session.user.id,
         EngagementType.LIKE,
       );
-
-      const existingDislike = await ctx.db.videoEngagement.findMany({
-        where: {
-          videoId: input.id,
-          userId: ctx.session.user.id,
-          engagementType: EngagementType.DISLIKE,
-        },
-      });
+      const existingDislike = await getExitsDislike(
+        ctx,
+        ctx.session.user.id,
+        input.id,
+      );
 
       const playlist = await getOrCreatePlaylist(
         ctx,
@@ -164,16 +114,21 @@ export const videoEngagementRouter = createTRPCRouter({
         );
       }
     }),
-
   addViewCount: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(addViewCountInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const rawVideo = await ctx.db.video.findFirst({
-        where: { id: input.id },
+      const rawVideo = await ctx.db.video.findUnique({
+        where: {
+          id: input.id,
+        },
       });
 
-      if (!rawVideo)
-        throw new TRPCError({ message: "Video not found", code: "NOT_FOUND" });
+      if (!rawVideo) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Sorry this video does not exist",
+        });
+      }
 
       if (ctx.session?.user.id && ctx.session.user.id !== "") {
         const playlist = await getOrCreatePlaylist(

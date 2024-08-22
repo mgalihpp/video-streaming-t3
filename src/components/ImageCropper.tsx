@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import { useRef } from "react";
 import { Cropper } from "react-cropper";
 import { Button } from "./ui/button";
+import "cropperjs/dist/cropper.css";
 
 export function ImageCropper({
   image,
@@ -12,7 +13,7 @@ export function ImageCropper({
   setCurrentPage,
   setOpen,
 }: {
-  setCurrentPage?: (page: number) => void;
+  setCurrentPage?: (page: boolean) => void;
   setCroppedImage: (image: string | null) => void;
   image: File | null | string;
   handleSubmit?: (croppedDataUrl: string) => void;
@@ -39,10 +40,10 @@ export function ImageCropper({
 
   const completeCrop = () => {
     cropImage();
-    setCurrentPage ? setCurrentPage(1) : null;
+    setCurrentPage ? setCurrentPage(false) : null;
   };
   const cancelCrop = () => {
-    setCurrentPage ? setCurrentPage(1) : null;
+    setCurrentPage ? setCurrentPage(false) : null;
     setOpen ? setOpen(false) : null;
   };
 

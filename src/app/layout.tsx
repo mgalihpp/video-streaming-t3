@@ -1,23 +1,18 @@
 import "@/styles/globals.css";
 
-import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
+import { GeistSans } from "geist/font/sans";
+import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import NextSessionProvider from "@/providers/SessionProvider";
-import Providers from "@/providers/Providers";
-import { Toaster } from "@/components/ui/toaster";
-import { Wrapper } from "@/components";
-import NextTopLoader from "nextjs-toploader";
-import ThemeProviders from "@/providers/ThemeProviders";
+import NextAuthProvider from "@/providers/NextAuthProvider";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-export const metadata = {
-  title: "YourTube",
+export const metadata: Metadata = {
+  title: {
+    template: "%s - YourTube",
+    default: "YourTube",
+  },
   description: `Welcome to YourTube - Your go-to platform for amazing videos!
   Discover a world of content with our incredible features. Enjoy seamless streaming, 
   personalized recommendations, and much more. Download YourTube now and embark on a visual journey 
@@ -27,23 +22,22 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans ${inter.variable} max-w-screen-2xl`}>
-        <NextSessionProvider>
-          <TRPCReactProvider cookies={cookies().toString()}>
-            <Providers>
-              <ThemeProviders>
-                <Wrapper>{children}</Wrapper>
-              </ThemeProviders>
-            </Providers>
-          </TRPCReactProvider>
-        </NextSessionProvider>
-        <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
-        <Toaster />
+    <html
+      lang="en"
+      className={`${GeistSans.variable}`}
+      suppressHydrationWarning
+    >
+      <body>
+        <TRPCReactProvider>
+          <NextAuthProvider>
+            <ThemeProvider defaultTheme="light" enableSystem={false}>
+              {children}
+            </ThemeProvider>
+          </NextAuthProvider>
+          <Toaster position="bottom-right" />
+        </TRPCReactProvider>
       </body>
     </html>
   );

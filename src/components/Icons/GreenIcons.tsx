@@ -93,6 +93,7 @@ export function GreenPeople(props: React.SVGProps<SVGSVGElement>) {
 export function GreenUserCheck(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="56"
       height="56"
       viewBox="0 0 56 56"
@@ -123,6 +124,7 @@ export function GreenUserCheck(props: React.SVGProps<SVGSVGElement>) {
 export function GreenHeart(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="56"
       height="56"
       viewBox="0 0 56 56"
@@ -154,6 +156,7 @@ export function GreenHeart(props: React.SVGProps<SVGSVGElement>) {
 export function GreenEye(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
+      {...props}
       width="56"
       height="56"
       viewBox="0 0 56 56"

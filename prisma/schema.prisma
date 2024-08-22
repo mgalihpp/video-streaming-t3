@@ -6,27 +6,31 @@ generator client {
 }
 
 datasource db {
-    provider     = "postgresql"
-    url          = env("DATABASE_URL")
-    directUrl    = env("DIRECT_URL")
-    relationMode = "prisma"
+    provider  = "postgresql"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id                       String  @id @default(cuid())
+    userId                   String
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String? // @db.Text
+    access_token             String? // @db.Text
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String? // @db.Text
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
     @@index([userId])
@@ -40,6 +44,28 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId])
+}
+
+model User {
+    id                     String                   @id @default(cuid())
+    name                   String?
+    email                  String?                  @unique
+    emailVerified          DateTime?
+    image                  String?
+    handle                 String?                  @unique
+    description            String?                  @db.Text
+    backgroundImage        String?                  @db.Text
+    accounts               Account[]
+    sessions               Session[]
+    Video                  Video[]
+    VideoEngagement        VideoEngagement[]
+    Comment                Comment[]
+    Announcement           Announcement[]
+    AnnouncementEngagement AnnouncementEngagement[]
+    followers              FollowEngagement[]       @relation("Followings")
+    followings             FollowEngagement[]       @relation("Followers")
+    Playlist               Playlist[]
+    CommentEngagement      CommentEngagement[]
 }
 
 model VerificationToken {
@@ -58,38 +84,17 @@ enum EngagementType {
     FOLLOW
 }
 
-model User {
-    id                     String                   @id @default(cuid())
-    name                   String?
-    email                  String?                  @unique
-    emailVerified          DateTime?
-    image                  String?
-    backgroundImage        String?                  @db.Text
-    handle                 String?                  @unique
-    description            String?                  @db.Text
-    accounts               Account[]
-    sessions               Session[]
-    videos                 Video[]
-    VideoEngagement        VideoEngagement[]
-    Comment                Comment[]
-    Announcement           Announcement[]
-    AnnouncementEngagement AnnouncementEngagement[]
-    followers              FollowEngagement[]       @relation("Followings")
-    followings             FollowEngagement[]       @relation("Followers")
-    Playlist               Playlist[]
-    RepliesComment         RepliesComment[]
-}
-
 model Video {
-    id           String   @id @default(cuid())
-    title        String   @db.Text
-    description  String   @db.Text
-    thumbnailUrl String   @db.Text
-    videoUrl     String   @db.Text
-    publish      Boolean  @default(true)
-    userId       String
-    createdAt    DateTime @default(now())
-    updateAt     DateTime @updatedAt
+    id               String   @id @default(cuid())
+    title            String   @db.Text
+    description      String   @db.Text
+    thumbnailUrl     String   @db.Text
+    spriteThumbnails String[] @default([])
+    videoUrl         String   @db.Text
+    publish          Boolean  @default(true)
+    userId           String
+    createdAt        DateTime @default(now())
+    updateAt         DateTime @updatedAt
 
     user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     VideoEngagement  VideoEngagement[]
@@ -110,7 +115,7 @@ model VideoEngagement {
     user  User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
     video Video? @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
+    @@index([userId, videoId])
     @@index([videoId])
 }
 
@@ -119,41 +124,34 @@ model Comment {
     message   String?  @db.Text
     videoId   String
     userId    String
+    parentId  String?
     createdAt DateTime @default(now())
     updateAt  DateTime @updatedAt
 
-    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    video   Video               @relation(fields: [videoId], references: [id], onDelete: Cascade)
-    replies CommentHasReplies[]
+    user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    video             Video               @relation(fields: [videoId], references: [id], onDelete: Cascade)
+    parent            Comment?            @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    replies           Comment[]           @relation("CommentReplies")
+    CommentEngagement CommentEngagement[]
 
     @@index([userId])
     @@index([videoId])
+    @@index([parentId])
 }
 
-model RepliesComment {
-    id        String   @id @default(cuid())
-    message   String?  @db.Text
-    userId    String
-    createdAt DateTime @default(now())
-    updateAt  DateTime @updatedAt
+model CommentEngagement {
+    id             String         @id @default(cuid())
+    userId         String?
+    commentId      String?
+    createdAt      DateTime       @default(now())
+    updateAt       DateTime       @updatedAt
+    engagementType EngagementType
 
-    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    replies CommentHasReplies[]
+    user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
-    @@index([userId])
-}
-
-model CommentHasReplies {
-    id               String  @id @default(cuid())
-    commentId        String
-    repliesCommentId String?
-
-    comments       Comment?        @relation(fields: [commentId], references: [id], onDelete: Cascade)
-    repliesComment RepliesComment? @relation(fields: [repliesCommentId], references: [id])
-
-    @@index([commentId, repliesCommentId])
+    @@index([userId, commentId])
     @@index([commentId])
-    @@index([repliesCommentId])
 }
 
 model Announcement {
@@ -193,7 +191,7 @@ model FollowEngagement {
     follower       User           @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
 
     @@id([followerId, followingId])
-    @@index([followerId])
+    @@index([followerId, followingId])
     @@index([followingId])
 }
 
@@ -220,5 +218,4 @@ model PlaylistHasVideo {
 
     @@index([playlistId, videoId])
     @@index([videoId])
-    @@index([playlistId])
 }
