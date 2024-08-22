@@ -40,8 +40,7 @@ export default function VideoCard({
         <CardContent className="space-y-2 p-4">
           <div className="flex w-full gap-2">
             <div>
-              <Avatar
-              >
+              <Avatar>
                 <AvatarImage src={userImage} alt={userName} />
                 <AvatarFallback>{userName}</AvatarFallback>
               </Avatar>
@@ -49,7 +48,7 @@ export default function VideoCard({
             <div>
               <VideoTitle title={title} limitHeight />
               <div className="flex items-center gap-3">
-                <div className="text-sm">
+                <div>
                   <VideoUserName name={userName} />
                   <VideoInfo views={views} createdAt={createdAt} />
                 </div>

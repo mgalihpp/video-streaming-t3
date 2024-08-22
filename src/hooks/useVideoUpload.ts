@@ -214,11 +214,11 @@ export function useVideoUpload() {
 
             updateVideo(updateVideoData, {
               onSuccess: () => {
-                toast.success("Video updated successfully");
                 refetch?.();
 
                 setTimeout(() => cb?.(3), 2000);
 
+                toast.success("Video updated successfully");
                 if (updateParams) {
                   router.push(`?vId=${data.id}&step=3&completed=1`);
                 }

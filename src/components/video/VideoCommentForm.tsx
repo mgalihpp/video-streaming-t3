@@ -17,6 +17,8 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Input } from "../ui/input";
 import { lazy, Suspense, useState } from "react";
 import { Smile } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
@@ -35,8 +37,11 @@ export const VideoCommentForm = ({
   refetch,
   cb,
 }: VideoCommentFormProps) => {
+  const { data: sessionData } = useSession();
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [emojiOpen, setEmojiOpen] = useState(false);
+
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof addCommentInputSchema>>({
     resolver: zodResolver(addCommentInputSchema),
@@ -51,6 +56,12 @@ export const VideoCommentForm = ({
     api.comment.addComment.useMutation();
 
   function onCreateComment(data: z.infer<typeof addCommentInputSchema>) {
+    if (!sessionData) {
+      toast.error("Please sign in to comment");
+      router.push("/login");
+      return;
+    }
+
     addComment(data, {
       onSuccess: () => {
         form.reset();

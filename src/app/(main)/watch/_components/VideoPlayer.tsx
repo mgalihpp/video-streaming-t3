@@ -28,8 +28,8 @@ export const VideoPlayer = memo(({ options }: VideoPlayerProps) => {
     initSpriteThumbnails(player, {
       urlArray: options.spriteThumbnails,
       interval: 30,
-      width: 70,
-      height: 70,
+      width: 120,
+      height: 90,
       columns: 1,
       rows: 1,
     });

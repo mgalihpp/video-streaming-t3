@@ -323,4 +323,50 @@ export const videoRouter = createTRPCRouter({
         videos: videoWithCount,
       };
     }),
+  getTrendingVideos: publicProcedure.query(async ({ ctx }) => {
+    const currentDate = new Date();
+    const weekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const trendingVideos = await ctx.db.video.findMany({
+      where: {
+        publish: true,
+        VideoEngagement: {
+          some: {
+            engagementType: EngagementType.VIEW,
+            createdAt: {
+              gte: weekAgo,
+            },
+          },
+        },
+      },
+      include: {
+        user: true, // Include the user who uploaded the video
+        _count: {
+          select: {
+            VideoEngagement: {
+              where: {
+                engagementType: EngagementType.VIEW,
+                createdAt: {
+                  gte: weekAgo,
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        VideoEngagement: {
+          _count: "desc",
+        },
+      },
+      take: 10, // Limit to top 10 videos
+    });
+
+    const videosWithViewCount = trendingVideos.map((video) => ({
+      ...video,
+      views: video._count.VideoEngagement,
+    }));
+
+    return videosWithViewCount;
+  }),
 });

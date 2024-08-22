@@ -17,7 +17,7 @@ export function VideoTitle({
         `break-all text-lg font-semibold leading-6 text-primary group-hover:text-gray-600`,
         {
           "text-base": limitSize,
-          "max-h-12 w-full overflow-hidden overflow-ellipsis": limitHeight,
+          "xl:line-clamp-2 lg:line-clamp-1 line-clamp-2": limitHeight,
         },
         className,
       )}

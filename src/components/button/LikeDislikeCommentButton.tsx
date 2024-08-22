@@ -22,6 +22,7 @@ interface LikeDislikeCommentButtonProps {
     dislikes: number;
   };
   refetch: () => Promise<unknown>;
+  isCanReply?: boolean;
 }
 
 export const LikeDislikeCommentButton = ({
@@ -30,6 +31,7 @@ export const LikeDislikeCommentButton = ({
   viewer,
   EngagementData,
   refetch,
+  isCanReply,
 }: LikeDislikeCommentButtonProps) => {
   const { data: session } = useSession();
 
@@ -102,21 +104,24 @@ export const LikeDislikeCommentButton = ({
             {dislikeCount}
           </span>
         </Button>
-        <Button
-          type="button"
-          aria-label="Reply Button"
-          className="group"
-          variant="transparent"
-          onClick={() => setIsReplying(!isReplying)}
-        >
-          <div className="rounded-full p-2 group-hover:bg-accent">
-            <span className="text-xs text-primary">Reply</span>
-          </div>
-        </Button>
+
+        {isCanReply && (
+          <Button
+            type="button"
+            aria-label="Reply Button"
+            className="group"
+            variant="transparent"
+            onClick={() => setIsReplying(!isReplying)}
+          >
+            <div className="rounded-full p-2 group-hover:bg-accent">
+              <span className="text-xs text-primary">Reply</span>
+            </div>
+          </Button>
+        )}
       </div>
 
       {isReplying && (
-        <div className="flex w-full flex-col mt-2">
+        <div className="mt-2 flex w-full flex-col">
           <VideoCommentForm
             videoId={videoId}
             refetch={refetch}

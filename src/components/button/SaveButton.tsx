@@ -40,8 +40,10 @@ import FolderPlus from "@/components/Icons/FolderPlus";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function SaveButton({ videoId }: { videoId: string }) {
+  const { data: sessionData } = useSession();
   const [open, setOpen] = useState(false);
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
   const [checkedStatus, setCheckedStatus] = useState<Record<string, boolean>>(
@@ -50,7 +52,9 @@ export default function SaveButton({ videoId }: { videoId: string }) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const { data: playlists, refetch: refetchPlaylists } =
-    api.playlist.getPlaylists.useQuery(undefined, {});
+    api.playlist.getPlaylists.useQuery(undefined, {
+      enabled: !!sessionData,
+    });
 
   useEffect(() => {
     if (videoId && open) {
@@ -122,7 +126,17 @@ export default function SaveButton({ videoId }: { videoId: string }) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="gap-1">
+          <Button
+            variant="outline"
+            className="gap-1"
+            onClick={(e) => {
+              if (!sessionData) {
+                e.preventDefault();
+                toast.error("You must be logged in to save videos");
+                return;
+              }
+            }}
+          >
             <FolderPlus className="size-5 shrink-0 stroke-primary" />
             Save
           </Button>

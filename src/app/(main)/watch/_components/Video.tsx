@@ -32,8 +32,7 @@ export default function Video() {
   } = api.video.getVideobyId.useQuery(
     { id: videoId!, viewerId: session?.user.id },
     {
-      enabled: !!videoId && !!session?.user.id,
-      retry: false,
+      enabled: !!videoId,
       refetchOnWindowFocus: false,
     },
   );
@@ -63,6 +62,13 @@ export default function Video() {
     }
   }, [videoId, videoData?.video.id, addViewCount]);
 
+  const getVideoType = (url: string | undefined): string => {
+    if (url?.includes(".m3u8")) {
+      return "application/x-mpegURL";
+    }
+    return "video/mp4";
+  };
+
   const options = useMemo(
     () => ({
       autoplay: false,
@@ -72,7 +78,7 @@ export default function Video() {
       sources: [
         {
           src: videoData?.video.videoUrl,
-          type: "application/x-mpegURL",
+          type: getVideoType(videoData?.video.videoUrl),
         },
       ],
       html5: {
@@ -225,7 +231,7 @@ export default function Video() {
       <div className="flex flex-col lg:w-1/3">
         {isRandomVideoLoading
           ? Array.from({ length: 9 }).map((_, index) => (
-              <div key={index} className="flex flex-col gap-2 lg:flex-row mb-4">
+              <div key={index} className="mb-4 flex flex-col gap-2 lg:flex-row">
                 <Skeleton className="h-28 lg:w-1/2" />
                 <div className="flex flex-col gap-2 lg:w-1/2">
                   <Skeleton className="h-10 w-full" />

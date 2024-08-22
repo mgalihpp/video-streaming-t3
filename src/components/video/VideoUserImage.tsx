@@ -13,7 +13,7 @@ export function UserImage({
       <Image
         src={image}
         alt="user image"
-        className="absolute rounded-full"
+        className="rounded-full object-cover"
         loading="lazy"
         fill
       />

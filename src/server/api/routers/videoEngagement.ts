@@ -3,7 +3,7 @@ import {
   addLikeCountInputSchema,
   addViewCountInputSchema,
 } from "@/lib/schema/videoEngagement";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import {
   createEngagement,
   deleteEngagementIfExits,
@@ -114,7 +114,7 @@ export const videoEngagementRouter = createTRPCRouter({
         );
       }
     }),
-  addViewCount: protectedProcedure
+  addViewCount: publicProcedure
     .input(addViewCountInputSchema)
     .mutation(async ({ ctx, input }) => {
       const rawVideo = await ctx.db.video.findUnique({

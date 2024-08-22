@@ -67,7 +67,10 @@ export function VideoComment({
         </div>
 
         <div className="flex w-full gap-2">
-          <UserImage image={session?.user.image ?? ""} className="mt-2" />
+          <UserImage
+            image={session?.user.image ?? "/profile.jpg"}
+            className="mt-2"
+          />
           <div className="flex w-full flex-col">
             <VideoCommentForm videoId={videoId} refetch={refetch} />
           </div>
@@ -89,6 +92,7 @@ export function VideoComment({
                   user={user}
                   videoId={videoId}
                   refetch={refetch}
+                  isCanReply
                 />
 
                 {comment.replies.map((reply) => {
@@ -122,7 +126,12 @@ const BlockComment = memo(
     user,
     videoId,
     refetch,
-  }: CommentProps & { videoId: string; refetch: () => Promise<unknown> }) => {
+    isCanReply,
+  }: CommentProps & {
+    videoId: string;
+    refetch: () => Promise<unknown>;
+    isCanReply?: boolean;
+  }) => {
     return (
       <div key={comment.id}>
         <div className="flex gap-2">
@@ -153,6 +162,7 @@ const BlockComment = memo(
                 hasDisliked: false,
                 hasLiked: false,
               }}
+              isCanReply={isCanReply}
             />
           </div>
         </div>

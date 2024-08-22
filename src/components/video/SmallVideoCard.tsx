@@ -58,7 +58,7 @@ export default function SmallVideoCard({
                 className="tracking-tighter"
               />
               <div className="flex items-center gap-3">
-                <div className="text-sm">
+                <div>
                   <VideoUserName name={userName} />
                   <VideoInfo views={views} createdAt={createdAt} />
                 </div>
