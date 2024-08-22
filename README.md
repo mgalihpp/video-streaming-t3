@@ -1,5 +1,6 @@
 ## Features
 
+- 📺 HSL Streaming Support
 - 🔒 Authentication
 - 🔧 Modern Data Fetching Using tRPC & zod
 - 📊 Prisma
@@ -10,8 +11,8 @@
 - 🎥 Video Page
 - ⌛ History Page
 - 💾 Playlist Page
-- 🔎Search Page
-- Trending Page
+- 🔎 Search Page
+- 📈 Trending Page
 
 # Create T3 App
 
