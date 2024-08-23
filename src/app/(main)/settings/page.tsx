@@ -29,6 +29,7 @@ import { ImageCropper } from "@/components/ImageCropper";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { updateUserInputSchema } from "@/lib/schema/user";
+import { Loader2 } from "lucide-react";
 
 interface CropImageModalProps {
   channel: {
@@ -46,6 +47,9 @@ export default function SettingsPage() {
   const {
     data: channel,
     isLoading,
+    isFetching,
+    isFetched,
+
     refetch,
   } = api.user.getUserChannel.useQuery(
     {
@@ -114,215 +118,227 @@ export default function SettingsPage() {
     }
   };
 
+  if (isFetching && isLoading) {
+    return (
+      <div className="mx-auto flex w-full items-center justify-center">
+        <Loader2 className="size-6 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div>
-        <CropImageModal
-          channel={{
-            id: channel?.user.id ?? "",
-            image: channel?.user.image ?? "",
-            backgroundImage: channel?.user.backgroundImage ?? "",
-          }}
-          refetch={refetch}
-          imageType="backgroundImage"
-        />
+      {!isFetching && isFetched && (
+        <div>
+          <div>
+            <CropImageModal
+              channel={{
+                id: channel?.user.id ?? "",
+                image: channel?.user.image ?? "",
+                backgroundImage: channel?.user.backgroundImage ?? "",
+              }}
+              refetch={refetch}
+              imageType="backgroundImage"
+            />
 
-        <div className="mx-auto mt-10 px-4 sm:px-6 lg:px-8">
-          <div className="!-mt-6 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-            <div className="flex items-center justify-center">
-              <CropImageModal
-                channel={{
-                  id: channel?.user.id ?? "",
-                  image: channel?.user.image ?? "",
-                  backgroundImage: channel?.user.backgroundImage ?? "",
-                }}
-                refetch={refetch}
-                imageType="image"
-              />
-            </div>
-            <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-              <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                <h1 className="truncate text-2xl font-bold text-primary">
-                  {channel?.user.name}
-                </h1>
-                <p className="text-regular text-primary/80">
-                  {channel?.user.handle}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="space-y-10 divide-y divide-primary/5">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
-              <div className="px-4 sm:px-0">
-                <h2 className="text-base font-semibold leading-7 text-primary">
-                  Personal Info
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-primary/80">
-                  Update your photo and personal details.
-                </p>
-              </div>
-
-              <div className="bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-                <div className="px-4 py-6 sm:p-8">
-                  <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                    <div className="sm:col-span-3">
-                      <label
-                        htmlFor="name"
-                        className="block text-sm font-medium leading-6 text-primary"
-                      >
-                        Name
-                      </label>
-                      <div className="mt-2">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <input
-                                  {...field}
-                                  autoComplete="family-name"
-                                  className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-4">
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium leading-6 text-primary"
-                      >
-                        Email address
-                      </label>
-                      <div className="mt-2">
-                        <input
-                          id="email"
-                          name="email"
-                          type="email"
-                          autoComplete="email"
-                          value={channel?.user.email ?? ""}
-                          readOnly
-                          className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                        />
-                      </div>
-                    </div>
+            <div className="mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+              <div className="!-mt-6 items-center sm:-mt-16 sm:flex sm:space-x-5">
+                <div className="flex items-center justify-center">
+                  <CropImageModal
+                    channel={{
+                      id: channel?.user.id ?? "",
+                      image: channel?.user.image ?? "",
+                      backgroundImage: channel?.user.backgroundImage ?? "",
+                    }}
+                    refetch={refetch}
+                    imageType="image"
+                  />
+                </div>
+                <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+                  <div className="mt-6 min-w-0 flex-1 sm:mt-0 sm:hidden md:block">
+                    <h1 className="truncate text-center text-2xl font-bold text-primary sm:text-start">
+                      {channel?.user.name ?? ""}
+                    </h1>
+                    <p className="text-regular text-primary/80">
+                      {channel?.user.handle ?? ""}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
-              <div className="mt-4 px-4 sm:px-0">
-                <h2 className="text-base font-semibold leading-7 text-primary">
-                  Profile
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-primary/80">
-                  This information will be displayed publicly so be careful what
-                  you share.
-                </p>
-              </div>
-              <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-                <div className="px-4 py-6 sm:p-8">
-                  <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                    <div className="sm:col-span-4">
-                      <label
-                        htmlFor="handle"
-                        className="block text-sm font-medium leading-6 text-primary"
-                      >
-                        Handle
-                      </label>
-                      <div className="mt-2">
-                        <div className="flex rounded-md bg-secondary shadow-sm ring-1 ring-inset ring-primary focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary sm:max-w-md">
-                          <span className="flex select-none items-center pl-3 text-primary/70 sm:text-sm">
-                            YourTube .com/
-                          </span>
-                          <FormField
-                            control={form.control}
-                            name="handle"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <input
-                                    {...field}
-                                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-primary placeholder:text-primary focus:outline-none focus:ring-0 sm:text-sm sm:leading-6"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <div className="space-y-10 divide-y divide-primary/5">
+                <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
+                  <div className="px-4 sm:px-0">
+                    <h2 className="text-base font-semibold leading-7 text-primary">
+                      Personal Info
+                    </h2>
+                    <p className="mt-1 text-sm leading-6 text-primary/80">
+                      Update your photo and personal details.
+                    </p>
+                  </div>
+
+                  <div className="bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+                    <div className="px-4 py-6 sm:p-8">
+                      <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                        <div className="sm:col-span-3">
+                          <label
+                            htmlFor="name"
+                            className="block text-sm font-medium leading-6 text-primary"
+                          >
+                            Name
+                          </label>
+                          <div className="mt-2">
+                            <FormField
+                              control={form.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <input
+                                      {...field}
+                                      autoComplete="family-name"
+                                      className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-4">
+                          <label
+                            htmlFor="email"
+                            className="block text-sm font-medium leading-6 text-primary"
+                          >
+                            Email address
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              id="email"
+                              name="email"
+                              type="email"
+                              autoComplete="email"
+                              value={channel?.user.email ?? ""}
+                              readOnly
+                              className="focus:ring-primary-600 block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+                  <div className="mt-4 px-4 sm:px-0">
+                    <h2 className="text-base font-semibold leading-7 text-primary">
+                      Profile
+                    </h2>
+                    <p className="mt-1 text-sm leading-6 text-primary/80">
+                      This information will be displayed publicly so be careful
+                      what you share.
+                    </p>
+                  </div>
+                  <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+                    <div className="px-4 py-6 sm:p-8">
+                      <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                        <div className="sm:col-span-4">
+                          <label
+                            htmlFor="handle"
+                            className="block text-sm font-medium leading-6 text-primary"
+                          >
+                            Handle
+                          </label>
+                          <div className="mt-2">
+                            <div className="flex w-full items-center rounded-md bg-secondary shadow-sm ring-1 ring-inset ring-primary focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary sm:max-w-md">
+                              <span className="flex select-none items-center text-nowrap pl-3 text-primary/70 sm:text-sm">
+                                YourTube .com/
+                              </span>
+                              <FormField
+                                control={form.control}
+                                name="handle"
+                                render={({ field }) => (
+                                  <FormItem className="w-full">
+                                    <FormControl>
+                                      <input
+                                        {...field}
+                                        className="block w-full border-0 bg-transparent py-1.5 pl-1 text-primary placeholder:text-primary focus:outline-none focus:ring-0 sm:text-sm sm:leading-6"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                        </div>
 
-                    <div className="col-span-full">
-                      <label
-                        htmlFor="description"
-                        className="block text-sm font-medium leading-6 text-primary"
-                      >
-                        About
-                      </label>
-                      <div className="mt-2">
-                        <FormField
-                          control={form.control}
-                          name="description"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <textarea
-                                  {...field}
-                                  rows={3}
-                                  className="block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="col-span-full">
+                          <label
+                            htmlFor="description"
+                            className="block text-sm font-medium leading-6 text-primary"
+                          >
+                            About
+                          </label>
+                          <div className="mt-2">
+                            <FormField
+                              control={form.control}
+                              name="description"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <textarea
+                                      {...field}
+                                      rows={3}
+                                      className="block w-full rounded-md border-0 bg-secondary p-2 py-1.5 text-primary shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <p className="mt-3 text-sm leading-6 text-primary/80">
+                            Write a few sentences about yourself.
+                          </p>
+                        </div>
                       </div>
-                      <p className="mt-3 text-sm leading-6 text-primary/80">
-                        Write a few sentences about yourself.
-                      </p>
+                    </div>
+                    <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
+                      <Button type="submit" disabled={isPending}>
+                        Save
+                      </Button>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-end gap-x-6 border-t border-primary/5 px-4 py-4 sm:px-8">
-                  <Button type="submit" disabled={isPending}>
-                    Save
-                  </Button>
+              </div>
+            </form>
+          </Form>
+          <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
+            <div className="mt-4 px-4 sm:px-0">
+              <h1 className="text-base font-semibold leading-7 text-primary">
+                Preferences
+              </h1>
+              <p className="mt-1 text-sm leading-6 text-primary/80">
+                Change theme.
+              </p>
+            </div>
+            <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
+              <div className="px-4 py-6 sm:p-8">
+                <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  <div className="sm:col-span-4">
+                    <SelecTheme />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </form>
-      </Form>
-      <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
-        <div className="mt-4 px-4 sm:px-0">
-          <h1 className="text-base font-semibold leading-7 text-primary">
-            Preferences
-          </h1>
-          <p className="mt-1 text-sm leading-6 text-primary/80">
-            Change theme.
-          </p>
         </div>
-        <div className="mt-4 bg-background shadow-sm ring-1 ring-primary/5 sm:rounded-xl md:col-span-2">
-          <div className="px-4 py-6 sm:p-8">
-            <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-4">
-                <SelecTheme />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </>
   );
 }
@@ -424,12 +440,12 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
               onChange={onFileChange}
             />
             <Image
-              className="w-full object-cover"
+              priority
+              className="h-32 w-full object-cover lg:h-64"
               src={channel.backgroundImage ?? "/background.jpg"}
-              style={{ aspectRatio: "1366/200", objectFit: "cover" }}
-              alt="background image"
-              width="1366"
-              height="200"
+              width={2000}
+              height={2000}
+              alt="error"
             />
           </label>
         </>
