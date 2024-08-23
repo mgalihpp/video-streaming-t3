@@ -35,9 +35,14 @@ import { api } from "@/trpc/server";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const session = await getServerAuthSession();
+
+  if (!session) {
+    return redirect("/login");
+  }
 
   const userStatsData = await api.user.getUserStats();
 

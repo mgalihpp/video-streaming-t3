@@ -14,8 +14,8 @@ export default function Home() {
 
   const { ref, entry } = useIntersection({
     root: lastPostRef.current,
-    rootMargin: "40px",
-    threshold: 0.9,
+    rootMargin: "60px",
+    threshold: 1,
   });
 
   const {

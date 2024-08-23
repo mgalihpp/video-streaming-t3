@@ -360,7 +360,7 @@ export const videoRouter = createTRPCRouter({
           _count: "desc",
         },
       },
-      take: 10, // Limit to top 10 videos
+      take: 50,
     });
 
     const videosWithViewCount = trendingVideos.map((video) => ({
@@ -390,6 +390,9 @@ export const videoRouter = createTRPCRouter({
         take: input.limit + 1,
         skip: input.skip,
         cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: {
+          id: "desc",
+        },
       });
 
       let nextCursor: typeof input.cursor | undefined = undefined;
