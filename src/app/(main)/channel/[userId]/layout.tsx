@@ -38,7 +38,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
           alt: `Profile image of ${userChannelData.user.name}`,
         },
       ],
-      url: `http://localhost:3000/channel/${userChannelData.user.id}`,
+      url: `https://yourtube-six.vercel.app/channel/${userChannelData.user.id}`,
     },
   };
 }

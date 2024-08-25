@@ -22,7 +22,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     openGraph: {
       title: videoData.video.title,
       type: "video.other",
-      url: `http://localhost:3000/watch?video=${videoData.video.id}`,
+      url: `https://yourtube-six.vercel.app/watch?video=${videoData.video.id}`,
       images: [
         {
           url: videoData.video.thumbnailUrl ?? "",
