@@ -260,7 +260,7 @@ export const videoRouter = createTRPCRouter({
         },
       });
     }),
-  getVideoByUserId: protectedProcedure
+  getVideoByUserId: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const videoWithUser = await ctx.db.video.findMany({
