@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: {
@@ -33,6 +34,7 @@ export default function RootLayout({
         <TRPCReactProvider>
           <NextAuthProvider>
             <ThemeProvider defaultTheme="light" enableSystem={false}>
+              <NextTopLoader showSpinner={false} color="#000" />
               {children}
             </ThemeProvider>
           </NextAuthProvider>
