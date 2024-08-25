@@ -112,7 +112,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return await updateUser(ctx, ctx.session.user.id, input);
     }),
-  getUserChannel: protectedProcedure
+  getUserChannel: publicProcedure
     .input(getUserChannelInputSchema)
     .query(async ({ ctx, input }) => {
       try {

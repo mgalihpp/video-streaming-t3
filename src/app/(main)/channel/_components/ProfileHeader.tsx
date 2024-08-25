@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { UserImage } from "@/components/video/VideoUserImage";
+import { Separator } from "@/components/ui/separator";
 
 interface ProfileHeaderProps {
   channelId: string;
@@ -116,11 +117,11 @@ export default function ProfileHeader({
                     {user?.name ?? ""}
                   </h1>
                   <p className="text-regular text-primary/80">{user?.handle}</p>
-                  <div className="mb-1 flex items-center justify-start text-xs">
+                  <div className="mb-1 flex items-center justify-start gap-2 text-xs">
                     <p className="text-primary/70">
                       {user?.followers} Followers
                     </p>
-                    <li className="pl-2 text-sm text-primary/90"></li>
+                    <Separator orientation="vertical" className="h-4" />
                     <p className="text-primary/70">
                       {user?.followings} Following
                     </p>

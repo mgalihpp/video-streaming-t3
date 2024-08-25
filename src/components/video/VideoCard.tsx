@@ -37,7 +37,7 @@ export default function VideoCard({
             <PlayIcon className="h-12 w-12 text-white" />
           </div>
         </div>
-        <CardContent className="space-y-2 p-4">
+        <CardContent className="space-y-2 p-0 pt-4">
           <div className="flex w-full gap-2">
             <div>
               <Avatar>

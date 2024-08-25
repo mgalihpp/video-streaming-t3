@@ -71,7 +71,7 @@ export default function Video() {
 
   const options = useMemo(
     () => ({
-      autoplay: false,
+      autoplay: true,
       controls: true,
       responsive: true,
       fluid: true,
