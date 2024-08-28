@@ -7,17 +7,20 @@ interface VideoComponentProps {
     thumbnailUrl: string;
     createdAt: Date;
     views: number;
+    start?: number;
   }[];
   users: {
     name: string | null;
     image: string | null;
   }[];
   refetch?: () => Promise<unknown>;
+  playlistId?: string;
 }
 
 export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
   videos,
   users,
+  playlistId,
 }) => {
   return (
     <div className="grid grid-cols-1 gap-2">
@@ -29,7 +32,7 @@ export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
 
         return (
           <SmallVideoCard
-            key={video.id}
+            key={index}
             videoId={video.id}
             thumbnailUrl={video.thumbnailUrl}
             title={video.title}
@@ -37,6 +40,7 @@ export const SmallSingleColumnVideo: React.FC<VideoComponentProps> = ({
             userName={user.name!}
             views={video.views}
             createdAt={video.createdAt}
+            playlist={{ id: playlistId ?? "", start: (video.start ?? 0) + 1 }}
           />
         );
       })}

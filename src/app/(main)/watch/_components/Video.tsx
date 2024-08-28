@@ -1,7 +1,5 @@
 "use client";
 
-import { api } from "@/trpc/react";
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { VideoPlayer } from "../_components/VideoPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,88 +11,34 @@ import Link from "next/link";
 import LikeDislikeButton from "@/components/button/LikeDislikeButton";
 import FollowButton from "@/components/button/FollowButton";
 import SaveButton from "@/components/button/SaveButton";
-import { useEffect, useMemo } from "react";
 import { SmallSingleColumnVideo } from "@/components/video/SmallSingleColumnVideo";
 import { VideoComment } from "@/components/video/VideoComment";
 import { VideoLoading } from "./VideoLoading";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { MixesPlaylists, MixesPlaylistsLoading } from "./MixesPlaylists";
+import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 
 export default function Video() {
-  const videoId = useSearchParams().get("video");
-  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const videoId = searchParams.get("video");
+  const playlistId = searchParams.get("playlist");
+  const startedPlaylistVideoIndex = searchParams.get("start");
 
   const {
-    data: videoData,
-    isLoading: isVideoLoading,
-    isFetched: isVideoFetched,
-    error: isVideoError, // unused cause of server side call
-    refetch: refetchVideo,
-  } = api.video.getVideobyId.useQuery(
-    { id: videoId!, viewerId: session?.user.id },
-    {
-      enabled: !!videoId,
-      refetchOnWindowFocus: false,
-    },
-  );
-
-  const { data: RandomVideoData, isLoading: isRandomVideoLoading } =
-    api.video.getRandomVideo.useQuery(
-      {
-        many: 10,
-        excludedVideoId: videoId ?? "",
-      },
-      {
-        enabled: !!videoId && !!videoData,
-        refetchOnWindowFocus: false,
-      },
-    );
-
-  const { mutateAsync: addViewCount } =
-    api.videoEngagement.addViewCount.useMutation();
-
-  useEffect(() => {
-    if (videoId && videoData?.video.id) {
-      addViewCount({
-        id: videoData.video.id,
-      }).catch((error) => {
-        console.log(error);
-      });
-    }
-  }, [videoId, videoData?.video.id, addViewCount]);
-
-  const getVideoType = (url: string | undefined): string => {
-    if (url?.includes(".m3u8")) {
-      return "application/x-mpegURL";
-    }
-    return "video/mp4";
-  };
-
-  const options = useMemo(
-    () => ({
-      autoplay: true,
-      controls: true,
-      responsive: true,
-      fluid: true,
-      sources: [
-        {
-          src: videoData?.video.videoUrl,
-          type: getVideoType(videoData?.video.videoUrl),
-        },
-      ],
-      html5: {
-        vhs: {
-          withCredentials: false,
-        },
-      },
-      poster: videoData?.video.thumbnailUrl ?? "",
-      spriteThumbnails: videoData?.video.spriteThumbnails ?? [],
-    }),
-    [
-      videoData?.video.videoUrl,
-      videoData?.video.thumbnailUrl,
-      videoData?.video.spriteThumbnails,
-    ],
-  );
+    videoData,
+    RandomVideoData,
+    playlistData,
+    isVideoLoading,
+    isRandomVideoLoading,
+    isPlaylistLoading,
+    isVideoFetched,
+    options,
+    refetchVideo,
+  } = useVideoPlayback({
+    videoId,
+    playlistId,
+    startedPlaylistVideoIndex,
+  });
 
   if (isVideoFetched && !videoData) {
     return (
@@ -229,6 +173,36 @@ export default function Video() {
       </div>
 
       <div className="flex flex-col lg:w-1/3">
+        {isPlaylistLoading ? (
+          <MixesPlaylistsLoading />
+        ) : (
+          playlistData && (
+            <MixesPlaylists
+              currentVideoIndex={
+                parseInt(startedPlaylistVideoIndex ?? "1") ?? 0
+              }
+              playlistVideos={playlistData.PlaylistHasVideo.map((video) => ({
+                id: video?.id ?? "",
+                createdAt: video?.createdAt ?? new Date(),
+                title: video?.title ?? "",
+                views: video?.views ?? 0,
+                thumbnailUrl: video?.thumbnailUrl ?? "",
+                user: {
+                  name: video.user?.name ?? "",
+                },
+              }))}
+              playlist={{
+                id: playlistData.id ?? "",
+                createdAt: playlistData.createdAt ?? "",
+                description: playlistData.description ?? "",
+                playlistThumbnail:
+                  playlistData.PlaylistHasVideo[0]?.thumbnailUrl ?? "",
+                title: playlistData.title,
+                videoCount: playlistData.PlaylistHasVideo.length ?? 0,
+              }}
+            />
+          )
+        )}
         {isRandomVideoLoading
           ? Array.from({ length: 9 }).map((_, index) => (
               <div key={index} className="mb-4 flex flex-col gap-2 lg:flex-row">

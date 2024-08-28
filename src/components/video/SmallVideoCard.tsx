@@ -14,6 +14,10 @@ interface VideoCardProps {
   userName: string;
   views: number;
   createdAt: Date;
+  playlist?: {
+    id: string;
+    start: number;
+  };
 }
 
 export default function SmallVideoCard({
@@ -24,10 +28,13 @@ export default function SmallVideoCard({
   userName,
   views,
   createdAt,
+  playlist,
 }: VideoCardProps) {
+  const href = `/watch?video=${videoId}${playlist?.id ? `&playlist=${playlist.id}&start=${playlist.start}` : ""}`;
+
   return (
     <Link
-      href={`/watch?video=${videoId}`}
+      href={href}
       className="group rounded-xl bg-background p-2 transition-all duration-300 ease-in-out hover:bg-muted-foreground/20"
     >
       <Card className="w-full gap-2 border-none bg-transparent shadow-none lg:flex lg:flex-row">

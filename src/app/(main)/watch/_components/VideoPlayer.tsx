@@ -5,6 +5,7 @@ import "@videojs/http-streaming";
 import "@/plugins/videojs/httpSourceSelector";
 import { type CustomPlayer } from "@/types/video";
 import initSpriteThumbnails from "@/plugins/videojs/spriteThumbnails";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface VideoPlayerProps {
   options: {
@@ -15,6 +16,13 @@ interface VideoPlayerProps {
       type: string;
     }[];
     spriteThumbnails?: string[];
+    poster?: string;
+    nextVideoId?: string;
+    playlistData?: {
+      PlaylistHasVideo: {
+        id?: string | undefined;
+      }[];
+    };
   };
 }
 
@@ -22,27 +30,9 @@ export const VideoPlayer = memo(({ options }: VideoPlayerProps) => {
   const videoRef = React.useRef<HTMLDivElement | null>(null);
   const playerRef = React.useRef<CustomPlayer | null>(null);
 
-  const handlePlayerReady = (player: CustomPlayer) => {
-    player.httpSourceSelector?.();
-    player.controlBar?.addClass("rounded-md");
-    initSpriteThumbnails(player, {
-      urlArray: options.spriteThumbnails,
-      interval: 30,
-      width: 120,
-      height: 70,
-      columns: 1,
-      rows: 1,
-    });
-
-    // You can handle player events here, for example:
-    player.on("waiting", () => {
-      videojs.log("player is waiting");
-    });
-
-    player.on("dispose", () => {
-      videojs.log("player will dispose");
-    });
-  };
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
 
   React.useEffect(() => {
     // Make sure Video.js player is only initialized once
@@ -67,6 +57,23 @@ export const VideoPlayer = memo(({ options }: VideoPlayerProps) => {
 
       player.autoplay(options.autoplay);
       player.src(options.sources);
+
+      if (options.poster) {
+        player.poster(options.poster);
+      }
+
+      if (options.spriteThumbnails) {
+        initSpriteThumbnails(player, {
+          urlArray: options.spriteThumbnails,
+          interval: 30,
+          width: 120,
+          height: 70,
+          columns: 1,
+          rows: 1,
+        });
+      }
+
+      handlePlayerReady(player);
     }
   }, [options, videoRef]);
 
@@ -81,6 +88,67 @@ export const VideoPlayer = memo(({ options }: VideoPlayerProps) => {
       }
     };
   }, [playerRef]);
+
+  const handlePlayerReady = (player: CustomPlayer) => {
+    player.httpSourceSelector?.();
+    player.controlBar?.addClass("rounded-md");
+
+    // Initialize sprite thumbnails
+    if (options.spriteThumbnails) {
+      initSpriteThumbnails(player, {
+        urlArray: options.spriteThumbnails,
+        interval: 30,
+        width: 120,
+        height: 70,
+        columns: 1,
+        rows: 1,
+      });
+    }
+
+    // You can handle player events here, for example:
+    player.on("waiting", () => {
+      videojs.log("player is waiting");
+    });
+
+    // handle video end if there has playlist it will navigate to next video
+    player.on("ended", () => {
+      videojs.log("player has ended");
+      const playlistId = searchParams.get("playlist");
+      const startedPlaylistVideoIndex = searchParams.get("start");
+
+      console.log(options.nextVideoId);
+
+      if (
+        options.nextVideoId &&
+        playlistId &&
+        options.playlistData &&
+        startedPlaylistVideoIndex
+      ) {
+        videojs.log("player has ended and navigating to next video");
+
+        const nextIndex = parseInt(startedPlaylistVideoIndex) + 1;
+
+        if (nextIndex > options.playlistData.PlaylistHasVideo.length) {
+          router.push(
+            pathname +
+              "?" +
+              `video=${options.nextVideoId}&playlist=${playlistId}&start=1`,
+          );
+          return;
+        }
+
+        router.push(
+          pathname +
+            "?" +
+            `video=${options.nextVideoId}&playlist=${playlistId}&start=${nextIndex}`,
+        );
+      }
+    });
+
+    player.on("dispose", () => {
+      videojs.log("player will dispose");
+    });
+  };
 
   return (
     <div data-vjs-player>

@@ -24,6 +24,7 @@ interface PlaylistPageProps {
       name: string | null;
       image: string | null;
     };
+    start?: number;
   }[];
   user: {
     id: string;
@@ -33,7 +34,6 @@ interface PlaylistPageProps {
   };
 }
 
-
 export const SinglePlaylistColumn: React.FC<PlaylistPageProps> = ({
   playlist,
   user,
@@ -42,6 +42,10 @@ export const SinglePlaylistColumn: React.FC<PlaylistPageProps> = ({
   if (!playlist ?? !videos ?? !videos ?? !user) {
     return <></>;
   }
+
+  const sortedVideos = videos.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 
   return (
     <>
@@ -71,22 +75,11 @@ export const SinglePlaylistColumn: React.FC<PlaylistPageProps> = ({
         <div className="mt-4 border-b border-gray-200 dark:border-secondary" />
         <div className="lg:w-1/3">
           <SmallSingleColumnVideo
-            videos={videos
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime(),
-              )
-              .map((video) => ({
-                ...video,
-              }))}
-            users={videos
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime(),
-              )
-              .map((video) => video.user)}
+            videos={sortedVideos.map((video) => ({
+              ...video,
+            }))}
+            users={sortedVideos.map((video) => video.user)}
+            playlistId={playlist.id}
           />
         </div>
       </div>

@@ -36,7 +36,7 @@ export default function PlaylistHistoryPage() {
             videoCount: playlistData.PlaylistHasVideo.length ?? 0,
           }}
           user={playlistData.user}
-          videos={playlistData.PlaylistHasVideo.map((video) => ({
+          videos={playlistData.PlaylistHasVideo.map((video, index) => ({
             id: video.id ?? "",
             title: video.title ?? "",
             thumbnailUrl: video.thumbnailUrl ?? "",
@@ -47,6 +47,7 @@ export default function PlaylistHistoryPage() {
               name: video.user?.name ?? "",
               image: video.user?.image ?? "",
             },
+            start: index,
           }))}
         />
       )}
