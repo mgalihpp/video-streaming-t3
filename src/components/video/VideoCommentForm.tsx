@@ -89,6 +89,7 @@ export const VideoCommentForm = ({
                 {isDesktop ? (
                   <div className="relative">
                     <Input
+                      autoFocus={reply}
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.value)}
                       placeholder="Type a message"
@@ -113,7 +114,11 @@ export const VideoCommentForm = ({
                     </div>
                   </div>
                 ) : (
-                  <Textarea {...field} placeholder="Type a message" />
+                  <Textarea
+                    {...field}
+                    autoFocus={reply}
+                    placeholder="Type a message"
+                  />
                 )}
               </FormControl>
               <FormMessage />

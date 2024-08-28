@@ -52,6 +52,7 @@ export function useVideoPlayback({
       { id: playlistId ?? "" },
       {
         enabled: !!playlistId,
+        refetchOnWindowFocus: false,
       },
     );
 
