@@ -8,6 +8,7 @@ import NextAuthProvider from "@/providers/NextAuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import NextTopLoader from "nextjs-toploader";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: {
@@ -40,6 +41,7 @@ export default function RootLayout({
           </NextAuthProvider>
           <Toaster position="bottom-right" />
         </TRPCReactProvider>
+        <Analytics />
       </body>
     </html>
   );
