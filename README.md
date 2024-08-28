@@ -1,3 +1,13 @@
+# PREVIEW
+
+<p align='center'>
+    <img src='./docs/1.png' alt='preview'>
+    <img src='./docs/2.png' alt='preview 2'>
+    <img src='./docs/3.png' alt='preview 3'>
+    <img src='./docs/4.png' alt='preview 4'>
+    <img src='./docs/5.png' alt='preview 5'>
+</p>
+
 ## Features
 
 - 📺 HSL Streaming Support
