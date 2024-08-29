@@ -1,4 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { VideoTitle } from "./VIdeoTitle";
 import { VideoUserName } from "./VideoUsername";
@@ -30,7 +31,11 @@ export default function VideoCard({
       href={`/watch?video=${videoId}`}
       className="group rounded-xl bg-background p-2 transition-all duration-300 ease-in-out hover:bg-muted-foreground/20"
     >
-      <Card className="w-full border-none bg-transparent shadow-none">
+      <motion.div
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full border-none bg-transparent shadow-none"
+      >
         <div className="relative">
           <Thumbnail thumbnailUrl={thumbnailUrl} title={title} />
           <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
@@ -56,7 +61,7 @@ export default function VideoCard({
             </div>
           </div>
         </CardContent>
-      </Card>
+      </motion.div>
     </Link>
   );
 }

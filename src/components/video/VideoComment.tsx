@@ -1,5 +1,4 @@
-"use client";
-
+import { motion } from "framer-motion";
 import { SortDesc } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserImage } from "./VideoUserImage";
@@ -86,7 +85,13 @@ export function VideoComment({
             if (comment.parentId) return null;
 
             return (
-              <div key={comment.id} className="space-y-4">
+              <motion.div
+                key={comment.id}
+                className="space-y-4"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
                 <BlockComment
                   comment={comment}
                   user={user}
@@ -97,7 +102,17 @@ export function VideoComment({
 
                 {comment.replies.map((reply) => {
                   return (
-                    <div key={reply.id} className="ml-10">
+                    <motion.div
+                      key={reply.id}
+                      className="ml-10"
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: 0.1,
+                        ease: "easeInOut",
+                      }}
+                    >
                       <BlockComment
                         comment={{
                           ...reply,
@@ -109,10 +124,10 @@ export function VideoComment({
                         videoId={videoId}
                         refetch={refetch}
                       />
-                    </div>
+                    </motion.div>
                   );
                 })}
-              </div>
+              </motion.div>
             );
           })}
       </div>
@@ -133,7 +148,12 @@ const BlockComment = memo(
     isCanReply?: boolean;
   }) => {
     return (
-      <div key={comment.id}>
+      <motion.div
+        key={comment.id}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
         <div className="flex gap-2">
           <UserImage image={user.image ?? ""} />
           <div className="flex w-full flex-col text-sm">
@@ -166,7 +186,7 @@ const BlockComment = memo(
             />
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   },
 );
@@ -183,7 +203,12 @@ const CommentMessage = ({ message }: { message: string }) => {
   const truncatedMessage = message.slice(0, 150);
 
   return (
-    <p className="my-2 block whitespace-pre-wrap text-primary/90">
+    <motion.p
+      className="my-2 block whitespace-pre-wrap text-primary/90"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ ease: "easeInOut", duration: 0.75 }}
+    >
       <span
         className="block"
         dangerouslySetInnerHTML={{
@@ -199,7 +224,7 @@ const CommentMessage = ({ message }: { message: string }) => {
           {isExpanded ? "Show Less" : "Show More"}
         </span>
       )}
-    </p>
+    </motion.p>
   );
 };
 

@@ -5,6 +5,7 @@ import Menu from "@/components/Icons/Menu";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar/Navbar";
 import SideBar from "@/components/navbar/Sidebar";
+import SmoothScroll from "./SmoothScrolling";
 
 interface WrapperProps {
   children: JSX.Element | ReactNode;
@@ -36,13 +37,15 @@ export default function Wrapper({ children }: WrapperProps) {
         setCloseSideBar={setCloseSidebar}
       />
       <div className="lg:hidden">{/* <Footer /> */}</div>
-      <div className={cn("lg:pl-56", { "lg:pl-20": closeSidebar })}>
-        <main className="container py-4 max-sm:p-0">
+      <SmoothScroll>
+        <div className={cn("lg:pl-56 mt-[4.35rem]", { "lg:pl-20": closeSidebar })}>
+          <main className="container py-4 max-sm:p-0">
             {children}
-          <div>
-            </div>
-        </main>
-      </div>
+
+            <div></div>
+          </main>
+        </div>
+      </SmoothScroll>
     </>
   );
 }

@@ -84,7 +84,7 @@
   @apply absolute -left-2/4 top-1/3 h-[3px] w-full -translate-y-2/4 bg-slate-200 content-[''];
 }
 .step {
-  @apply relative z-10 flex size-6 items-center text-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white sm:text-sm;
+  @apply relative z-10 flex size-6 items-center justify-center rounded-full bg-slate-700 text-center text-xs font-semibold text-white sm:text-sm;
 }
 .active .step {
   @apply bg-sky-600;
@@ -103,4 +103,17 @@
 .active:not(:first-child) .step-bar {
   width: 100%;
   animation: stepperLineAnimation 1s ease-out forwards;
+}
+
+.scroll-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.lottie-svg-class {
+  @apply size-10 !important;
 }

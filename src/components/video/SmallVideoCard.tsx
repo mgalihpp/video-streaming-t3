@@ -1,4 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { VideoTitle } from "./VIdeoTitle";
 import { VideoUserName } from "./VideoUsername";
@@ -37,7 +38,11 @@ export default function SmallVideoCard({
       href={href}
       className="group rounded-xl bg-background p-2 transition-all duration-300 ease-in-out hover:bg-muted-foreground/20"
     >
-      <Card className="w-full gap-2 border-none bg-transparent shadow-none lg:flex lg:flex-row">
+      <motion.div
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full gap-2 border-none bg-transparent shadow-none lg:flex lg:flex-row"
+      >
         <div className="relative flex-shrink-0 lg:w-1/2">
           <Thumbnail thumbnailUrl={thumbnailUrl} title={title} />
           <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
@@ -73,7 +78,7 @@ export default function SmallVideoCard({
             </div>
           </div>
         </CardContent>
-      </Card>
+      </motion.div>
     </Link>
   );
 }

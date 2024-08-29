@@ -8,6 +8,8 @@ import { ThumbsDown, ThumbsUp } from "@/components/Icons/Icons";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
+import { Player, PlayerEvent } from "@lottiefiles/react-lottie-player";
+import { useEffect, useRef, useState } from "react";
 
 interface LikeDislikeButtonProps {
   EngagementData: {
@@ -27,6 +29,9 @@ export default function LikeDislikeButton({
 }: LikeDislikeButtonProps) {
   const { data: sessionData } = useSession();
 
+  const likeRef = useRef<Player>(null);
+  const [animationComplete, setAnimationComplete] = useState(false);
+
   const router = useRouter();
 
   const { likeCount, dislikeCount, handleDislike, handleLike, userChoice } =
@@ -37,25 +42,57 @@ export default function LikeDislikeButton({
       addDislikeMutation: api.videoEngagement.addDislikeCount.useMutation(),
     });
 
+  useEffect(() => {
+    if (userChoice.like) {
+      setAnimationComplete(true);
+    }
+  }, [userChoice.like]);
+
   return (
     <div className="flex-end isolate flex items-center rounded-full border shadow-sm">
       <Button
         type="button"
         variant="transparent"
-        onClick={() =>
-          sessionData?.user.id
-            ? void handleLike({
+        onClick={() => {
+          if (sessionData?.user.id) {
+            if (animationComplete) {
+              setAnimationComplete(false);
+              handleLike({
                 id: EngagementData.id,
-              })
-            : router.push("/login")
-        }
+              });
+            }
+
+            likeRef.current?.play();
+          } else {
+            router.push("/login");
+          }
+        }}
         className="flex items-center justify-center gap-2 rounded-s-full border-none hover:bg-accent"
       >
-        <ThumbsUp
-          className={cn(`h-5 w-5 shrink-0 stroke-primary`, {
-            "fill-primary stroke-secondary": userChoice.like,
-          })}
-        />
+        {animationComplete ? (
+          <ThumbsUp
+            className={cn(`h-5 w-5 shrink-0 stroke-primary`, {
+              "fill-primary stroke-secondary": userChoice.like,
+            })}
+          />
+        ) : (
+          <Player
+            onEvent={async (e) => {
+              if (e === PlayerEvent.Complete) {
+                setAnimationComplete(true);
+
+                handleLike({
+                  id: EngagementData.id,
+                });
+              }
+            }}
+            ref={likeRef}
+            rendererSettings={{
+              className: "lottie-svg-class",
+            }}
+            src="https://lottie.host/8d1ddbe3-be23-4489-b597-8a4953ab0204/IaBmFfJoxz.json"
+          />
+        )}
         <span
           className={cn("stroke-secondary", {
             "text-primary": userChoice.like,

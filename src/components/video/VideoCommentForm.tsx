@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import {
   Form,
   FormField,
@@ -79,7 +80,12 @@ export const VideoCommentForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onCreateComment)}>
+      <motion.form
+        onSubmit={form.handleSubmit(onCreateComment)}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
         <FormField
           control={form.control}
           name="message"
@@ -142,7 +148,7 @@ export const VideoCommentForm = ({
             Comment
           </Button>
         </div>
-      </form>
+      </motion.form>
     </Form>
   );
 };
