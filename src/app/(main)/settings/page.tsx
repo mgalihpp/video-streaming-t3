@@ -30,6 +30,7 @@ import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { updateUserInputSchema } from "@/lib/schema/user";
 import { Loader2 } from "lucide-react";
+import { env } from "@/env";
 
 interface CropImageModalProps {
   channel: {
@@ -377,12 +378,14 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
       id: channel.id,
       [imageType]: channel[imageType] ?? undefined,
     };
+  
+    const cloudName = env.NEXT_PUBLIC_CLOUDINARY_NAME;
 
     const formData = new FormData();
     formData.append("upload_preset", "ml_image");
     formData.append("file", croppedDataUrl);
 
-    fetch("https://api.cloudinary.com/v1_1/ddhvywd6h/image/upload", {
+    fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: "POST",
       body: formData,
     })
